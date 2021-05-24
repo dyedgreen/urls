@@ -1,0 +1,22 @@
+[package]
+name = "server"
+version = "0.1.0"
+authors = ["Tilman Roeder"]
+edition = "2018"
+
+[dependencies]
+anyhow = "1.0"
+bb8-diesel = { path = "../bb8-diesel" }
+chrono = { version = "0.4", features = ["serde"] }
+dotenv = "0.15"
+diesel = { version = "1.4", features = ["sqlite", "chrono"] }
+diesel_migrations = "1.4"
+env_logger = "0.8"
+lettre = { version = "0.10.0-rc.3", features = ["tokio1", "tokio1-native-tls", "file-transport"] }
+log = "0.4"
+nanoid = "0.4"
+once_cell = "1.7"
+openssl = "*" # needed to compile with diesel for musl
+tera = "1"
+tokio = { version = "1", features = ["full"] }
+warp = "0.3"
