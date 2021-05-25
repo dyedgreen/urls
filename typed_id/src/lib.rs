@@ -26,7 +26,7 @@ const ERR: &str = "An ID must be exactly of size 21";
 /// type BarID = ID<1>;
 /// // ...
 /// ```
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
 pub struct ID<const KIND: u64>(ArrayString<SIZE>);
 
 impl<const KIND: u64> ID<KIND> {
@@ -99,6 +99,50 @@ impl<'de, const KIND: u64> serde::Deserialize<'de> for ID<KIND> {
     }
 }
 
+impl<const KIND: u64> diesel::expression::AsExpression<diesel::sql_types::Text> for ID<KIND> {
+    type Expression = diesel::expression::bound::Bound<diesel::sql_types::Text, Self>;
+
+    fn as_expression(self) -> Self::Expression {
+        diesel::expression::bound::Bound::new(self)
+    }
+}
+
+impl<const KIND: u64>
+    diesel::expression::AsExpression<diesel::sql_types::Nullable<diesel::sql_types::Text>>
+    for ID<KIND>
+{
+    type Expression = diesel::expression::bound::Bound<
+        diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        Self,
+    >;
+
+    fn as_expression(self) -> Self::Expression {
+        diesel::expression::bound::Bound::new(self)
+    }
+}
+
+impl<const KIND: u64> diesel::expression::AsExpression<diesel::sql_types::Text> for &ID<KIND> {
+    type Expression = diesel::expression::bound::Bound<diesel::sql_types::Text, Self>;
+
+    fn as_expression(self) -> Self::Expression {
+        diesel::expression::bound::Bound::new(self)
+    }
+}
+
+impl<const KIND: u64>
+    diesel::expression::AsExpression<diesel::sql_types::Nullable<diesel::sql_types::Text>>
+    for &ID<KIND>
+{
+    type Expression = diesel::expression::bound::Bound<
+        diesel::sql_types::Nullable<diesel::sql_types::Text>,
+        Self,
+    >;
+
+    fn as_expression(self) -> Self::Expression {
+        diesel::expression::bound::Bound::new(self)
+    }
+}
+
 impl<DB, const KIND: u64> diesel::serialize::ToSql<diesel::sql_types::Text, DB> for ID<KIND>
 where
     DB: diesel::backend::Backend,
@@ -119,6 +163,16 @@ where
 {
     fn from_sql(bytes: Option<&DB::RawValue>) -> diesel::deserialize::Result<Self> {
         Ok(String::from_sql(bytes)?.as_str().try_into()?)
+    }
+}
+
+impl<A, DB, const KIND: u64> diesel::deserialize::FromSqlRow<A, DB> for ID<KIND>
+where
+    DB: diesel::backend::Backend,
+    ID<KIND>: diesel::deserialize::FromSql<A, DB>,
+{
+    fn build_from_row<R: diesel::row::Row<DB>>(row: &mut R) -> diesel::deserialize::Result<Self> {
+        diesel::deserialize::FromSql::<A, DB>::from_sql(row.take())
     }
 }
 

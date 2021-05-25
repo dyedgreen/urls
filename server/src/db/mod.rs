@@ -4,6 +4,7 @@ use bb8_diesel::{bb8, DieselConnectionManager};
 use diesel::sqlite::SqliteConnection;
 
 pub mod id;
+pub mod models;
 
 pub type Pool = bb8::Pool<DieselConnectionManager<SqliteConnection>>;
 pub type PooledConnection<'a> =
