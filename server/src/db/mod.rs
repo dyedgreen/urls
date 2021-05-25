@@ -19,7 +19,7 @@ pub async fn connect(config: &Config) -> Result<Pool> {
     {
         // Run migrations
         let conn = pool.get().await?;
-        embedded_migrations::run_with_output(&*conn, &mut std::io::stdout())?;
+        embedded_migrations::run(&*conn)?;
 
         // TODO: Do any first time setup if needed ...
     }
