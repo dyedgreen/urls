@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "bb8_diesel",
   "server",
-  "bb8-diesel",
+  "typed_id",
+  "web_session",
 ]

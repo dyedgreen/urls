@@ -7,6 +7,6 @@ async fn main() {
         .await
         .map_err(|err| log::error!("Failed to connect to database: {}", err))
         .unwrap();
-    let server = global_routes(pool);
+    let server = global_routes(&config::ENV, pool);
     warp::serve(server).run(([0, 0, 0, 0], 8080)).await;
 }

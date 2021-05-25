@@ -12,5 +12,5 @@ pub async fn mock() -> impl Filter<Extract = (impl Reply,), Error = Infallible> 
         .expect("Failed to connect to test database");
     // TODO: Might want to update working directory, such that templates and www are
     //       found correctly...
-    global_routes(pool)
+    global_routes(&test_conf, pool)
 }

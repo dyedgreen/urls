@@ -1,0 +1,11 @@
+[package]
+name = "typed_id"
+version = "0.1.0"
+authors = ["Tilman Roeder <dyed.green.info@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+arrayvec = { version = "0.7", features = ["serde"] }
+diesel = "1.4"
+nanoid = "0.4"
+serde = "1"
