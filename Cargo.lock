@@ -1656,6 +1656,7 @@ dependencies = [
  "nanoid",
  "once_cell",
  "openssl",
+ "serde",
  "tera",
  "tokio",
  "typed_id",

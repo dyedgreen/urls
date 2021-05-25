@@ -13,7 +13,9 @@ pub mod db;
 pub mod graphql;
 pub mod pages;
 pub mod schema;
+pub mod templates;
 
+pub use config::Config;
 pub use context::Context;
 
 /// Global routes for the app. These are separated out to enable
@@ -30,9 +32,9 @@ pub fn global_routes(
 
     let api = ctx.clone().with(warp::wrap_fn(graphql::api));
     let api = warp::path("graphql").and(api).boxed();
-    let graphiql = warp::path!("graphql" / "playground")
-        .and(juniper_warp::graphiql_filter("/graphql", None))
-        .boxed();
+
+    let graphiql = ctx.clone().with(warp::wrap_fn(pages::graphiql::page));
+    let graphiql = warp::path!("graphql" / "playground").and(graphiql).boxed();
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 

@@ -1,10 +1,10 @@
-use crate::db::id::UserID;
 use crate::{config::Config, db::Pool, Context};
 use std::convert::Infallible;
 use warp::Filter;
 use web_session::Session;
 
 pub mod error;
+pub mod graphiql;
 pub mod index;
 pub mod xsrf;
 
@@ -17,14 +17,16 @@ const AUTH_COOKIE_NAME: &'static str = "session";
 pub fn context(conf: &Config, pool: Pool) -> impl ContextFilter {
     let conf = conf.clone();
     warp::cookie(AUTH_COOKIE_NAME)
-        .map(move |token: String| {
-            Session::<UserID>::from_base64(&token, conf.session_key())
-                .ok()
-                .and_then(|sess| sess.value())
-        })
+        .map(|session: String| Some(session))
         .or(warp::any().map(|| None))
         .unify()
-        .map(move |logged_in_user| Context::new(&pool, logged_in_user))
+        .and(xsrf::token())
+        .map(move |session: Option<String>, xsrf: String| {
+            let logged_in_user = session
+                .and_then(|sess| Session::from_base64(&sess, conf.session_key()).ok())
+                .and_then(|sess| sess.value());
+            Context::new(&pool, xsrf, logged_in_user)
+        })
 }
 
 /// A shorthand for filters which can be used to extract a request context

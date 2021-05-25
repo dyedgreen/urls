@@ -1,5 +1,4 @@
-use std::convert::Infallible;
-use std::error::Error;
+use std::{convert::Infallible, fmt::Display};
 use warp::http;
 use warp::{reply::Response, Rejection, Reply};
 
@@ -12,7 +11,7 @@ pub enum ServerError {
 
 impl<E> From<E> for ServerError
 where
-    E: Error,
+    E: Display,
 {
     fn from(error: E) -> Self {
         log::warn!("Internal server error: {}", error);
@@ -22,14 +21,14 @@ where
 
 /// Map a general error to a 404 not found error. This bails
 /// out and renders a generic 404 not found error page.
-pub fn not_found(error: impl Error) -> ServerError {
+pub fn not_found(error: impl Display) -> ServerError {
     log::info!("Coercing to not found error: {}", error);
     ServerError::NotFound
 }
 
 /// Map a general error to a request error. This bails out
 /// and renders a generic 400 bad request error page.
-pub fn request(error: impl Error) -> ServerError {
+pub fn request(error: impl Display) -> ServerError {
     log::info!("Coercing to request error: {}", error);
     ServerError::Request
 }
@@ -60,6 +59,6 @@ pub async fn recover(rejection: Rejection) -> Result<Response, Infallible> {
     if rejection.is_not_found() {
         reply::<&str, _>(Err(ServerError::NotFound))
     } else {
-        reply::<&str, _>(Err(ServerError::Internal))
+        reply::<&str, _>(Err(ServerError::Request))
     }
 }

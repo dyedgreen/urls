@@ -4,8 +4,8 @@ use nanoid::nanoid;
 use once_cell::sync::Lazy;
 use std::path::{Path, PathBuf};
 
-static DEFAULT_WWW: &str = "www";
-static DEFAULT_TEMPLATES: &str = "templates/**/*.html";
+static DEFAULT_WWW: &str = "www/static";
+static DEFAULT_TEMPLATES: &str = "www/templates/**/*.html";
 
 /// Configuration loaded from the environment.
 pub static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
@@ -16,17 +16,17 @@ pub static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
     }
 });
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Config {
     database_url: String,
     www_dir: PathBuf,
-    templates_dir: PathBuf,
+    templates_glob: String,
     session_key: Vec<u8>,
     hostname: String,
     smtp: Option<SmtpConfig>,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SmtpConfig {
     host: String,
     user: String,
@@ -42,7 +42,7 @@ impl Config {
         Self {
             database_url: format!("file:{}?mode=memory&cache=shared", nanoid!(16)),
             www_dir: DEFAULT_WWW.into(),
-            templates_dir: DEFAULT_TEMPLATES.into(),
+            templates_glob: DEFAULT_TEMPLATES.into(),
             session_key: random_session_key(),
             hostname: "localhost".into(),
             smtp: None,
@@ -62,8 +62,8 @@ impl Config {
 
     /// Directory glob to load template files
     /// from.
-    pub fn templates(&self) -> &Path {
-        self.templates_dir.as_path()
+    pub fn templates(&self) -> &str {
+        self.templates_glob.as_str()
     }
 
     /// SMTP server host and credentials.
@@ -114,15 +114,13 @@ fn load_from_env() -> Result<Config> {
         })
         .into();
 
-    let templates_dir = var("TEMPLATES_DIR")
-        .unwrap_or_else(|_| {
-            log::info!(
-                "TEMPLATES_DIR configuration not set, using default '{}'",
-                DEFAULT_TEMPLATES
-            );
-            DEFAULT_TEMPLATES.to_string()
-        })
-        .into();
+    let templates_glob = var("TEMPLATES_DIR").unwrap_or_else(|_| {
+        log::info!(
+            "TEMPLATES_DIR configuration not set, using default '{}'",
+            DEFAULT_TEMPLATES
+        );
+        DEFAULT_TEMPLATES.to_string()
+    });
 
     let smtp = match (var("SMTP_HOST"), var("SMTP_USER"), var("SMTP_PASS")) {
         (Ok(host), Ok(user), Ok(password)) => Some(SmtpConfig {
@@ -146,7 +144,7 @@ fn load_from_env() -> Result<Config> {
     Ok(Config {
         database_url,
         www_dir,
-        templates_dir,
+        templates_glob,
         smtp,
         session_key,
         hostname,

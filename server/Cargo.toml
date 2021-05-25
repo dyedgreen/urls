@@ -19,6 +19,7 @@ log = "0.4"
 nanoid = "0.4"
 once_cell = "1.7"
 openssl = "*" # needed to compile with diesel for musl
+serde = { version = "1", features = ["derive"] }
 validator = { version = "0.13.0", features = ["derive"] }
 web_session = { path = "../web_session" }
 tera = "1"

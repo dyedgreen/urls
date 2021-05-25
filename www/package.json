@@ -1,0 +1,12 @@
+{
+  "name": "www",
+  "version": "0.1.0",
+  "author": "Tilman Roeder",
+  "license": "MIT",
+  "devDependencies": {
+    "snowpack": "^3.5.1"
+  },
+  "dependencies": {
+    "preact": "^10.5.13"
+  }
+}
