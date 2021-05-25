@@ -5,3 +5,8 @@ members = [
   "typed_id",
   "web_session",
 ]
+
+# Fast-track juniper update to tokio 1.0
+[patch.crates-io]
+juniper = { git = "https://github.com/dyedgreen/juniper", branch = "master" }
+juniper_warp = { git = "https://github.com/dyedgreen/juniper", branch = "master" }

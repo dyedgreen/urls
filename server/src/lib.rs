@@ -10,6 +10,7 @@ use warp::{Filter, Reply};
 pub mod config;
 pub mod context;
 pub mod db;
+pub mod graphql;
 pub mod pages;
 pub mod schema;
 
@@ -25,11 +26,17 @@ pub fn global_routes(
     let ctx = pages::context(&conf, pool);
 
     let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
-    let index = warp::path::end().and(index);
+    let index = warp::path::end().and(index).boxed();
+
+    let api = ctx.clone().with(warp::wrap_fn(graphql::api));
+    let api = warp::path("graphql").and(api).boxed();
+    let graphiql = warp::path!("graphql" / "playground")
+        .and(juniper_warp::graphiql_filter("/graphql", None))
+        .boxed();
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 
-    let routes = index.or(www);
+    let routes = index.or(api).or(graphiql).or(www);
     let server = routes
         .recover(pages::error::recover)
         .map(|reply| warp::reply::with_header(reply, "X-Frame-Options", "DENY"))

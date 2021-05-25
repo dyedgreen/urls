@@ -33,3 +33,5 @@ impl Context {
         self.request_time
     }
 }
+
+impl juniper::Context for Context {}

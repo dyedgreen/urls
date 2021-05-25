@@ -176,6 +176,70 @@ where
     }
 }
 
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::GraphQLValue<S> for ID<KIND> {
+    type Context = ();
+    type TypeInfo = ();
+
+    fn type_name<'i>(&self, _: &'i ()) -> Option<&'i str> {
+        Some("ID")
+    }
+
+    fn resolve(
+        &self,
+        _: &(),
+        _: Option<&[juniper::Selection<S>]>,
+        _: &juniper::Executor<Self::Context, S>,
+    ) -> juniper::ExecutionResult<S> {
+        Ok(juniper::Value::scalar(self.to_string()))
+    }
+}
+
+impl<S, const KIND: u64> juniper::GraphQLValueAsync<S> for ID<KIND>
+where
+    Self::TypeInfo: Sync,
+    Self::Context: Sync,
+    S: juniper::ScalarValue + Send + Sync,
+{
+    fn resolve_async<'a>(
+        &'a self,
+        info: &'a Self::TypeInfo,
+        selection_set: Option<&'a [juniper::Selection<S>]>,
+        executor: &'a juniper::Executor<Self::Context, S>,
+    ) -> juniper::BoxFuture<'a, juniper::ExecutionResult<S>> {
+        use juniper::futures::future;
+        let v = juniper::GraphQLValue::resolve(self, info, selection_set, executor);
+        Box::pin(future::ready(v))
+    }
+}
+
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::GraphQLType<S> for ID<KIND> {
+    fn name(_: &()) -> Option<&'static str> {
+        Some("ID")
+    }
+
+    fn meta<'r>(_: &(), registry: &mut juniper::Registry<'r, S>) -> juniper::meta::MetaType<'r, S>
+    where
+        juniper::DefaultScalarValue: 'r,
+    {
+        registry.build_scalar_type::<ID<KIND>>(&()).into_meta()
+    }
+}
+
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::FromInputValue<S> for ID<KIND> {
+    fn from_input_value(v: &juniper::InputValue<S>) -> Option<Self> {
+        v.as_string_value().and_then(|s: &str| s.try_into().ok())
+    }
+}
+
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::ParseScalarValue<S> for ID<KIND> {
+    fn from_str<'a>(value: juniper::parser::ScalarToken<'a>) -> juniper::ParseScalarResult<'a, S> {
+        <String as juniper::ParseScalarValue<S>>::from_str(value)
+    }
+}
+
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::marker::IsInputType<S> for ID<KIND> {}
+impl<S: juniper::ScalarValue, const KIND: u64> juniper::marker::IsOutputType<S> for ID<KIND> {}
+
 #[cfg(test)]
 mod tests {
     use super::*;

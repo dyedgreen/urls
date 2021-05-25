@@ -4,6 +4,7 @@ use crate::Context;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
+use juniper::GraphQLInputObject;
 use lettre::address::Address;
 use std::str::FromStr;
 use validator::Validate;
@@ -18,7 +19,7 @@ pub struct User {
     email: String,
 }
 
-#[derive(Debug, Clone, Validate)]
+#[derive(Debug, Clone, Validate, GraphQLInputObject)]
 pub struct NewUserInput {
     #[validate(length(min = 1, max = 256))]
     name: String,

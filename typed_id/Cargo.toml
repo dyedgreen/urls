@@ -7,5 +7,6 @@ edition = "2018"
 [dependencies]
 arrayvec = { version = "0.7", features = ["serde"] }
 diesel = "1.4"
+juniper = "0.15.5"
 nanoid = "0.4"
 serde = "1"
