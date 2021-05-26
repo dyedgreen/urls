@@ -5,11 +5,11 @@ use juniper::{graphql_object, FieldResult, GraphQLObject};
 pub struct Mutation;
 
 /// A value mutations can return, if there
-/// is no other interesting information
-/// that occured.
+/// is no other interesting object that could
+/// be returned.
 #[derive(Debug, Copy, Clone, GraphQLObject)]
 struct Void {
-    /// Indicates weather the operation was
+    /// Indicates whether the operation was
     /// successful.
     ok: bool,
 }

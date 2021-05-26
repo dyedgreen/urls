@@ -5,7 +5,7 @@ function reload() {
   window.location.href = window.location.href;
 }
 
-function ErrorInfo({error}) {
+function ErrorInfo({ error }) {
   return <div class="w-full flex justify-center p-8">
     <div class="w-full max-w-3xl bg-red-500 rounded-lg p-4">
       <h1 class="text-white text-xl font-semibold">Error</h1>
@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component {
     this.setState({ error });
   }
 
-  render({children}, {error}) {
+  render({ children }, { error }) {
     if (error !== false) {
       return <ErrorInfo error={error} />;
     }

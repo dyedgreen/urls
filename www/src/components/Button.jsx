@@ -8,7 +8,7 @@ export default function Button({title, onClick, type = "default", style}) {
       break;
     case "default":
     default:
-      classes += " bg-blue-600 text-white hover:bg-blue-800";
+      classes += " bg-blue-500 text-white hover:bg-blue-400";
   }
   return <button
     class={classes}

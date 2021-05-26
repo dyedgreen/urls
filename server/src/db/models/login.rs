@@ -65,9 +65,8 @@ impl Login {
             .get_result(&*conn)?;
         if num_logins_last_hour >= LOGIN_LIMIT_PER_HOUR {
             return Err(anyhow!(
-                "Exceeded login limit of {} per hour for {}",
+                "Exceeded login limit of {} per hour",
                 LOGIN_LIMIT_PER_HOUR,
-                user_id,
             ));
         }
 

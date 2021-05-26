@@ -46,11 +46,15 @@ export function useQuery(query, args) {
   }
 }
 
-export function useMutation(mutation){
-  return async (vars) => {
-    let { data, errors } = fetchQuery(mutation, vars);
+export function useMutation(mutation) {
+  const [inFlight, setInFlight] = useState(false);
+
+  const commit = async (vars) => {
+    let { data, errors } = await fetchQuery(mutation, vars);
     if (errors != null)
       throw errors;
     return data;
   };
+
+  return { commit, inFlight };
 }

@@ -7,7 +7,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use juniper::GraphQLInputObject;
 use lettre::address::Address;
-use lettre::Message;
+use lettre::message::{Mailbox, Message};
 use std::str::FromStr;
 use validator::Validate;
 
@@ -99,10 +99,7 @@ impl User {
         let login = Login::create(ctx, self.id()).await?;
         let email = Message::builder()
             .from("noreply@urls.fyi".parse().unwrap())
-            .to(lettre::message::Mailbox::new(
-                Some(self.name.clone()),
-                self.email()?,
-            ))
+            .to(Mailbox::new(Some(self.name.clone()), self.email()?))
             .subject("Login request")
             .body(format!(
                 "A login code was requested for your account ({email}).\n\n\
