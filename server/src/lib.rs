@@ -10,6 +10,7 @@ use warp::{Filter, Reply};
 pub mod config;
 pub mod context;
 pub mod db;
+pub mod email;
 pub mod graphql;
 pub mod pages;
 pub mod schema;
@@ -24,8 +25,9 @@ pub use context::Context;
 pub fn global_routes(
     conf: &config::Config,
     pool: db::Pool,
+    mailer: email::Mailer,
 ) -> impl Filter<Extract = (impl Reply,), Error = Infallible> + Clone {
-    let ctx = pages::context(&conf, pool);
+    let ctx = pages::context(&conf, pool, mailer);
 
     let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
     let index = warp::path::end().and(index).boxed();

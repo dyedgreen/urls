@@ -21,6 +21,9 @@ pub async fn mock() -> impl Filter<Extract = (impl Reply,), Error = Infallible> 
     let pool = db::connect(&test_conf)
         .await
         .expect("Failed to connect to test database");
+    let mailer = email::connect(&test_conf)
+        .await
+        .expect("Failed to connect to test mailer");
 
-    global_routes(&test_conf, pool)
+    global_routes(&test_conf, pool, mailer)
 }

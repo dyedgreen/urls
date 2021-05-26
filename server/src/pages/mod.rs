@@ -1,4 +1,4 @@
-use crate::{config::Config, db::Pool, Context};
+use crate::{config::Config, db::Pool, email::Mailer, Context};
 use std::convert::Infallible;
 use warp::Filter;
 use web_session::Session;
@@ -14,7 +14,7 @@ const AUTH_COOKIE_NAME: &'static str = "session";
 /// Captures a context from the given request. This never fails, and
 /// thus should be used at the end of a filter chain to extract the context
 /// only if the request will be processed by that filter.
-pub fn context(conf: &Config, pool: Pool) -> impl ContextFilter {
+pub fn context(conf: &Config, pool: Pool, mailer: Mailer) -> impl ContextFilter {
     let conf = conf.clone();
     warp::cookie(AUTH_COOKIE_NAME)
         .map(|session: String| Some(session))
@@ -25,7 +25,7 @@ pub fn context(conf: &Config, pool: Pool) -> impl ContextFilter {
             let logged_in_user = session
                 .and_then(|sess| Session::from_base64(&sess, conf.session_key()).ok())
                 .and_then(|sess| sess.value());
-            Context::new(&pool, xsrf, logged_in_user)
+            Context::new(&pool, &mailer, xsrf, logged_in_user)
         })
 }
 

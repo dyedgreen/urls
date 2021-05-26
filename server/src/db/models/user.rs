@@ -1,4 +1,5 @@
 use crate::db::id::UserID;
+use crate::db::models::Login;
 use crate::schema::users;
 use crate::Context;
 use anyhow::Result;
@@ -6,6 +7,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use juniper::GraphQLInputObject;
 use lettre::address::Address;
+use lettre::Message;
 use std::str::FromStr;
 use validator::Validate;
 
@@ -80,5 +82,27 @@ impl User {
             .execute(&*conn)?;
 
         Ok(user)
+    }
+
+    /// Creates a login and sends an email to the user, containing the
+    /// login token.
+    pub async fn request_login(&self, ctx: &Context) -> Result<()> {
+        let login = Login::create(ctx, self.id()).await?;
+        let email = Message::builder()
+            .from("noreply@urls.fyi".parse().unwrap())
+            .to(lettre::message::Mailbox::new(
+                Some(self.name.clone()),
+                self.email()?,
+            ))
+            .subject("Login request")
+            .body(format!(
+                "A login code was requested for your account ({email}).\n\n\
+                Code: {token}\n\n\
+                If you did not request the code, you may safely ignore this email.",
+                email = self.email,
+                token = login.token(),
+            ))?;
+        ctx.mailer().send(email).await?;
+        Ok(())
     }
 }

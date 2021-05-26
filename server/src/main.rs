@@ -7,6 +7,10 @@ async fn main() {
         .await
         .map_err(|err| log::error!("Failed to connect to database: {}", err))
         .unwrap();
-    let server = global_routes(&config::ENV, pool);
+    let mailer = email::connect(&config::ENV)
+        .await
+        .map_err(|err| log::error!("Failed to connect to mailer: {}", err))
+        .unwrap();
+    let server = global_routes(&config::ENV, pool, mailer);
     warp::serve(server).run(([0, 0, 0, 0], 8080)).await;
 }

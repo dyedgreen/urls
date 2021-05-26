@@ -1,5 +1,6 @@
 use crate::db::id::UserID;
 use crate::db::{Pool, PooledConnection};
+use crate::email::Mailer;
 use crate::pages::xsrf;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
@@ -16,6 +17,7 @@ use warp::Reply;
 #[derive(Debug, Clone)]
 pub struct Context {
     pool: Pool,
+    mailer: Mailer,
     xsrf_token: String,
     logged_in_user: Option<UserID>,
     request_time: DateTime<Utc>,
@@ -23,9 +25,15 @@ pub struct Context {
 
 impl Context {
     /// Create a new request context.
-    pub fn new(pool: &Pool, xsrf_token: String, logged_in_user: Option<UserID>) -> Self {
+    pub fn new(
+        pool: &Pool,
+        mailer: &Mailer,
+        xsrf_token: String,
+        logged_in_user: Option<UserID>,
+    ) -> Self {
         Self {
             pool: pool.clone(),
+            mailer: mailer.clone(),
             xsrf_token,
             logged_in_user,
             request_time: Utc::now(),
@@ -36,6 +44,13 @@ impl Context {
     /// connection pool.
     pub async fn conn(&self) -> Result<PooledConnection<'_>> {
         Ok(self.pool.get().await?)
+    }
+
+    /// Retrieve the mailer to send an email
+    /// message. Note that sending emails costs
+    /// money.
+    pub fn mailer(&self) -> &Mailer {
+        &self.mailer
     }
 
     /// Prefer this over `Utc::now()`, since it
