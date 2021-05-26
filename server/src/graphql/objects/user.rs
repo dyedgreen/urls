@@ -8,4 +8,8 @@ impl User {
     fn id(&self) -> UserID {
         self.id()
     }
+
+    fn name(&self) -> &str {
+        self.name()
+    }
 }
