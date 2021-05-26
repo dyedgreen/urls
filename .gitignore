@@ -1,6 +1,7 @@
 # Build files
 target
 node_modules
+emails
 
 # Misc
 *.db

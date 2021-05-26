@@ -28,6 +28,8 @@ impl Mutation {
         Ok(user)
     }
 
+    /// Request a login code for the user associated with the given `email`. Note
+    /// this this might fail because of rate limiting.
     async fn request_login(ctx: &Context, email: String) -> FieldResult<Void> {
         let user = User::find_by_email(ctx, &email).await?;
         user.request_login(ctx).await?;

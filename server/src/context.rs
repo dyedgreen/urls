@@ -61,6 +61,13 @@ impl Context {
         self.logged_in_user
     }
 
+    /// Determine if the context has a logged in user.
+    /// This is essentially an alias for
+    /// `ctx.maybe_user_id().is_some()`
+    pub fn is_logged_in(&self) -> bool {
+        self.maybe_user_id().is_some()
+    }
+
     /// Retrieve the ID of the logged in user
     /// as a `Result`. This is useful if you want
     /// to enforce a logged in user. If you do not
@@ -140,7 +147,7 @@ impl Context {
             tera::Context::new()
         };
         render_data.insert("xsrf_token", &self.xsrf_token);
-        render_data.insert("logged_in", &self.logged_in_user.is_some());
+        render_data.insert("is_logged_in", &self.is_logged_in());
 
         let body = crate::templates::render(template, &render_data)?;
         let html = warp::reply::html(body);

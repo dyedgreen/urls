@@ -32,6 +32,9 @@ pub fn global_routes(
     let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
     let index = warp::path::end().and(index).boxed();
 
+    let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
+    let login = warp::path("login").and(login).boxed();
+
     let api = ctx.clone().with(warp::wrap_fn(graphql::api));
     let api = warp::path("graphql").and(api).boxed();
 
@@ -40,7 +43,7 @@ pub fn global_routes(
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 
-    let routes = index.or(api).or(graphiql).or(www);
+    let routes = index.or(login).or(api).or(graphiql).or(www);
     let server = routes
         .recover(pages::error::recover)
         .map(|reply| warp::reply::with_header(reply, "X-Frame-Options", "DENY"))

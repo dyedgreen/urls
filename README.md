@@ -9,3 +9,17 @@ A personal link aggregator.
 - [ ] Implement sessions
 - [ ] Implement uses, user sessions and a login page
 - [ ] Decide on front-end ...
+
+## Development
+Pointers for how to do things
+
+### Build FrontEnd JS Resources
+
+Run the following commands. If you want to generate the final build, omit the
+`--watch`, since it will prevent bundling.
+
+```bash
+$ cd www
+$ npm install
+$ ./node-modules/.bin/snowpack build (--watch)
+```
