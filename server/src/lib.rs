@@ -22,12 +22,17 @@ pub use context::Context;
 /// Global routes for the app. These are separated out to enable
 /// simple integration testing on the whole server without running
 /// an actual web server.
+///
+/// Note that some places use the global `Config.env()`, to access
+/// configuration information, so some of the config values set in
+/// e.g. a test config might not always be honored by the resulting
+/// filter. (There is the aspiration to change this in the future.)
 pub fn global_routes(
     conf: &config::Config,
     pool: db::Pool,
     mailer: email::Mailer,
 ) -> impl Filter<Extract = (impl Reply,), Error = Infallible> + Clone {
-    let ctx = pages::context(&conf, pool, mailer);
+    let ctx = pages::context(pool, mailer);
 
     let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
     let index = warp::path::end().and(index).boxed();

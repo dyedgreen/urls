@@ -6,9 +6,11 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use nanoid::nanoid;
+use web_session::Session;
 
 const LOGIN_LIMIT_PER_HOUR: i64 = 3;
-const LOGIN_VALID_MINUTES: i64 = 30;
+const LOGIN_VALID_MINUTES: i64 = 60;
+const WEB_SESSION_VALID_DAYS: i64 = 7;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, Associations)]
 #[belongs_to(User)]
@@ -86,5 +88,26 @@ impl Login {
             .execute(&*conn)?;
 
         Ok(login)
+    }
+
+    /// Claims the login token and returns a session. The session can be
+    /// used to authenticate to the graphql API.
+    pub async fn claim(&mut self, ctx: &Context, token: &str) -> Result<Session<UserID>> {
+        if self.is_claimed() {
+            Err(anyhow!("The login was already claimed"))
+        } else if self.valid_until() < ctx.now() {
+            Err(anyhow!("The login is expired"))
+        } else if self.token() != token {
+            Err(anyhow!("Invalid login token"))
+        } else {
+            self.claimed = true;
+            self.updated_at = ctx.now().naive_utc();
+            let conn = ctx.conn().await?;
+            *self = self.save_changes(&*conn)?;
+            Ok(Session::new(
+                self.user_id,
+                ctx.now() + Duration::days(WEB_SESSION_VALID_DAYS),
+            ))
+        }
     }
 }

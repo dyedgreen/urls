@@ -21,7 +21,7 @@ export default function Notice({ type = "notice", message, style }) {
       icon = ICON_NOTICE;
   }
   return <div class={classes}>
-      <div class="mr-4">{icon}</div>
+      <div class="mr-2">{icon}</div>
       <p class="leading-snug">{message}</p>
     </div>
 }

@@ -7,8 +7,7 @@ use std::path::{Path, PathBuf};
 static DEFAULT_WWW: &str = "www/static";
 static DEFAULT_TEMPLATES: &str = "www/templates/**/*.html";
 
-/// Configuration loaded from the environment.
-pub static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
+static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
     Ok(conf) => conf,
     Err(msg) => {
         log::error!("Failed to load configuration: {}", msg);
@@ -34,6 +33,12 @@ pub struct SmtpConfig {
 }
 
 impl Config {
+    /// Configuration loaded from the
+    /// environment.
+    pub fn env() -> &'static Self {
+        &ENV
+    }
+
     /// Configuration suitable for unit
     /// or integration tests. Database
     /// connections are in-memory, and no

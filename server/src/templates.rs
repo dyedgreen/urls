@@ -1,22 +1,22 @@
 #[cfg(debug_assertions)]
 mod render_impl {
-    use crate::config;
+    use crate::Config;
     use tera::{Context, Result, Tera};
 
     pub fn render(template: &str, ctx: &Context) -> Result<String> {
-        let inst = Tera::new(config::ENV.templates())?;
+        let inst = Tera::new(Config::env().templates())?;
         inst.render(template, ctx)
     }
 }
 
 #[cfg(not(debug_assertions))]
 mod render_impl {
-    use crate::config;
+    use crate::Config;
     use once_cell::sync::Lazy;
     use tera::{Context, Result, Tera};
 
     const TEMPLATES: Lazy<Tera> = Lazy::new(|| {
-        let inst = Tera::new(config::ENV.templates());
+        let inst = Tera::new(Config::env().templates());
         match inst {
             Ok(inst) => inst,
             Err(err) => {

@@ -4,6 +4,9 @@
     <div id="login"></div>
 {% endblock content %}
 {% block scripts %}
-    <script>window.__xsrf_token = "{{ xsrf_token }}"</script>
+    <script>
+        window.__xsrf_token = "{{ xsrf_token }}";
+        window.__auth_cookie = "{{ auth_cookie }}";
+    </script>
     <script type="module" src="/dist/login.js"></script>
 {% endblock head %}

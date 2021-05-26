@@ -1,5 +1,5 @@
 use crate::db::models::{NewUserInput, User};
-use crate::Context;
+use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
 
 pub struct Mutation;
@@ -34,5 +34,13 @@ impl Mutation {
         let user = User::find_by_email(ctx, &email).await?;
         user.request_login(ctx).await?;
         Void::ok()
+    }
+
+    /// Login using the given `email` and a login code previously obtained
+    /// from `request_login`.
+    async fn login(ctx: &Context, email: String, token: String) -> FieldResult<String> {
+        let user = User::find_by_email(ctx, &email).await?;
+        let session = user.login(ctx, &token).await?;
+        Ok(session.base64(Config::env().session_key())?)
     }
 }

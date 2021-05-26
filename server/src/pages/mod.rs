@@ -15,8 +15,7 @@ const AUTH_COOKIE_NAME: &'static str = "session";
 /// Captures a context from the given request. This never fails, and
 /// thus should be used at the end of a filter chain to extract the context
 /// only if the request will be processed by that filter.
-pub fn context(conf: &Config, pool: Pool, mailer: Mailer) -> impl ContextFilter {
-    let conf = conf.clone();
+pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
     warp::cookie(AUTH_COOKIE_NAME)
         .map(|session: String| Some(session))
         .or(warp::any().map(|| None))
@@ -24,7 +23,7 @@ pub fn context(conf: &Config, pool: Pool, mailer: Mailer) -> impl ContextFilter 
         .and(xsrf::token())
         .map(move |session: Option<String>, xsrf: String| {
             let logged_in_user = session
-                .and_then(|sess| Session::from_base64(&sess, conf.session_key()).ok())
+                .and_then(|sess| Session::from_base64(&sess, Config::env().session_key()).ok())
                 .and_then(|sess| sess.value());
             Context::new(&pool, &mailer, xsrf, logged_in_user)
         })

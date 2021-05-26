@@ -17,7 +17,7 @@ fn set_work_dir() {
 pub async fn mock() -> impl Filter<Extract = (impl Reply,), Error = Infallible> + Clone {
     set_work_dir();
 
-    let test_conf = config::Config::test();
+    let test_conf = Config::test();
     let pool = db::connect(&test_conf)
         .await
         .expect("Failed to connect to test database");

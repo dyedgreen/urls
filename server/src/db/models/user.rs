@@ -1,6 +1,6 @@
 use crate::db::id::UserID;
 use crate::db::models::Login;
-use crate::schema::users;
+use crate::schema::{logins, users};
 use crate::Context;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -10,6 +10,7 @@ use lettre::address::Address;
 use lettre::message::{Mailbox, Message};
 use std::str::FromStr;
 use validator::Validate;
+use web_session::Session;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset)]
 pub struct User {
@@ -110,5 +111,16 @@ impl User {
             ))?;
         ctx.mailer().send(email).await?;
         Ok(())
+    }
+
+    /// Login this user by consuming a login token and returning a web
+    /// session.
+    pub async fn login(&self, ctx: &Context, token: &str) -> Result<Session<UserID>> {
+        let mut login: Login = Login::belonging_to(self)
+            .filter(logins::dsl::token.eq(token))
+            .filter(logins::dsl::valid_until.gt(ctx.now().naive_utc()))
+            .get_result(&*ctx.conn().await?)?;
+        let session = login.claim(ctx, token).await?;
+        Ok(session)
     }
 }
