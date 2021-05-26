@@ -1,25 +1,23 @@
-# Urls
+# https://urls.fyi
 
 [![CI](https://github.com/dyedgreen/urls/actions/workflows/ci.yml/badge.svg)](https://github.com/dyedgreen/urls/actions/workflows/ci.yml)
 
 A personal link aggregator.
 
-## To Do
-- [ ] Implement mailer infrastructure ... (will be used for pwd less logins)
-- [ ] Implement sessions
-- [ ] Implement uses, user sessions and a login page
-- [ ] Decide on front-end ...
-
 ## Development
-Pointers for how to do things
+Pointers for how to do things.
 
 ### Build FrontEnd JS Resources
 
-Run the following commands. If you want to generate the final build, omit the
-`--watch`, since it will prevent bundling.
-
+To generate a production build:
 ```bash
 $ cd www
 $ npm install
-$ ./node-modules/.bin/snowpack build (--watch)
+$ ./node-modules/.bin/snowpack build
+```
+
+To constantly rebuild (for fish)
+```fish
+$ cd www
+$ while true; ./node_modules/.bin/snowpack build; sleep 2; end
 ```
