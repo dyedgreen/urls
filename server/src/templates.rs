@@ -39,4 +39,6 @@ mod render_impl {
 /// builds: When in debug mode, the templates
 /// are re-loaded before each render for an
 /// improved developer experience.
-pub use render_impl::render;
+pub fn render(template: &str, ctx: &tera::Context) -> tera::Result<String> {
+    render_impl::render(template, ctx)
+}

@@ -2,7 +2,7 @@
 // Run with `snowpack build`
 module.exports = {
   buildOptions: {
-    out: "static",
+    out: "static/dist",
     watch: true,
   },
 };

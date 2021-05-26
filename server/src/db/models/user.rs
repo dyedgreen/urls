@@ -84,6 +84,15 @@ impl User {
         Ok(user)
     }
 
+    /// Retrieve a user by it's email address.
+    pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
+        let conn = ctx.conn().await?;
+        let user = users::table
+            .filter(users::dsl::email.eq(email))
+            .get_result(&*conn)?;
+        Ok(user)
+    }
+
     /// Creates a login and sends an email to the user, containing the
     /// login token.
     pub async fn request_login(&self, ctx: &Context) -> Result<()> {

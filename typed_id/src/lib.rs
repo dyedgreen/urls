@@ -176,6 +176,18 @@ where
     }
 }
 
+impl<T, DB, const KIND: u64> diesel::deserialize::Queryable<T, DB> for ID<KIND>
+where
+    DB: diesel::backend::Backend,
+    Self: diesel::deserialize::FromSql<T, DB>,
+{
+    type Row = Self;
+
+    fn build(row: Self::Row) -> Self {
+        row
+    }
+}
+
 impl<S: juniper::ScalarValue, const KIND: u64> juniper::GraphQLValue<S> for ID<KIND> {
     type Context = ();
     type TypeInfo = ();

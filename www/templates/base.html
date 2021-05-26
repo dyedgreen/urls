@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{% block title %}TODO{% endblock title %}</title>
+    <title>{% block title %}URLs{% endblock title %}</title>
+    {% block head %}{% include "includes/head.html" %}{% endblock head %}
 </head>
 <body>
     {% block content %}{% endblock content %}
+    {% block scripts %}{% endblock scripts %}
 </body>
 </html>

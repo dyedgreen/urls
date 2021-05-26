@@ -1,9 +1,12 @@
 use crate::db::id::UserID;
+use crate::db::models::User;
 use crate::db::{Pool, PooledConnection};
 use crate::email::Mailer;
 use crate::pages::xsrf;
-use anyhow::Result;
+use crate::schema::users;
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
+use diesel::{query_dsl::methods::FindDsl, RunQueryDsl};
 use serde::Serialize;
 use warp::Reply;
 
@@ -51,6 +54,57 @@ impl Context {
     /// money.
     pub fn mailer(&self) -> &Mailer {
         &self.mailer
+    }
+
+    /// Retrieve the ID of the logged in user.
+    pub fn maybe_user_id(&self) -> Option<UserID> {
+        self.logged_in_user
+    }
+
+    /// Retrieve the ID of the logged in user
+    /// as a `Result`. This is useful if you want
+    /// to enforce a logged in user. If you do not
+    /// want to force a logged in user, use
+    /// [`maybe_user_id`](maybe_user_id).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use server::Context;
+    /// use anyhow::Result;
+    ///
+    /// fn some_handler(ctx: &Context) -> Result<()> {
+    ///     // ...
+    ///     let id = ctx.user_id()?;
+    ///     // ...
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn user_id(&self) -> Result<UserID> {
+        self.maybe_user_id().ok_or_else(|| anyhow!("Not logged in"))
+    }
+
+    /// Retrieve the logged in `User`. This requires
+    /// a database query. If you only need the users
+    /// ID, prefer [`maybe_user_id`](maybe_user_id).
+    pub async fn maybe_user(&self) -> Result<Option<User>> {
+        if let Some(id) = self.maybe_user_id() {
+            let conn = self.conn().await?;
+            let user = users::table.find(id).get_result(&*conn)?;
+            Ok(Some(user))
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// Retrieve the logged in user from this
+    /// context. This is similar to [`user_id`](user_id),
+    /// and is meant to force a logged in user.
+    /// Also see [`maybe_user`](maybe_user).
+    pub async fn user(&self) -> Result<User> {
+        self.maybe_user()
+            .await?
+            .ok_or_else(|| anyhow!("Not logged in"))
     }
 
     /// Prefer this over `Utc::now()`, since it

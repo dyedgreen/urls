@@ -1,3 +1,4 @@
+use crate::templates;
 use std::{convert::Infallible, fmt::Display};
 use warp::http;
 use warp::{reply::Response, Rejection, Reply};
@@ -44,12 +45,29 @@ where
         .map(|reply| reply.into_response())
         .map_err(Into::into)
         .or_else(|error| {
-            let (page, status) = match error {
-                ServerError::Internal => ("500 internal", http::StatusCode::INTERNAL_SERVER_ERROR),
-                ServerError::Request => ("400 bad request", http::StatusCode::BAD_REQUEST),
-                ServerError::NotFound => ("404 not found", http::StatusCode::NOT_FOUND),
+            let status = match error {
+                ServerError::Internal => http::StatusCode::INTERNAL_SERVER_ERROR,
+                ServerError::Request => http::StatusCode::BAD_REQUEST,
+                ServerError::NotFound => http::StatusCode::NOT_FOUND,
             };
-            Ok(warp::reply::with_status(page, status).into_response())
+
+            let mut ctx = tera::Context::new();
+            ctx.insert("status", &status.as_u16());
+            let page = templates::render("pages/error.html", &ctx);
+
+            match page {
+                Ok(body) => {
+                    Ok(warp::reply::with_status(warp::reply::html(body), status).into_response())
+                }
+                Err(err) => {
+                    log::error!("Failed to render error page: {}", err);
+                    Ok(warp::reply::with_status(
+                        "500 Internal server error",
+                        http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )
+                    .into_response())
+                }
+            }
         })
 }
 
