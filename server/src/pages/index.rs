@@ -1,9 +1,9 @@
 use crate::pages::{error, ContextFilter};
 use crate::Context;
-use warp::{filters::BoxedFilter, reply::Response, Filter};
+use warp::{filters::BoxedFilter, reply::Response, Filter, Reply};
 
-async fn handle(_ctx: Context) -> Result<&'static str, error::ServerError> {
-    Ok("todo")
+async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
+    Ok(ctx.render::<()>("pages/index.html", None)?.into_response())
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {

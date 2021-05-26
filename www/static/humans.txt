@@ -4,8 +4,13 @@ Built by:
   @dyedgreen (GitHub, Twitter)
 
 
-Build with:
+Build with (among other things):
 
   Rust (https://www.rust-lang.org)
   Warp (https://crates.io/crates/warp)
   Diesel (https://diesel.rs)
+  Tera (https://tera.netlify.app/docs)
+
+  Snowpack (http://snowpack.dev)
+  Preact (http://preactjs.com)
+  Tailwind (https://tailwindcss.com)
