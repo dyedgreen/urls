@@ -20,4 +20,18 @@ impl Viewer {
     async fn user(ctx: &Context) -> FieldResult<Option<User>> {
         Ok(ctx.maybe_user().await?)
     }
+
+    /// Email address of the currently logged in user.
+    async fn email(ctx: &Context) -> FieldResult<Option<String>> {
+        // This field is on the viewer, since the email of other uses
+        // should not be accessible without being logged in as that user.
+        // By having it on the viewer, the graphql type system can enforce
+        // that invariant.
+        let email = ctx
+            .maybe_user()
+            .await?
+            .and_then(|user| user.email().ok())
+            .map(|address| address.to_string());
+        Ok(email)
+    }
 }
