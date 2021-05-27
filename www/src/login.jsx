@@ -63,7 +63,7 @@ function Login() {
 
   return <ErrorBoundary>
     <div class="w-full flex justify-center p-8">
-      <div class="w-full max-w-md bg-white rounded-lg p-4">
+      <div class="w-full max-w-md bg-white shadow rounded-lg p-4">
         <h1 class="text-2xl font-semibold">Login</h1>
         {notice && <Notice message={notice} type="info" style="mt-2" />}
         {error && <Notice message={error} type="error" style="mt-2" />}
