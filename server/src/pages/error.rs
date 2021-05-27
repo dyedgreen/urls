@@ -1,4 +1,4 @@
-use crate::templates;
+use askama::Template;
 use std::{convert::Infallible, fmt::Display};
 use warp::http;
 use warp::{reply::Response, Rejection, Reply};
@@ -8,6 +8,13 @@ pub enum ServerError {
     Internal,
     NotFound,
     Request,
+}
+
+#[derive(Template)]
+#[template(path = "pages/error.html")]
+struct ErrorPage {
+    status: http::StatusCode,
+    is_logged_in: bool,
 }
 
 impl<E> From<E> for ServerError
@@ -50,24 +57,11 @@ where
                 ServerError::Request => http::StatusCode::BAD_REQUEST,
                 ServerError::NotFound => http::StatusCode::NOT_FOUND,
             };
-
-            let mut ctx = tera::Context::new();
-            ctx.insert("status", &status.as_u16());
-            let page = templates::render("pages/error.html", &ctx);
-
-            match page {
-                Ok(body) => {
-                    Ok(warp::reply::with_status(warp::reply::html(body), status).into_response())
-                }
-                Err(err) => {
-                    log::error!("Failed to render error page: {}", err);
-                    Ok(warp::reply::with_status(
-                        "500 Internal server error",
-                        http::StatusCode::INTERNAL_SERVER_ERROR,
-                    )
-                    .into_response())
-                }
-            }
+            let page = ErrorPage {
+                status,
+                is_logged_in: false,
+            };
+            Ok(warp::reply::with_status(page, status).into_response())
         })
 }
 

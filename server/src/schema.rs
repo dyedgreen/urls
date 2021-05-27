@@ -22,7 +22,4 @@ table! {
 
 joinable!(logins -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    logins,
-    users,
-);
+allow_tables_to_appear_in_same_query!(logins, users,);

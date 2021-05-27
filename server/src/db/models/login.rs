@@ -11,6 +11,12 @@ use web_session::Session;
 const LOGIN_LIMIT_PER_HOUR: i64 = 3;
 const LOGIN_VALID_MINUTES: i64 = 60;
 const WEB_SESSION_VALID_DAYS: i64 = 7;
+const TOKEN_ALPHABET: &[char] = &[
+    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+    'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
+    'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    'V', 'W', 'X', 'Y', 'Z',
+];
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, Associations)]
 #[belongs_to(User)]
@@ -75,7 +81,7 @@ impl Login {
         let login = Login {
             id: LoginID::new(),
             user_id,
-            token: nanoid!(12),
+            token: nanoid!(12, TOKEN_ALPHABET),
             valid_until: (ctx.now() + Duration::minutes(LOGIN_VALID_MINUTES)).naive_utc(),
             claimed: false,
 

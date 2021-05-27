@@ -2,13 +2,10 @@ use crate::db::id::UserID;
 use crate::db::models::User;
 use crate::db::{Pool, PooledConnection};
 use crate::email::Mailer;
-use crate::pages::xsrf;
 use crate::schema::users;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use diesel::{query_dsl::methods::FindDsl, RunQueryDsl};
-use serde::Serialize;
-use warp::Reply;
 
 /// Application request context. The context holds information
 /// about the current request, and also can provide access to
@@ -121,37 +118,15 @@ impl Context {
         self.request_time
     }
 
+    /// Return the contexts XSRF token, e.g. to
+    /// render it into a template.
+    pub fn xsrf_token(&self) -> &str {
+        &self.xsrf_token
+    }
+
     /// Check if a given XSRF token is valid.
     pub fn check_xsrf_token(&self, token: &str) -> bool {
         self.xsrf_token == token
-    }
-
-    /// Render the given template and turn the
-    /// result into a warp response. The reply
-    /// will also set some common cookies, such
-    /// as the XSRF cookie.
-    ///
-    /// When rendering, the context will automatically
-    /// populate the template context with common
-    /// values. The full list of set values is:
-    ///
-    /// - `xsrf_token: String` cross site request forgery token
-    /// - `logged_in: bool` determine if the viewer is logged in
-    pub fn render<T>(&self, template: &str, data: Option<T>) -> Result<impl Reply>
-    where
-        T: Serialize,
-    {
-        let mut render_data = if let Some(data) = data {
-            tera::Context::from_serialize(data)?
-        } else {
-            tera::Context::new()
-        };
-        render_data.insert("xsrf_token", &self.xsrf_token);
-        render_data.insert("is_logged_in", &self.is_logged_in());
-
-        let body = crate::templates::render(template, &render_data)?;
-        let html = warp::reply::html(body);
-        Ok(xsrf::cookie(html, &self.xsrf_token))
     }
 }
 

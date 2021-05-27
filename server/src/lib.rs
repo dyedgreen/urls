@@ -14,7 +14,6 @@ pub mod email;
 pub mod graphql;
 pub mod pages;
 pub mod schema;
-pub mod templates;
 
 pub use config::Config;
 pub use context::Context;
@@ -40,6 +39,8 @@ pub fn global_routes(
     let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
     let login = warp::path("login").and(login);
 
+    let logout = warp::path("logout").and(pages::logout::filter());
+
     let api = ctx.clone().with(warp::wrap_fn(graphql::api));
     let api = warp::path("graphql").and(api);
 
@@ -48,7 +49,7 @@ pub fn global_routes(
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 
-    let routes = index.or(login).or(api).or(graphiql).or(www);
+    let routes = index.or(login).or(logout).or(api).or(graphiql).or(www);
     let server = routes
         .recover(pages::error::recover)
         .map(|reply| warp::reply::with_header(reply, "X-Frame-Options", "DENY"))

@@ -1,9 +1,19 @@
 use crate::pages::{error, ContextFilter};
 use crate::Context;
+use askama::Template;
 use warp::{filters::BoxedFilter, reply::Response, Filter, Reply};
 
-async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
-    Ok(ctx.render::<()>("pages/index.html", None)?.into_response())
+#[derive(Template)]
+#[template(path = "pages/index.html")]
+struct Page {
+    is_logged_in: bool,
+}
+
+async fn handle(ctx: Context) -> Result<impl Reply, error::ServerError> {
+    let page = Page {
+        is_logged_in: ctx.is_logged_in(),
+    };
+    Ok(page)
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {

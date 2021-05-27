@@ -1,21 +1,26 @@
 use crate::pages::{error, ContextFilter};
 use crate::Context;
-use serde::Serialize;
+use askama::Template;
 use warp::{filters::BoxedFilter, http::Uri, reply::Response, Filter, Reply};
 
-#[derive(Debug, Serialize)]
-struct Data {
-    auth_cookie: &'static str,
+#[derive(Template)]
+#[template(path = "pages/login.html")]
+struct Page<'a> {
+    xsrf_token: &'a str,
+    auth_cookie: &'a str,
+    is_logged_in: bool,
 }
 
 async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
     if ctx.is_logged_in() {
         Ok(warp::redirect::temporary(Uri::from_static("/")).into_response())
     } else {
-        let data = Data {
+        let page = Page {
+            xsrf_token: ctx.xsrf_token(),
             auth_cookie: super::AUTH_COOKIE_NAME,
+            is_logged_in: false,
         };
-        Ok(ctx.render("pages/login.html", Some(data))?.into_response())
+        Ok(page.into_response())
     }
 }
 
