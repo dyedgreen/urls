@@ -49,11 +49,18 @@ function Login() {
   const commitLogin = () => login.commit({ email, code });
 
   const loading = request.inFlight || login.inFlight;
-  const buttonAction = showCode ? commitLogin : commitRequest;
+  const submit = e => {
+    e.preventDefault();
+    if (showCode) {
+      commitLogin();
+    } else {
+      commitRequest();
+    }
+  }
 
   return <ErrorBoundary>
     <div class="w-full flex justify-center p-8">
-      <div class="w-full max-w-md bg-white shadow rounded-lg p-4">
+      <form class="w-full max-w-md bg-white shadow rounded-lg p-4" onSubmit={submit}>
         <h1 class="text-2xl font-semibold">Login</h1>
         {notice && <Notice message={notice} type="info" style="mt-2" />}
         {error && <Notice message={error} type="error" style="mt-2" />}
@@ -78,7 +85,7 @@ function Login() {
 
         <Button
           title={showCode ? "Login" : "Request Code"}
-          onClick={buttonAction}
+          onClick={submit}
           style="mt-2 w-full"
           disabled={loading}
           loading={loading}
@@ -86,7 +93,7 @@ function Login() {
         <button onClick={() => setShowCode(!showCode)} class="w-full mt-2 text-center text-blue-500">
           {showCode ? "I need a login code" : "I already have a login code"}
         </button>
-      </div>
+      </form>
     </div>
   </ErrorBoundary>;
 }

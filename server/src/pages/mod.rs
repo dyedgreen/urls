@@ -3,6 +3,7 @@ use std::convert::Infallible;
 use warp::Filter;
 use web_session::Session;
 
+pub mod account;
 pub mod error;
 pub mod graphiql;
 pub mod index;

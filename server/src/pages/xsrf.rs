@@ -14,6 +14,10 @@ pub fn cookie(reply: impl Reply, token: &str) -> impl Reply {
     warp::reply::with_header(
         reply,
         "Set-Cookie",
-        format!("{}={}; Path=/; HttpOnly", super::XSRF_COOKIE_NAME, token),
+        format!(
+            "{}={}; Path=/; HttpOnly; SameSite=Strict",
+            super::XSRF_COOKIE_NAME,
+            token
+        ),
     )
 }

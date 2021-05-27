@@ -123,4 +123,15 @@ impl User {
         let session = login.claim(ctx, token).await?;
         Ok(session)
     }
+
+    /// Update the users email address. This verifies that the email
+    /// address is valid.
+    pub async fn update_email(&mut self, ctx: &Context, email: &str) -> Result<()> {
+        let address: Address = email.parse()?;
+        self.email = address.to_string();
+        self.updated_at = ctx.now().naive_utc();
+        let conn = ctx.conn().await?;
+        *self = self.save_changes(&*conn)?;
+        Ok(())
+    }
 }

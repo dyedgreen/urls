@@ -1,3 +1,4 @@
+use super::viewer::Viewer;
 use crate::db::models::{NewUserInput, User};
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
@@ -42,5 +43,12 @@ impl Mutation {
         let user = User::find_by_email(ctx, &email).await?;
         let session = user.login(ctx, &token).await?;
         Ok(session.base64(Config::env().session_key())?)
+    }
+
+    /// Update the email address for the currently logged in user.
+    async fn update_email(ctx: &Context, email: String) -> FieldResult<Viewer> {
+        let mut user = ctx.user().await?;
+        user.update_email(ctx, &email).await?;
+        Ok(Viewer)
     }
 }

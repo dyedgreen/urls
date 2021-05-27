@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}account{% endblock title %}
+{% block content %}
+    <div id="account"></div>
+{% endblock content %}
+{% block scripts %}
+    <script>
+        window.__xsrf_token = "{{ xsrf_token }}";
+    </script>
+    <script type="module" src="/dist/account.js"></script>
+{% endblock scripts %}

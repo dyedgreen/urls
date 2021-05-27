@@ -15,7 +15,7 @@ export default function TextInput({ value, onChange, label, placeholder, style }
       id={inputID}
       type="text"
       value={value}
-      onChange={e => typeof onChange === "function" && onChange(e.target.value)}
+      onInput={e => typeof onChange === "function" && onChange(e.target.value)}
       placeholder={placeholder}
     />
   </div>;

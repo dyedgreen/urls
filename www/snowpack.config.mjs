@@ -11,7 +11,10 @@ export default {
     out: "static/dist",
   },
   optimize: {
-    entrypoints: ["src/login.jsx"],
+    entrypoints: [
+      "src/login.jsx",
+      "src/account.jsx"
+    ],
     bundle: true,
     minify: true,
     treeshake: true,
