@@ -10,8 +10,11 @@ import Notice from "@app/Notice";
 function Login() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
-  const [error, setError] = useState(null);
   const [showCode, setShowCode] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
 
   const request = useMutation(graphql`
     mutation RequestLogin($email: String!) {
@@ -21,14 +24,18 @@ function Login() {
     }
   `);
   const commitRequest = () => {
+    setLoading(true);
     request
       .commit({ email })
       .then(() => {
+        setNotice(`A login code was sent to ${email}.`);
         setError(null);
         setShowCode(true);
+        setLoading(false);
       })
       .catch((errors) => {
-        setError(`Could not request code: ${errors[0].message}`)
+        setError(`Could not request code: ${errors[0].message}`);
+        setLoading(false);
       });
   };
 
@@ -38,16 +45,17 @@ function Login() {
     }
   `);
   const commitLogin = () => {
+    setLoading(true);
     login
       .commit({ email, code })
       .then(({login}) => {
-        setError(null);
-        setShowCode(true);
+        // redirect to home page, so no need to reset state ...
         document.cookie = `${window.__auth_cookie}=${login};path=/;max-age=604800`;
         window.location.href = "/";
       })
       .catch((errors) => {
-        setError(`Failed to log in: ${errors[0].message}`)
+        setError(`Failed to log in: ${errors[0].message}`);
+        setLoading(false);
       });
   };
 
@@ -57,6 +65,7 @@ function Login() {
     <div class="w-full flex justify-center p-8">
       <div class="w-full max-w-md bg-white rounded-lg p-4">
         <h1 class="text-2xl font-semibold">Login</h1>
+        {notice && <Notice message={notice} type="info" style="mt-2" />}
         {error && <Notice message={error} type="error" style="mt-2" />}
 
         <TextInput
@@ -81,6 +90,8 @@ function Login() {
           title={showCode ? "Login" : "Request Code"}
           onClick={buttonAction}
           style="mt-2 w-full"
+          disabled={loading}
+          loading={loading}
         />
         <button onClick={() => setShowCode(!showCode)} class="w-full mt-2 text-center text-blue-500">
           {showCode ? "I need a login code" : "I already have a login code"}

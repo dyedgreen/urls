@@ -10,7 +10,7 @@ struct Data {
 
 async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
     if ctx.is_logged_in() {
-        Ok(warp::redirect(Uri::from_static("/")).into_response())
+        Ok(warp::redirect::temporary(Uri::from_static("/")).into_response())
     } else {
         let data = Data {
             auth_cookie: super::AUTH_COOKIE_NAME,
