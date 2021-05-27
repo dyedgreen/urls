@@ -1,8 +1,8 @@
 import { useState, useEffect } from "preact/hooks";
 
-function fetchQuery(query, variables) {
+async function fetchQuery(query, variables) {
   const xsrfToken = window.__xsrf_token;
-  return fetch("/graphql", {
+  const resp = await fetch("/graphql", {
     method: "POST",
     credentials: "include",
     headers: {
@@ -10,8 +10,8 @@ function fetchQuery(query, variables) {
       "X-XSRF-Token": xsrfToken,
     },
     body: JSON.stringify({ query, variables }),
-  })
-  .then(res => res.json());
+  });
+  return await resp.json();
 }
 
 export function graphql([query]) {
@@ -31,7 +31,8 @@ export function useQuery(query, args) {
         setData(data);
         setLoading(false);
       }
-    });
+    })
+    .catch(err => setErrors(err));
   }, [query, args]);
 
   useEffect(() => {
@@ -46,14 +47,29 @@ export function useQuery(query, args) {
   }
 }
 
-export function useMutation(mutation) {
+export function useMutation(mutation, { onCommit, onError }) {
   const [inFlight, setInFlight] = useState(false);
+  const [errors, setErrors] = useState(undefined);
 
-  const commit = async (vars) => {
-    let { data, errors } = await fetchQuery(mutation, vars);
-    if (errors != null)
-      throw errors;
-    return data;
+  if (errors !== undefined)
+    throw errors;
+
+  const commit = (vars) => {
+    (async () => {
+      setInFlight(true);
+      const { data, errors } = await fetchQuery(mutation, vars);
+      setInFlight(false);
+
+      if (errors != null) {
+        if (typeof onError === "function") {
+          onError(errors);
+        } else {
+          setErrors(error)
+        }
+      } else {
+        onCommit(data);
+      }
+    })();
   };
 
   return { commit, inFlight };

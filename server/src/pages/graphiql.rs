@@ -13,7 +13,8 @@ async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
     let page = Page {
         xsrf_token: ctx.xsrf_token(),
     };
-    Ok(page.into_response())
+    let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+    Ok(resp.into_response())
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {

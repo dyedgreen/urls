@@ -20,7 +20,8 @@ async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
             auth_cookie: super::AUTH_COOKIE_NAME,
             is_logged_in: false,
         };
-        Ok(page.into_response())
+        let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+        Ok(resp.into_response())
     }
 }
 
