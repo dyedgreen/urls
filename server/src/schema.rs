@@ -11,6 +11,16 @@ table! {
 }
 
 table! {
+    roles (id) {
+        id -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        user_id -> Text,
+        permission -> Text,
+    }
+}
+
+table! {
     users (id) {
         id -> Text,
         created_at -> Timestamp,
@@ -21,5 +31,6 @@ table! {
 }
 
 joinable!(logins -> users (user_id));
+joinable!(roles -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(logins, users,);
+allow_tables_to_appear_in_same_query!(logins, roles, users,);
