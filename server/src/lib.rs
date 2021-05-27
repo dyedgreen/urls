@@ -35,16 +35,16 @@ pub fn global_routes(
     let ctx = pages::context(pool, mailer);
 
     let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
-    let index = warp::path::end().and(index).boxed();
+    let index = warp::path::end().and(index);
 
     let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
-    let login = warp::path("login").and(login).boxed();
+    let login = warp::path("login").and(login);
 
     let api = ctx.clone().with(warp::wrap_fn(graphql::api));
-    let api = warp::path("graphql").and(api).boxed();
+    let api = warp::path("graphql").and(api);
 
     let graphiql = ctx.clone().with(warp::wrap_fn(pages::graphiql::page));
-    let graphiql = warp::path!("graphql" / "playground").and(graphiql).boxed();
+    let graphiql = warp::path!("graphql" / "playground").and(graphiql);
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 
