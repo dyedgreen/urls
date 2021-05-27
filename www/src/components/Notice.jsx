@@ -12,16 +12,16 @@ export default function Notice({ type = "info", message, style }) {
   let icon;
   switch (type) {
     case "error":
-      classes += " bg-red-200 text-red-800";
+      classes += " bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200";
       icon = ICON_ERROR;
       break;
     case "warning":
-      classes += " bg-yellow-200 text-yellow-800";
+      classes += " bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200";
       icon = ICON_ERROR;
       break;
     case "info":
     default:
-      classes += " bg-blue-200 text-blue-800";
+      classes += " bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200";
       icon = ICON_NOTICE;
   }
   return <div class={classes}>

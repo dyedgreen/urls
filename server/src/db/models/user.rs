@@ -1,6 +1,6 @@
 use crate::db::id::UserID;
-use crate::db::models::Login;
-use crate::schema::{logins, users};
+use crate::db::models::{Login, Permission, Role};
+use crate::schema::{logins, roles, users};
 use crate::Context;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -55,6 +55,17 @@ impl User {
 
     pub fn updated_at(&self) -> DateTime<Utc> {
         DateTime::from_utc(self.updated_at, Utc)
+    }
+
+    /// Return a list of all active permissions for this
+    /// user.
+    pub async fn permissions(&self, ctx: &Context) -> Result<Vec<Permission>> {
+        let conn = ctx.conn().await?;
+        let permissions = Role::belonging_to(self)
+            .order_by(roles::dsl::created_at.asc())
+            .select(roles::dsl::permission)
+            .load(&*conn)?;
+        Ok(permissions)
     }
 }
 

@@ -2,9 +2,10 @@ use diesel::backend::Backend;
 use diesel::deserialize::FromSql;
 use diesel::serialize::{Output, ToSql};
 use diesel::sql_types::Text;
+use juniper::GraphQLEnum;
 use std::io::Write;
 
-#[derive(AsExpression, FromSqlRow, Debug, Clone)]
+#[derive(GraphQLEnum, AsExpression, FromSqlRow, Debug, Clone, Copy)]
 #[sql_type = "Text"]
 pub enum Permission {
     Administrator,

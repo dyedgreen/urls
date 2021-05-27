@@ -12,9 +12,9 @@ export default function({ title, children, initiallyExpanded = true }) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
 
   return (
-    <div class="w-full bg-gray-100 mt-2 rounded-md">
+    <div class="w-full mt-2 rounded-md bg-gray-100 dark:bg-gray-700">
       <button
-        class="w-full p-2 flex justify-between items-center rounded-md hover:bg-gray-200"
+        class="w-full p-2 flex justify-between items-center rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-white"
         onClick={() => setExpanded(!expanded)}
       >
         <h1 class="text-lg font-semibold">{title}</h1>

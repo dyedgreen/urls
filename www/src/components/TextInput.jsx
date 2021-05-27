@@ -11,7 +11,7 @@ export default function TextInput({ value, onChange, label, placeholder, style }
       {label}
     </label>
     <input
-      class="w-full bg-gray-200 p-2 text-md rounded-md"
+      class="w-full p-2 text-md rounded-md bg-gray-200 dark:bg-gray-600 dark:text-white"
       id={inputID}
       type="text"
       value={value}

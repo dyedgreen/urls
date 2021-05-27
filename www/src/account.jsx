@@ -25,8 +25,8 @@ function Account() {
       {
         loading ?
         <ActivityIndicator size="large" /> :
-        <div class="w-full max-w-screen-md bg-white shadow rounded-lg p-4">
-          <h1 class="text-2xl font-semibold">Account Settings</h1>
+        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+          <h1 class="text-2xl font-semibold dark:text-white">Account Settings</h1>
           <h2 class="text-xl text-gray-500 mb-4">
             Welcome back {data?.viewer?.user?.name}
           </h2>

@@ -28,7 +28,7 @@ export default function({}) {
       setNotice(`Email changed to ${updateEmail?.email}`);
     },
     onError: ([{message}]) => {
-      setError(message);
+      setError(`Failed to change email: ${message}`);
       setNotice(null);
     },
   });

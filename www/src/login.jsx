@@ -60,8 +60,8 @@ function Login() {
 
   return <ErrorBoundary>
     <div class="w-full flex justify-center p-8">
-      <form class="w-full max-w-md bg-white shadow rounded-lg p-4" onSubmit={submit}>
-        <h1 class="text-2xl font-semibold">Login</h1>
+      <form class="w-full max-w-md bg-white dark:bg-gray-800 shadow rounded-lg p-4" onSubmit={submit}>
+        <h1 class="text-2xl font-semibold dark:text-white">Login</h1>
         {notice && <Notice message={notice} type="info" style="mt-2" />}
         {error && <Notice message={error} type="error" style="mt-2" />}
 
@@ -90,7 +90,10 @@ function Login() {
           disabled={loading}
           loading={loading}
         />
-        <button onClick={() => setShowCode(!showCode)} class="w-full mt-2 text-center text-blue-500">
+        <button onClick={e => {
+          e.preventDefault();
+          setShowCode(!showCode);
+        }} class="w-full mt-2 text-center text-blue-500">
           {showCode ? "I need a login code" : "I already have a login code"}
         </button>
       </form>
