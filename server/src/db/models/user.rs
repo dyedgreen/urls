@@ -1,5 +1,5 @@
 use crate::db::id::UserID;
-use crate::db::models::{Login, Permission, Role};
+use crate::db::models::{Invite, Login, Permission, Role};
 use crate::schema::{logins, roles, users};
 use crate::Context;
 use anyhow::Result;
@@ -70,7 +70,10 @@ impl User {
 }
 
 impl User {
-    /// Creates a new user in the database.
+    /// Creates a new user in the database. Also see
+    /// [`create_with_invite`](create_with_invite), which
+    /// requires an unclaimed invite and is most likely
+    /// what you want.
     pub async fn create(ctx: &Context, input: NewUserInput) -> Result<Self> {
         let input = NewUserInput {
             name: input.name.trim().into(),
@@ -94,6 +97,23 @@ impl User {
             .execute(&*conn)?;
 
         Ok(user)
+    }
+
+    /// Create a user by claiming the given invite.
+    pub async fn create_with_invite(
+        ctx: &Context,
+        input: NewUserInput,
+        mut invite: Invite,
+    ) -> Result<Self> {
+        let user = Self::create(ctx, input).await?;
+        match invite.claim(ctx, &user).await {
+            Ok(()) => Ok(user),
+            Err(err) => {
+                // TODO: Should this use a transaction?
+                diesel::delete(&user).execute(&*ctx.conn().await?)?;
+                Err(err.into())
+            }
+        }
     }
 
     /// Retrieve a user by it's email address.

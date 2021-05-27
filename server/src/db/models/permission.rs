@@ -12,6 +12,17 @@ pub enum Permission {
     Moderator,
 }
 
+impl Permission {
+    /// Determine if this permission grants the ability to
+    /// create unlimited invite tokens.
+    pub fn unlimited_invites(&self) -> bool {
+        match *self {
+            Permission::Administrator => true,
+            Permission::Moderator => false,
+        }
+    }
+}
+
 impl<DB> ToSql<Text, DB> for Permission
 where
     DB: Backend,

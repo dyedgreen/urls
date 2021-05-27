@@ -1,4 +1,15 @@
 table! {
+    invites (id) {
+        id -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        token -> Text,
+        created_by -> Text,
+        claimed_by -> Nullable<Text>,
+    }
+}
+
+table! {
     logins (id) {
         id -> Text,
         created_at -> Timestamp,
@@ -33,4 +44,9 @@ table! {
 joinable!(logins -> users (user_id));
 joinable!(roles -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(logins, roles, users,);
+allow_tables_to_appear_in_same_query!(
+    invites,
+    logins,
+    roles,
+    users,
+);

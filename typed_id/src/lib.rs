@@ -156,6 +156,20 @@ where
     }
 }
 
+impl<DB, const KIND: u64>
+    diesel::serialize::ToSql<diesel::sql_types::Nullable<diesel::sql_types::Text>, DB> for ID<KIND>
+where
+    DB: diesel::backend::Backend,
+    str: diesel::serialize::ToSql<diesel::sql_types::Text, DB>,
+{
+    fn to_sql<W: std::io::Write>(
+        &self,
+        out: &mut diesel::serialize::Output<W, DB>,
+    ) -> diesel::serialize::Result {
+        self.as_str().to_sql(out)
+    }
+}
+
 impl<DB, const KIND: u64> diesel::deserialize::FromSql<diesel::sql_types::Text, DB> for ID<KIND>
 where
     DB: diesel::backend::Backend,
