@@ -17,7 +17,7 @@ impl User {
         self.name()
     }
 
-    /// The date when this users account
+    /// The date when this user account
     /// was created.
     fn joined(&self) -> DateTime<Utc> {
         self.created_at()

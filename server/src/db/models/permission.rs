@@ -14,13 +14,14 @@ pub enum Permission {
 impl<DB> ToSql<Text, DB> for Permission
 where
     DB: Backend,
+    str: ToSql<Text, DB>,
 {
     fn to_sql<W: Write>(&self, out: &mut Output<W, DB>) -> diesel::serialize::Result {
         let t = match *self {
             Permission::Administrator => "administrator",
             Permission::Moderator => "moderator",
         };
-        <str as ToSql<Text, DB>>::to_sql(t, out)
+        t.to_sql(out)
     }
 }
 
