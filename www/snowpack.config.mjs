@@ -1,10 +1,11 @@
-// Snowpack Configuration File
-
 export default {
   root: "src",
   alias: {
     "picoql": "./src/picoql.js",
     "@app": "./src/components",
+  },
+  devOptions: {
+    tailwindConfig: "./tailwind.config.js",
   },
   buildOptions: {
     out: "static/dist",
@@ -16,4 +17,7 @@ export default {
     treeshake: true,
     target: "es2018",
   },
+  plugins: [
+    "@snowpack/plugin-postcss",
+  ],
 };
