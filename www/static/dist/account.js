@@ -15,5 +15,5 @@ var c,S,K,Y,P={},$=[],Se=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|
         }
       }
     }
-  `);return l(xe,null,l("div",{class:"w-full flex justify-center p-8"},t?l(N,{size:"large"}):l("div",{class:"w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4"},l("h1",{class:"text-2xl font-semibold"},"Account Settings"),l("h2",{class:"text-xl text-gray-500 mb-4"},"Welcome back ",(r=(n=e==null?void 0:e.viewer)==null?void 0:n.user)==null?void 0:r.name),l(X,{title:"Invite a friend"},"TODO"),l(X,{title:"Change email",initiallyExpanded:!1},l(je,null)))))}W(l(Oe,null),document.getElementById("account"));
+  `);return l("div",{class:"w-full flex justify-center p-8"},t?l(N,{size:"large"}):l("div",{class:"w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4"},l("h1",{class:"text-2xl font-semibold"},"Account Settings"),l("h2",{class:"text-xl text-gray-500 mb-4"},"Welcome back ",(r=(n=e==null?void 0:e.viewer)==null?void 0:n.user)==null?void 0:r.name),l(X,{title:"Invite a friend"},"TODO"),l(X,{title:"Change email",initiallyExpanded:!1},l(je,null))))}W(l(xe,null,l(Oe,null)),document.getElementById("account"));
 //# sourceMappingURL=account.js.map

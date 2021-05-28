@@ -58,7 +58,7 @@ function Login() {
     }
   }
 
-  return <ErrorBoundary>
+  return (
     <div class="w-full flex justify-center p-8">
       <form class="w-full max-w-md bg-white dark:bg-gray-800 shadow rounded-lg p-4" onSubmit={submit}>
         <h1 class="text-2xl font-semibold">Login</h1>
@@ -98,7 +98,7 @@ function Login() {
         </button>
       </form>
     </div>
-  </ErrorBoundary>;
+  );
 }
 
-render(<Login />, document.getElementById("login"));
+render(<ErrorBoundary><Login /></ErrorBoundary>, document.getElementById("login"));
