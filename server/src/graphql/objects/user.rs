@@ -1,8 +1,8 @@
 use crate::db::id::UserID;
-use crate::db::models::User;
+use crate::db::models::{Invite, User};
 use crate::Context;
 use chrono::{DateTime, Utc};
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 
 #[graphql_object(context = Context)]
 impl User {
@@ -21,5 +21,11 @@ impl User {
     /// was created.
     fn joined(&self) -> DateTime<Utc> {
         self.created_at()
+    }
+
+    /// Invitation used by this user to register
+    /// their account, if any.
+    async fn invite(&self, ctx: &Context) -> FieldResult<Option<Invite>> {
+        Ok(self.invite(ctx).await?)
     }
 }

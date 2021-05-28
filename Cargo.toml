@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "bb8_diesel",
+  "juniper_relay",
   "server",
   "typed_id",
   "web_session",

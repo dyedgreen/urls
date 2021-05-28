@@ -15,6 +15,7 @@ diesel = { version = "1.4", features = ["sqlite", "chrono"] }
 diesel_migrations = "1.4"
 env_logger = "0.8"
 juniper = { version = "0.15.5", features = ["chrono"] }
+juniper_relay = { path = "../juniper_relay" }
 juniper_warp = "0.6.3"
 lettre = { version = "0.10.0-rc.3", features = ["tokio1", "tokio1-native-tls", "file-transport"] }
 log = "0.4"

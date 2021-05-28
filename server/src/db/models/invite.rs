@@ -1,6 +1,6 @@
 use crate::db::id::{InviteID, UserID};
 use crate::db::models::User;
-use crate::schema::invites;
+use crate::schema::{invites, users};
 use crate::Context;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -41,6 +41,24 @@ impl Invite {
 
     pub fn updated_at(&self) -> DateTime<Utc> {
         DateTime::from_utc(self.updated_at, Utc)
+    }
+
+    /// Return the user who created this invitation.
+    pub async fn created_by(&self, ctx: &Context) -> Result<User> {
+        let user = users::table
+            .find(self.created_by)
+            .get_result(&*ctx.conn().await?)?;
+        Ok(user)
+    }
+
+    /// Return the user who claimed this invitation, if any.
+    pub async fn claimed_by(&self, ctx: &Context) -> Result<Option<User>> {
+        if let Some(id) = self.claimed_by {
+            let user = users::table.find(id).get_result(&*ctx.conn().await?)?;
+            Ok(Some(user))
+        } else {
+            Ok(None)
+        }
     }
 }
 

@@ -1,7 +1,10 @@
 use arrayvec::ArrayString;
 use nanoid::nanoid;
-use std::cmp::{Eq, PartialEq};
 use std::convert::{TryFrom, TryInto};
+use std::{
+    cmp::{Eq, PartialEq},
+    str::FromStr,
+};
 use std::{fmt, ops};
 
 const SIZE: usize = 21;
@@ -66,6 +69,14 @@ impl<const KIND: u64> ops::Deref for ID<KIND> {
 impl<const KIND: u64> AsRef<str> for ID<KIND> {
     fn as_ref(&self) -> &str {
         self.as_str()
+    }
+}
+
+impl<const KIND: u64> FromStr for ID<KIND> {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.try_into()
     }
 }
 

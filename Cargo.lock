@@ -813,6 +813,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "juniper_relay"
+version = "0.1.0"
+dependencies = [
+ "juniper",
+]
+
+[[package]]
 name = "juniper_warp"
 version = "0.6.3"
 source = "git+https://github.com/dyedgreen/juniper?branch=master#15733b4724f86720d3381040bd8d508bc660a396"
@@ -1528,6 +1535,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "juniper",
+ "juniper_relay",
  "juniper_warp",
  "lettre",
  "log",

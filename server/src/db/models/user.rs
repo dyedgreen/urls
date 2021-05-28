@@ -1,6 +1,6 @@
 use crate::db::id::UserID;
 use crate::db::models::{Invite, Login, Permission, Role};
-use crate::schema::{logins, roles, users};
+use crate::schema::{invites, logins, roles, users};
 use crate::Context;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -75,6 +75,15 @@ impl User {
             .load(&*conn)?;
         Ok(permissions)
     }
+
+    /// Invite used to register this user.
+    pub async fn invite(&self, ctx: &Context) -> Result<Option<Invite>> {
+        let invite = invites::table
+            .filter(invites::dsl::claimed_by.eq(self.id()))
+            .get_result(&*ctx.conn().await?)
+            .optional()?;
+        Ok(invite)
+    }
 }
 
 impl User {
@@ -117,7 +126,7 @@ impl User {
         match invite.claim(ctx, &user).await {
             Ok(()) => Ok(user),
             Err(err) => {
-                // TODO: Should this use a transaction?
+                // TODO: Should this use a transaction? Yes, but ..
                 diesel::delete(&user).execute(&*ctx.conn().await?)?;
                 Err(err.into())
             }
