@@ -15,17 +15,17 @@ export default function({}) {
 
   const { commit, inFlight } = useMutation(graphql`
     mutation ChangeEmailMutation($email: String!) {
-      updateEmail(email: $email) {
+      updateUser(input: {email: $email}) {
         id
         email
       }
     }
   `, {
-    onCommit: ({ updateEmail }) => {
+    onCommit: ({ updateUser }) => {
       setEmail("");
       setConfirmEmail("");
       setError(null);
-      setNotice(`Email changed to ${updateEmail?.email}`);
+      setNotice(`Email changed to ${updateUser?.email}`);
     },
     onError: ([{message}]) => {
       setError(`Failed to change email: ${message}`);

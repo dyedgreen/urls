@@ -81,8 +81,15 @@ impl Invite {
         }
     }
 
-    /// Claim this invite for the given
-    /// user.
+    /// Retrieve an invitation based on it's invitation token.
+    pub async fn find_by_token(ctx: &Context, token: &str) -> Result<Self> {
+        let invite = invites::table
+            .filter(invites::dsl::token.eq(token))
+            .get_result(&*ctx.conn().await?)?;
+        Ok(invite)
+    }
+
+    /// Claim this invite for the given user.
     pub async fn claim(&mut self, ctx: &Context, claimed_by: &User) -> Result<()> {
         if self.claimed_by.is_some() {
             Err(anyhow!("This invitation is already claimed"))

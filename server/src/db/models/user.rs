@@ -25,9 +25,17 @@ pub struct User {
 #[derive(Debug, Clone, Validate, GraphQLInputObject)]
 pub struct NewUserInput {
     #[validate(length(min = 1, max = 256))]
-    name: String,
+    pub name: String,
     #[validate(email)]
-    email: String,
+    pub email: String,
+}
+
+#[derive(Debug, Clone, Validate, GraphQLInputObject)]
+pub struct UpdateUserInput {
+    #[validate(length(min = 1, max = 256))]
+    name: Option<String>,
+    #[validate(email)]
+    email: Option<String>,
 }
 
 impl User {
@@ -116,6 +124,30 @@ impl User {
         }
     }
 
+    /// Update this users details using data given in an update
+    /// object. This is meant to be exposed from the graphql API.
+    pub async fn update(&mut self, ctx: &Context, input: UpdateUserInput) -> Result<()> {
+        let input = UpdateUserInput {
+            name: input.name.map(|name| name.trim().into()),
+            email: input.email.map(|email| email.trim().into()),
+        };
+        input.validate()?;
+        let UpdateUserInput { name, email } = input;
+
+        if let Some(name) = name {
+            self.name = name;
+            self.updated_at = ctx.now().naive_utc();
+        }
+
+        if let Some(email) = email {
+            self.email = email;
+            self.updated_at = ctx.now().naive_utc();
+        }
+
+        *self = self.save_changes(&*ctx.conn().await?)?;
+        Ok(())
+    }
+
     /// Retrieve a user by it's email address.
     pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
         let conn = ctx.conn().await?;
@@ -153,16 +185,5 @@ impl User {
             .get_result(&*ctx.conn().await?)?;
         let session = login.claim(ctx, token).await?;
         Ok(session)
-    }
-
-    /// Update the users email address. This verifies that the email
-    /// address is valid.
-    pub async fn update_email(&mut self, ctx: &Context, email: &str) -> Result<()> {
-        let address: Address = email.parse()?;
-        self.email = address.to_string();
-        self.updated_at = ctx.now().naive_utc();
-        let conn = ctx.conn().await?;
-        *self = self.save_changes(&*conn)?;
-        Ok(())
     }
 }

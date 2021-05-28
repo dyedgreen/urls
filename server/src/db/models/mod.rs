@@ -8,4 +8,4 @@ pub use invite::Invite;
 pub use login::Login;
 pub use permission::Permission;
 pub use role::Role;
-pub use user::{NewUserInput, User};
+pub use user::{NewUserInput, UpdateUserInput, User};

@@ -7,7 +7,7 @@ macro_rules! check_status {
     ($name:ident, $method:expr, $path:expr, $status:expr) => {
         #[tokio::test(flavor = "multi_thread")]
         async fn $name() {
-            let server = setup::mock().await;
+            let (server, _) = setup::mock().await;
 
             let res = warp::test::request()
                 .method($method)
@@ -21,5 +21,7 @@ macro_rules! check_status {
 
 check_status!(index_page, "/", 200);
 check_status!(login_page, "/login", 200);
+check_status!(logout_page, "/logout", 307);
+check_status!(account_page, "/account", 307);
 check_status!(graphiql_page, "/graphql/playground", 200);
 check_status!(not_found, "/404", 404);

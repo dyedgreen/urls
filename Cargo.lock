@@ -1534,6 +1534,7 @@ dependencies = [
  "nanoid",
  "once_cell",
  "openssl",
+ "serde_json",
  "tokio",
  "typed_id",
  "validator",

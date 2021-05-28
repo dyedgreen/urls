@@ -1,5 +1,5 @@
 use super::viewer::Viewer;
-use crate::db::models::{NewUserInput, User};
+use crate::db::models::{Invite, NewUserInput, UpdateUserInput, User};
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
 
@@ -23,10 +23,18 @@ impl Void {
 
 #[graphql_object(context = Context)]
 impl Mutation {
-    /// TODO: Delete this function or make it admin only or smth ...
-    async fn create_user(ctx: &Context, input: NewUserInput) -> FieldResult<User> {
-        let user = User::create(ctx, input).await?;
+    /// Register a new user and claim the provided invitation code `token`.
+    async fn create_user(ctx: &Context, input: NewUserInput, token: String) -> FieldResult<User> {
+        let invite = Invite::find_by_token(ctx, &token).await?;
+        let user = User::create_with_invite(ctx, input, invite).await?;
         Ok(user)
+    }
+
+    /// Update details for the currently logged in user.
+    async fn update_user(ctx: &Context, input: UpdateUserInput) -> FieldResult<Viewer> {
+        let mut user = ctx.user().await?;
+        user.update(ctx, input).await?;
+        Ok(Viewer)
     }
 
     /// Request a login code for the user associated with the given `email`. Note
@@ -37,18 +45,11 @@ impl Mutation {
         Void::ok()
     }
 
-    /// Login using the given `email` and a login code previously obtained
+    /// Login using the given `email` and a login code (or token) previously obtained
     /// from `request_login`.
     async fn login(ctx: &Context, email: String, token: String) -> FieldResult<String> {
         let user = User::find_by_email(ctx, &email).await?;
         let session = user.login(ctx, &token).await?;
         Ok(session.base64(Config::env().session_key())?)
-    }
-
-    /// Update the email address for the currently logged in user.
-    async fn update_email(ctx: &Context, email: String) -> FieldResult<Viewer> {
-        let mut user = ctx.user().await?;
-        user.update_email(ctx, &email).await?;
-        Ok(Viewer)
     }
 }

@@ -4,9 +4,6 @@
 
 A personal link aggregator.
 
-# TODO -.- (get picoql to throw correctly ...)
-https://stackoverflow.com/questions/35091054/javascript-promise-catch-not-working
-
 ## Development
 Pointers for how to do things.
 
