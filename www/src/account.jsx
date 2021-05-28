@@ -6,6 +6,7 @@ import ActivityIndicator from "@app/ActivityIndicator";
 import ErrorBoundary from "@app/ErrorBoundary";
 import Section from "@app/account/Section";
 import ChangeEmail from "@app/account/ChangeEmail";
+import ChangeName from "@app/account/ChangeName";
 
 function Account() {
   const { data, loading } = useQuery(graphql`
@@ -33,6 +34,9 @@ function Account() {
 
           <Section title="Invite a friend">
             TODO
+          </Section>
+          <Section title="Change name" initiallyExpanded={false}>
+            <ChangeName currentName={data?.viewer?.user?.name} />
           </Section>
           <Section title="Change email" initiallyExpanded={false}>
             <ChangeEmail />

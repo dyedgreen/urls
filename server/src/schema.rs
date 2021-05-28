@@ -44,9 +44,4 @@ table! {
 joinable!(logins -> users (user_id));
 joinable!(roles -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    invites,
-    logins,
-    roles,
-    users,
-);
+allow_tables_to_appear_in_same_query!(invites, logins, roles, users,);

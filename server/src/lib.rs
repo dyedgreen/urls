@@ -14,6 +14,7 @@ pub mod email;
 pub mod graphql;
 pub mod pages;
 pub mod schema;
+pub mod setup;
 
 pub use config::Config;
 pub use context::Context;
