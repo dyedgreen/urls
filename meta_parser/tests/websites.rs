@@ -49,7 +49,10 @@ fn blog_discord_com() {
     let html = include_bytes!("blog.discord.com.html");
     let mut meta = Meta::new();
     meta.parse(html);
-    assert_eq!(meta.title, Some("Announcing our Latest Profile Badge: the Certified Discord Moderator | by Nelly | May, 2021 | Discord Blog".into()));
+    assert_eq!(
+        meta.title,
+        Some("Announcing our Latest Profile Badge: the Certified Discord Moderator".into())
+    );
     assert_eq!(meta.description, Some("The Certified Discord Moderator badge rewards the unsung heroes who go above and beyond and make communities on Discord what they are.".into()));
     assert_eq!(
         meta.image,

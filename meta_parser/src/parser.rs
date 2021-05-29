@@ -127,22 +127,30 @@ fn text<'a, E: ParseError<&'a [u8]>>(input: &'a [u8]) -> IResult<&[u8], &[u8], E
 
 /// matches an un-interesting key-value pair, i.e. `xxx=yyy`
 fn uninteresting_kw_pair<'a, E: ParseError<&'a [u8]>>(input: &'a [u8]) -> IResult<&[u8], (), E> {
-    not(keyword_name)(input)?;
-    not(keyword_property)(input)?;
-    not(keyword_content)(input)?;
-    let key = take_till(|i| i == b'=');
-    delimited(key, equals, text)(input)
+    let not_name = not(keyword_name);
+    let not_property = not(keyword_property);
+    let not_content = not(keyword_content);
+    let key = take_till(|i| i == b'=' || i == b'>');
+    let uninteresting_key = preceded(not_name, preceded(not_property, preceded(not_content, key)));
+    delimited(uninteresting_key, equals, text)(input)
 }
 
 /// matches and discards white-space (and uninteresting key value pairs)
 fn tag_white_space<'a, E: ParseError<&'a [u8]>>(input: &'a [u8]) -> IResult<&[u8], (), E> {
     let ws =
         |i: &'a [u8]| -> IResult<&'a [u8], (), E> { multispace0(i).map(|(rest, _)| (rest, ())) };
-    let mut ws_or_kw = alt((uninteresting_kw_pair, ws));
+    let ws_pair = preceded(multispace0, uninteresting_kw_pair);
+    let mut ws_or_kw = alt((ws_pair, ws));
     let mut rest = input;
     loop {
         match ws_or_kw(rest) {
-            Ok((r, ())) => rest = r,
+            Ok((r, ())) => {
+                if rest == r {
+                    return Ok((rest, ()));
+                } else {
+                    rest = r
+                }
+            }
             Err(_) => return Ok((rest, ())),
         }
     }
@@ -153,22 +161,29 @@ fn meta_tag<'a, E: ParseError<&'a [u8]>>(input: &'a [u8]) -> IResult<&[u8], Meta
     let name_kw = alt((keyword_name, keyword_property));
     let name = preceded(preceded(name_kw, equals), text);
     let content = preceded(preceded(keyword_content, equals), text);
-    let name_ws = preceded(multispace0, name);
-    let content_ws = preceded(multispace0, content);
+
+    let name_ws = preceded(tag_white_space, name);
+    let content_ws = preceded(tag_white_space, content);
+
     let name_content = permutation((name_ws, content_ws));
+
     let open = preceded(open_meta_tag, multispace1);
     let close = preceded(multispace0, close_tag);
+
     let (rest, (name, content)) = delimited(open, name_content, close)(input)?;
     Ok((rest, MetaTag { name, content }))
 }
 
 /// Parses a single `<title>...</title>` tag.
 fn title_tag<'a, E: ParseError<&'a [u8]>>(input: &'a [u8]) -> IResult<&[u8], TitleTag<'a>, E> {
-    let title_open_ws = preceded(keyword_title, multispace0);
+    let title_open_ws = preceded(keyword_title, tag_white_space);
     let open_tag = delimited(open_bracket, title_open_ws, close_bracket);
+
     let title_close_ws = delimited(multispace0, keyword_title, multispace0);
     let close_tag = delimited(preceded(open_bracket, slash), title_close_ws, close_bracket);
+
     let child_text = take_till(|i| i == b'<');
+
     let (rest, title) = delimited(open_tag, child_text, close_tag)(input)?;
     Ok((rest, TitleTag { title }))
 }
