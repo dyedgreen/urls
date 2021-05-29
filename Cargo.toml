@@ -2,6 +2,7 @@
 members = [
   "bb8_diesel",
   "juniper_relay",
+  "meta_parser",
   "server",
   "typed_id",
   "web_session",

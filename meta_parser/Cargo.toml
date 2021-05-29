@@ -1,0 +1,9 @@
+[package]
+name = "meta_parser"
+version = "0.1.0"
+description = "Parse web <meta /> tags"
+authors = ["Tilman Roeder"]
+edition = "2018"
+
+[dependencies]
+nom = "6.1"
