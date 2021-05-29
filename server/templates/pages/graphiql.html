@@ -9,6 +9,24 @@
             overflow: hidden;
             width: 100%;
         }
+        @media (prefers-color-scheme: dark) {
+            html {
+                filter: invert(1) hue-rotate(180deg);
+            }
+            html img, picture, video {
+                filter: invert(1) hue-rotate(180deg);
+            }
+            .graphiql-container .topBar {
+                background: #fff !important;
+                border-color: rgb(214, 214, 214) !important;
+            }
+            .graphiql-container .execute-button {
+                background: #fff !important;
+                border: 1px solid rgb(91, 98, 107) !important;
+                box-shadow: none !important;
+                fill: #888 !important;
+            }
+        }
     </style>
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/graphiql@0.17.5/graphiql.min.css">
 </head>
