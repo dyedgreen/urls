@@ -39,7 +39,8 @@ impl Viewer {
     }
 
     /// Invitations issued by the currently logged in user. If no
-    /// user is logged in, the connection will be empty.
+    /// user is logged in, the connection will be empty. The invitations
+    /// can optionally be filtered by claimed or available.
     async fn invites(
         ctx: &Context,
         first: Option<i32>,

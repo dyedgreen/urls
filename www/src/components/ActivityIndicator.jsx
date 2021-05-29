@@ -1,9 +1,9 @@
 import { h } from "preact";
 
-export default function ActivityIndicator({ size = "small" }) {
+export default function ActivityIndicator({ size = "small", style = "" }) {
   const classes = size === "large" ? "h-8 w-8" : "h-4 w-4";
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" class={classes} viewBox="0 0 24 24" stroke="none" fill="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" class={`${classes} ${style ?? ""}`} viewBox="0 0 24 24" stroke="none" fill="currentColor">
       <rect x="10" y="0" width="4" height="8" rx="2" opacity="0">
         <animate
           attributeName="opacity"

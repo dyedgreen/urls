@@ -68,7 +68,7 @@ export function useMutation(mutation, { onCommit, onError }) {
         if (typeof onError === "function") {
           onError(errors);
         } else {
-          setErrors(error)
+          setErrors(errors)
         }
       } else {
         onCommit(data);

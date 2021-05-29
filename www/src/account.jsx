@@ -5,8 +5,10 @@ import { graphql, useQuery, useMutation } from "picoql";
 import ActivityIndicator from "@app/ActivityIndicator";
 import ErrorBoundary from "@app/ErrorBoundary";
 import Section from "@app/account/Section";
-import ChangeEmail from "@app/account/ChangeEmail";
+
+import ManageInvites from "@app/account/ManageInvites";
 import ChangeName from "@app/account/ChangeName";
+import ChangeEmail from "@app/account/ChangeEmail";
 
 function Account() {
   const { data, loading } = useQuery(graphql`
@@ -32,14 +34,14 @@ function Account() {
             Welcome back {data?.viewer?.user?.name}
           </h2>
 
-          <Section title="Invite a friend">
-            TODO
-          </Section>
           <Section title="Change name" initiallyExpanded={false}>
             <ChangeName currentName={data?.viewer?.user?.name} />
           </Section>
           <Section title="Change email" initiallyExpanded={false}>
             <ChangeEmail />
+          </Section>
+          <Section title="Invite a friend">
+            <ManageInvites />
           </Section>
         </div>
       }

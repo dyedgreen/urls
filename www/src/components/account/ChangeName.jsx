@@ -6,7 +6,7 @@ import TextInput from "@app/TextInput";
 import Button from "@app/Button";
 import Notice from "@app/Notice";
 
-export default function({ currentName }) {
+export default function ChangeName({ currentName }) {
   const [name, setName] = useState(currentName);
 
   const [error, setError] = useState(null);
@@ -51,6 +51,12 @@ export default function({ currentName }) {
       onChange={setName}
       style="mb-2"
     />
-    <Button title="Update" onClick={submit} disabled={!canSubmit} loading={inFlight} />
+    <Button
+      title="Update"
+      onClick={submit}
+      disabled={!canSubmit}
+      loading={inFlight}
+      style="w-full"
+    />
   </form>;
 }
