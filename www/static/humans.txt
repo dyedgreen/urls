@@ -10,6 +10,7 @@ Build with (among other things):
   Warp (https://crates.io/crates/warp)
   Diesel (https://diesel.rs)
   Askama (https://github.com/djc/askama)
+  Nom (https://github.com/Geal/nom)
 
   Snowpack (http://snowpack.dev)
   Preact (http://preactjs.com)
