@@ -15,7 +15,7 @@ export default function Button({
     case "flat":
       classes += " bg-white text-black";
       if (!disabled)
-        classes += " hover:bg-gray-100";
+        classes += " hover:bg-gray-200";
       break;
     case "default":
     default:

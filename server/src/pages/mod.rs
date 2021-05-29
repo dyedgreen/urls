@@ -9,6 +9,7 @@ pub mod graphiql;
 pub mod index;
 pub mod login;
 pub mod logout;
+pub mod register;
 pub mod xsrf;
 
 const XSRF_COOKIE_NAME: &'static str = "xsrf";

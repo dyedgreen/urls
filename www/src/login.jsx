@@ -39,7 +39,7 @@ function Login() {
     }
   `, {
     onCommit: ({login}) => {
-      document.cookie = `${window.__auth_cookie}=${login};path=/;max-age=604800`;
+      document.cookie = `session=${login};path=/;max-age=604800`;
       window.location.href = "/";
     },
     onError: (errors) => {
@@ -56,7 +56,7 @@ function Login() {
     } else {
       commitRequest();
     }
-  }
+  };
 
   return (
     <div class="w-full flex justify-center p-8">

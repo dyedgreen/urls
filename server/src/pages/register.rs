@@ -4,7 +4,7 @@ use askama::Template;
 use warp::{filters::BoxedFilter, http::Uri, reply::Response, Filter, Reply};
 
 #[derive(Template)]
-#[template(path = "pages/login.html")]
+#[template(path = "pages/register.html")]
 struct Page<'a> {
     xsrf_token: &'a str,
     is_logged_in: bool,

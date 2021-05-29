@@ -2,6 +2,7 @@ use super::viewer::Viewer;
 use crate::db::models::{Invite, NewUserInput, UpdateUserInput, User};
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
+use validator::Validate;
 
 pub struct Mutation;
 
@@ -25,6 +26,7 @@ impl Void {
 impl Mutation {
     /// Register a new user by claiming the provided invitation code `token`.
     async fn register_user(ctx: &Context, input: NewUserInput, token: String) -> FieldResult<User> {
+        input.validate()?; // surface input errors early for better UX
         let invite = Invite::find_by_token(ctx, &token).await?;
         let user = User::create_with_invite(ctx, input, invite).await?;
         Ok(user)

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}login{% endblock title %}
+{% block title %}register{% endblock title %}
 {% block content %}
-    <div id="login"></div>
+    <div id="register"></div>
 {% endblock content %}
 {% block scripts %}
     <script>
         window.__xsrf_token = "{{ xsrf_token }}";
     </script>
-    <script type="module" src="/dist/login.js"></script>
+    <script type="module" src="/dist/register.js"></script>
 {% endblock scripts %}
