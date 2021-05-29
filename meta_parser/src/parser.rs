@@ -1,6 +1,6 @@
 use nom::branch::{alt, permutation};
 use nom::bytes::streaming::{tag_no_case, take_till};
-use nom::character::streaming::{char, multispace0, multispace1, one_of};
+use nom::character::streaming::{char, multispace0, multispace1};
 use nom::combinator::not;
 use nom::sequence::{delimited, preceded};
 use nom::{error::ParseError, Err, IResult};

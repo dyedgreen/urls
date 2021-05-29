@@ -5,6 +5,8 @@ mod parser;
 
 const MAX_BUFFER_SIZE: usize = 4096;
 
+/// Contains meta information about a
+/// parsed HTML page.
 #[derive(Debug, Clone)]
 pub struct Meta {
     pub title: Option<String>,
@@ -28,7 +30,7 @@ impl Meta {
     }
 
     /// Parse additional HTML. If the parser needs more data
-    /// to finish matching, the html is retained in a buffer,
+    /// to finish matching, the HTML is retained in a buffer,
     /// and this function returns.
     ///
     /// The amount of bytes held in this buffer will always be
