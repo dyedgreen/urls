@@ -21,6 +21,15 @@ impl Permission {
             Permission::Moderator => false,
         }
     }
+
+    /// Determine if this permission grants the ability to
+    /// create or delete user roles.
+    pub fn modify_user_roles(&self) -> bool {
+        match *self {
+            Permission::Administrator => true,
+            Permission::Moderator => false,
+        }
+    }
 }
 
 impl<DB> ToSql<Text, DB> for Permission

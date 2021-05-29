@@ -19,7 +19,7 @@ fn request(query: &str, variables: Value, session: &str) -> RequestBuilder {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn test_login() {
-    let (server, mailer) = setup::mock().await;
+    let (server, ctx) = setup::mock().await;
 
     // Obtain a login email
     let query = "
@@ -46,7 +46,7 @@ async fn test_login() {
         })
     );
 
-    let email = setup::last_email(&mailer).await;
+    let email = setup::last_email(&ctx).await;
     let token = email
         .split_whitespace()
         .find(|maybe_token| maybe_token.len() == 12)
@@ -100,6 +100,146 @@ async fn test_login() {
         json!({
             "data": {
                 "viewer": { "email": "test.user@urls.fyi" },
+            },
+        })
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn test_invite_limit() {
+    let (server, ctx) = setup::mock().await;
+    let session = setup::session_token(&ctx, "test.user@urls.fyi").await;
+    let session_admin = setup::session_token(&ctx, "test.admin@urls.fyi").await;
+
+    let query = "
+        mutation IssueInvite {
+            issueInvite {
+                createdBy {
+                    name
+                }
+            }
+        }
+    ";
+
+    // users have 3 invites
+    for _ in 0..3 {
+        let vars = json!({});
+        let res = request(query, vars, &session).reply(&server).await;
+        assert_eq!(res.status(), 200);
+
+        let body: Value = serde_json::from_slice(res.body()).unwrap();
+        assert_eq!(
+            body,
+            json!({
+                "data": {
+                    "issueInvite": {
+                        "createdBy": { "name": "Test User" },
+                    },
+                },
+            })
+        );
+    }
+
+    let vars = json!({});
+    let res = request(query, vars, &session).reply(&server).await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).unwrap();
+    assert!(body.as_object().unwrap().contains_key("errors"));
+
+    // admins have unlimited invites
+    for _ in 0..10 {
+        let vars = json!({});
+        let res = request(query, vars, &session_admin).reply(&server).await;
+        assert_eq!(res.status(), 200);
+
+        let body: Value = serde_json::from_slice(res.body()).unwrap();
+        assert_eq!(
+            body,
+            json!({
+                "data": {
+                    "issueInvite": {
+                        "createdBy": { "name": "Test Administrator" },
+                    },
+                },
+            })
+        );
+    }
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn test_grant_revoke_permissions() {
+    let (server, ctx) = setup::mock().await;
+    let session = setup::session_token(&ctx, "test.user@urls.fyi").await;
+    let session_admin = setup::session_token(&ctx, "test.admin@urls.fyi").await;
+
+    let query_grant = "
+        mutation GrantPermission($permission: Permission!, $email: String!) {
+            grantPermission(permission: $permission, email: $email) {
+                permissions
+            }
+        }
+    ";
+    let query_revoke = "
+        mutation GrantPermission($permission: Permission!, $email: String!) {
+            revokePermission(permission: $permission, email: $email) {
+                permissions
+            }
+        }
+    ";
+    let vars = json!({
+        "permission": "MODERATOR",
+        "email": "test.user@urls.fyi",
+    });
+
+    // only admins can grant permissions
+    let res = request(query_grant, vars.clone(), &session)
+        .reply(&server)
+        .await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).unwrap();
+    assert!(body.as_object().unwrap().contains_key("errors"));
+
+    let res = request(query_grant, vars.clone(), &session_admin)
+        .reply(&server)
+        .await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).unwrap();
+    assert_eq!(
+        body,
+        json!({
+            "data":{
+                "grantPermission": {
+                    "permissions": ["MODERATOR"],
+                },
+            },
+        })
+    );
+
+    // only admins can revoke permissions
+    let res = request(query_revoke, vars.clone(), &session)
+        .reply(&server)
+        .await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).unwrap();
+    assert!(body.as_object().unwrap().contains_key("errors"));
+
+    let res = request(query_revoke, vars.clone(), &session_admin)
+        .reply(&server)
+        .await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).unwrap();
+    assert_eq!(
+        body,
+        json!({
+            "data":{
+                "revokePermission": {
+                    "permissions": [],
+                },
             },
         })
     );

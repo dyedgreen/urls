@@ -1,5 +1,5 @@
 use super::viewer::Viewer;
-use crate::db::models::{Invite, NewUserInput, UpdateUserInput, User};
+use crate::db::models::{Invite, NewUserInput, Permission, Role, UpdateUserInput, User};
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
 use validator::Validate;
@@ -37,6 +37,38 @@ impl Mutation {
         let mut user = ctx.user().await?;
         user.update(ctx, input).await?;
         Ok(Viewer)
+    }
+
+    /// Grants the given permission to the user with the
+    /// provided email.
+    async fn grant_permission(
+        ctx: &Context,
+        permission: Permission,
+        email: String,
+    ) -> FieldResult<User> {
+        ctx.user()
+            .await?
+            .check_permissions(ctx, |perm| perm.modify_user_roles())
+            .await?;
+        let user = User::find_by_email(ctx, &email).await?;
+        Role::create(ctx, user.id(), permission).await?;
+        Ok(user)
+    }
+
+    /// Revokes the given permission from the user with
+    /// the provided email.
+    async fn revoke_permission(
+        ctx: &Context,
+        permission: Permission,
+        email: String,
+    ) -> FieldResult<User> {
+        ctx.user()
+            .await?
+            .check_permissions(ctx, |perm| perm.modify_user_roles())
+            .await?;
+        let user = User::find_by_email(ctx, &email).await?;
+        Role::delete_by_permission(ctx, user.id(), permission).await?;
+        Ok(user)
     }
 
     /// Request a login code for the user associated with the given `email`. Note

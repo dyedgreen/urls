@@ -4,7 +4,7 @@ use crate::schema::roles;
 use crate::Context;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime, Utc};
-use diesel::RunQueryDsl;
+use diesel::prelude::*;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, Associations)]
 #[belongs_to(User)]
@@ -58,5 +58,19 @@ impl Role {
     pub async fn delete(&self, ctx: &Context) -> Result<()> {
         diesel::delete(self).execute(&*ctx.conn().await?)?;
         Ok(())
+    }
+
+    /// Deletes a role by permission for the given user.
+    pub async fn delete_by_permission(
+        ctx: &Context,
+        user_id: UserID,
+        permission: Permission,
+    ) -> Result<Self> {
+        let role: Self = roles::table
+            .filter(roles::dsl::user_id.eq(user_id))
+            .filter(roles::dsl::permission.eq(permission))
+            .get_result(&*ctx.conn().await?)?;
+        role.delete(ctx).await?;
+        Ok(role)
     }
 }

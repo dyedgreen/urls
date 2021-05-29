@@ -43,7 +43,7 @@ async fn generate_mock_users(ctx: &Context) {
 /// tests on the server and API.
 pub async fn mock() -> (
     impl Filter<Extract = (impl Reply,), Error = Infallible> + Clone,
-    email::Mailer,
+    Context,
 ) {
     set_work_dir();
 
@@ -58,15 +58,25 @@ pub async fn mock() -> (
     let ctx = Context::new(&pool, &mailer, "".into(), None);
     generate_mock_users(&ctx).await;
 
-    (global_routes(&test_conf, pool, mailer.clone()), mailer)
+    (global_routes(&test_conf, pool, mailer.clone()), ctx)
 }
 
 /// Return the last sent email message.
 #[allow(dead_code)]
-pub async fn last_email(mailer: &email::Mailer) -> String {
-    let path = match mailer.clone() {
+pub async fn last_email(ctx: &Context) -> String {
+    let path = match ctx.mailer().clone() {
         email::Mailer::File { last_message, .. } => last_message.lock().await.clone().unwrap(),
         _ => panic!("No email was sent"),
     };
     tokio::fs::read_to_string(path).await.unwrap()
+}
+
+/// Return a valid session token for the given user email.
+#[allow(dead_code)]
+pub async fn session_token(ctx: &Context, email: &str) -> String {
+    let user = db::models::User::find_by_email(ctx, email)
+        .await
+        .expect("Missing user");
+    let sess = web_session::Session::new(user.id(), chrono::Utc::now() + chrono::Duration::days(1));
+    sess.base64(Config::env().session_key()).unwrap()
 }

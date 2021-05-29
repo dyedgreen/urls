@@ -1,5 +1,5 @@
 use crate::db::id::UserID;
-use crate::db::models::{Invite, User};
+use crate::db::models::{Invite, Permission, User};
 use crate::Context;
 use chrono::{DateTime, Utc};
 use juniper::{graphql_object, FieldResult};
@@ -27,5 +27,11 @@ impl User {
     /// their account, if any.
     async fn invite(&self, ctx: &Context) -> FieldResult<Option<Invite>> {
         Ok(self.invite(ctx).await?)
+    }
+
+    /// List of active permissions for this
+    /// user.
+    async fn permissions(&self, ctx: &Context) -> FieldResult<Vec<Permission>> {
+        Ok(self.permissions(ctx).await?)
     }
 }

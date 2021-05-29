@@ -2,7 +2,7 @@ use crate::db::id::UserID;
 use crate::db::models::{Invite, Login, Permission, Role};
 use crate::schema::{invites, logins, roles, users};
 use crate::Context;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use juniper::GraphQLInputObject;
@@ -76,6 +76,21 @@ impl User {
         Ok(permissions)
     }
 
+    /// Check if a predicate is true for any given
+    /// user permission. If none of the permissions
+    /// resolves the predicate to `true`, this returns
+    /// an error.
+    pub async fn check_permissions<F>(&self, ctx: &Context, predicate: F) -> Result<()>
+    where
+        F: Fn(Permission) -> bool,
+    {
+        if self.permissions(ctx).await?.into_iter().any(predicate) {
+            Ok(())
+        } else {
+            Err(anyhow!("Not authorized"))
+        }
+    }
+
     /// Invite used to register this user.
     pub async fn invite(&self, ctx: &Context) -> Result<Option<Invite>> {
         let invite = invites::table
@@ -83,6 +98,23 @@ impl User {
             .get_result(&*ctx.conn().await?)
             .optional()?;
         Ok(invite)
+    }
+}
+
+impl User {
+    /// Load by ID.
+    pub async fn find(ctx: &Context, id: UserID) -> Result<Self> {
+        let user = users::table.find(id).get_result(&*ctx.conn().await?)?;
+        Ok(user)
+    }
+
+    /// Retrieve a user by it's email address.
+    pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
+        let conn = ctx.conn().await?;
+        let user = users::table
+            .filter(users::dsl::email.eq(email))
+            .get_result(&*conn)?;
+        Ok(user)
     }
 }
 
@@ -155,15 +187,6 @@ impl User {
 
         *self = self.save_changes(&*ctx.conn().await?)?;
         Ok(())
-    }
-
-    /// Retrieve a user by it's email address.
-    pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
-        let conn = ctx.conn().await?;
-        let user = users::table
-            .filter(users::dsl::email.eq(email))
-            .get_result(&*conn)?;
-        Ok(user)
     }
 
     /// Creates a login and sends an email to the user, containing the

@@ -70,33 +70,31 @@ impl Invite {
             .select(diesel::dsl::count_star())
             .get_result(&*ctx.conn().await?)?;
 
-        let allow_invite = total_invites_issued < MAX_INVITES_PER_USER
-            || created_by
-                .permissions(ctx)
-                .await?
-                .into_iter()
-                .any(|perm| perm.unlimited_invites());
-        if allow_invite {
-            let invite = Invite {
-                id: InviteID::new(),
-                created_at: ctx.now().naive_utc(),
-                updated_at: ctx.now().naive_utc(),
-
-                token: nanoid!(32, TOKEN_ALPHABET),
-                created_by: created_by.id(),
-                claimed_by: None,
-            };
-            diesel::insert_into(invites::table)
-                .values(&invite)
-                .execute(&*ctx.conn().await?)?;
-
-            Ok(invite)
-        } else {
-            Err(anyhow!(
-                "This account is not allowed to issue more than {} invitations",
-                MAX_INVITES_PER_USER
-            ))
+        if total_invites_issued >= MAX_INVITES_PER_USER {
+            created_by
+                .check_permissions(ctx, |perm| perm.unlimited_invites())
+                .await
+                .map_err(|_| {
+                    anyhow!(
+                        "This account is not allowed to issue more than {} invitations",
+                        MAX_INVITES_PER_USER
+                    )
+                })?;
         }
+
+        let invite = Invite {
+            id: InviteID::new(),
+            created_at: ctx.now().naive_utc(),
+            updated_at: ctx.now().naive_utc(),
+
+            token: nanoid!(32, TOKEN_ALPHABET),
+            created_by: created_by.id(),
+            claimed_by: None,
+        };
+        diesel::insert_into(invites::table)
+            .values(&invite)
+            .execute(&*ctx.conn().await?)?;
+        Ok(invite)
     }
 
     /// Retrieve an invitation based on it's invitation token.
