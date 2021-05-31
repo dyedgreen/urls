@@ -1,9 +1,7 @@
 use crate::Config;
 use anyhow::Result;
-use lettre::{
-    transport::smtp::authentication::Credentials, AsyncFileTransport, AsyncSmtpTransport,
-    AsyncTransport, Message, Tokio1Executor,
-};
+use lettre::transport::smtp::authentication::{Credentials, Mechanism};
+use lettre::{AsyncFileTransport, AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -53,9 +51,10 @@ impl Mailer {
 pub async fn connect(config: &Config) -> Result<Mailer> {
     if let Some(conf) = config.smtp() {
         let creds = Credentials::new(conf.user().to_string(), conf.password().to_string());
-        let mailer = AsyncSmtpTransport::<Tokio1Executor>::relay(conf.host())?
+        let mailer = AsyncSmtpTransport::<Tokio1Executor>::starttls_relay(conf.host())?
             .port(conf.port())
             .credentials(creds)
+            .authentication(vec![Mechanism::Plain])
             .build();
         log::info!("Emails will be sent via smtp");
         Ok(Mailer::Smtp(mailer))
