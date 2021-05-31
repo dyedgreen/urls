@@ -5,7 +5,7 @@ use once_cell::sync::Lazy;
 use std::path::{Path, PathBuf};
 
 static DEFAULT_WWW: &str = "www/static";
-static DEFAULT_TEMPLATES: &str = "www/templates/**/*.html";
+static DEFAULT_SMTP_PORT: u16 = 587;
 
 static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
     Ok(conf) => conf,
@@ -19,7 +19,6 @@ static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
 pub struct Config {
     database_url: String,
     www_dir: PathBuf,
-    templates_glob: String,
     session_key: Vec<u8>,
     hostname: String,
     smtp: Option<SmtpConfig>,
@@ -28,6 +27,7 @@ pub struct Config {
 #[derive(Debug, Clone)]
 pub struct SmtpConfig {
     host: String,
+    port: Option<u16>,
     user: String,
     password: String,
 }
@@ -47,7 +47,6 @@ impl Config {
         Self {
             database_url: format!("file:{}?mode=memory&cache=shared", nanoid!(16)),
             www_dir: DEFAULT_WWW.into(),
-            templates_glob: DEFAULT_TEMPLATES.into(),
             session_key: random_session_key(),
             hostname: "localhost".into(),
             smtp: None,
@@ -63,12 +62,6 @@ impl Config {
     /// from.
     pub fn www(&self) -> &Path {
         self.www_dir.as_path()
-    }
-
-    /// Directory glob to load template files
-    /// from.
-    pub fn templates(&self) -> &str {
-        self.templates_glob.as_str()
     }
 
     /// SMTP server host and credentials.
@@ -91,6 +84,10 @@ impl Config {
 impl SmtpConfig {
     pub fn host(&self) -> &str {
         &self.host
+    }
+
+    pub fn port(&self) -> u16 {
+        self.port.unwrap_or(DEFAULT_SMTP_PORT)
     }
 
     pub fn user(&self) -> &str {
@@ -119,22 +116,21 @@ fn load_from_env() -> Result<Config> {
         })
         .into();
 
-    let templates_glob = var("TEMPLATES_DIR").unwrap_or_else(|_| {
-        log::info!(
-            "TEMPLATES_DIR configuration not set, using default '{}'",
-            DEFAULT_TEMPLATES
-        );
-        DEFAULT_TEMPLATES.to_string()
-    });
-
     let smtp = match (var("SMTP_HOST"), var("SMTP_USER"), var("SMTP_PASS")) {
         (Ok(host), Ok(user), Ok(password)) => Some(SmtpConfig {
             host,
+            port: var("SMTP_PORT").ok().and_then(|port| {
+                port.parse()
+                    .map_err(|_| {
+                        log::warn!("Invalid SMTP_PORT set, using default {}", DEFAULT_SMTP_PORT);
+                    })
+                    .ok()
+            }),
             user,
             password,
         }),
         _ => {
-            log::info!("SMTP_HOST, SMTP_USER, or SMTP_PASS not set");
+            log::info!("SMTP_HOST, SMTP_PORT, SMTP_USER, or SMTP_PASS not set");
             None
         }
     };
@@ -149,7 +145,6 @@ fn load_from_env() -> Result<Config> {
     Ok(Config {
         database_url,
         www_dir,
-        templates_glob,
         smtp,
         session_key,
         hostname,
