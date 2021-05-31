@@ -5,15 +5,17 @@ use warp::{filters::BoxedFilter, reply::Response, Filter, Reply};
 
 #[derive(Template)]
 #[template(path = "pages/index.html")]
-struct Page {
+struct Page<'a> {
+    xsrf_token: &'a str,
     is_logged_in: bool,
 }
 
-async fn handle(ctx: Context) -> Result<impl Reply, error::ServerError> {
+async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
     let page = Page {
+        xsrf_token: ctx.xsrf_token(),
         is_logged_in: ctx.is_logged_in(),
     };
-    Ok(page)
+    Ok(page.into_response())
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {

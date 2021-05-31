@@ -6,7 +6,7 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use futures_util::StreamExt;
-use juniper::{FieldResult, GraphQLInputObject};
+use juniper::GraphQLInputObject;
 use meta_parser::Meta;
 use validator::Validate;
 use warp::http::Uri;
