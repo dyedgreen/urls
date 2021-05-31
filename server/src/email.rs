@@ -23,7 +23,7 @@ impl Mailer {
         match self {
             Mailer::Smtp(mailer) => {
                 log::info!(
-                    "Sending email to: {}",
+                    "Sending email to {}",
                     message
                         .envelope()
                         .to()

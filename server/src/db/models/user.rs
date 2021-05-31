@@ -194,7 +194,7 @@ impl User {
     pub async fn request_login(&self, ctx: &Context) -> Result<()> {
         let login = Login::create(ctx, self.id()).await?;
         let email = Message::builder()
-            .from("noreply@urls.fyi".parse().unwrap())
+            .from("noreply@urls.fyi <noreply@urls.fyi>".parse().unwrap()) // TODO: Make configurable ...
             .to(Mailbox::new(Some(self.name.clone()), self.email()?))
             .subject("Login request")
             .body(format!(

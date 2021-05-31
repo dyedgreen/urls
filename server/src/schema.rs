@@ -32,6 +32,19 @@ table! {
 }
 
 table! {
+    urls (id) {
+        id -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        url -> Text,
+        title -> Nullable<Text>,
+        description -> Nullable<Text>,
+        image -> Nullable<Text>,
+        created_by -> Text,
+    }
+}
+
+table! {
     users (id) {
         id -> Text,
         created_at -> Timestamp,
@@ -43,5 +56,12 @@ table! {
 
 joinable!(logins -> users (user_id));
 joinable!(roles -> users (user_id));
+joinable!(urls -> users (created_by));
 
-allow_tables_to_appear_in_same_query!(invites, logins, roles, users,);
+allow_tables_to_appear_in_same_query!(
+    invites,
+    logins,
+    roles,
+    urls,
+    users,
+);

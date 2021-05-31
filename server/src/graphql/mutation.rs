@@ -1,5 +1,7 @@
 use super::viewer::Viewer;
-use crate::db::models::{Invite, NewUserInput, Permission, Role, UpdateUserInput, User};
+use crate::db::models::{
+    Invite, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput, Url, User,
+};
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
 use validator::Validate;
@@ -91,5 +93,11 @@ impl Mutation {
     async fn issue_invite(ctx: &Context) -> FieldResult<Invite> {
         let user = ctx.user().await?;
         Ok(Invite::create(ctx, &user).await?)
+    }
+
+    /// Create a new URL and crawls the associated HTML page for
+    /// meta data.
+    async fn submit_url(ctx: &Context, input: NewUrlInput) -> FieldResult<Url> {
+        Ok(Url::create(ctx, input, ctx.user_id()?).await?)
     }
 }

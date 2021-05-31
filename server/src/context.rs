@@ -6,6 +6,22 @@ use crate::schema::users;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use diesel::{query_dsl::methods::FindDsl, RunQueryDsl};
+use once_cell::sync::Lazy;
+
+const HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
+    use ::std::time::Duration;
+
+    reqwest::Client::builder()
+        .user_agent("urls.fyi")
+        .connect_timeout(Duration::from_secs(5))
+        .timeout(Duration::from_secs(60))
+        .redirect(reqwest::redirect::Policy::limited(10))
+        .gzip(true)
+        .brotli(true)
+        .build()
+        .map_err(|err| log::error!("Failed to build http client: {}", err))
+        .unwrap()
+});
 
 /// Application request context. The context holds information
 /// about the current request, and also can provide access to
@@ -51,6 +67,13 @@ impl Context {
     /// money.
     pub fn mailer(&self) -> &Mailer {
         &self.mailer
+    }
+
+    /// Retrieve an http client which can be used
+    /// to make requests from the server. Requests
+    /// employ a server-wide connection pool.
+    pub fn http_client(&self) -> reqwest::Client {
+        HTTP_CLIENT.clone()
     }
 
     /// Retrieve the ID of the logged in user.
