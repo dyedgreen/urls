@@ -20,12 +20,12 @@ export default function SubmitUrl() {
     }
   `, {
     onCommit: ({ submitUrl: { id, title } }) => {
-      setUrl(null);
+      setUrl("");
       setError(null);
       if (title) {
-        setNotice(`"${title}" was success submitted`);
+        setNotice(`"${title}" was successfully submitted`);
       } else {
-        setNotice("Your url was success submitted");
+        setNotice("Your url was successfully submitted");
       }
     },
     onError: ([{message}]) => {
