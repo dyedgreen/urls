@@ -32,6 +32,14 @@ table! {
 }
 
 table! {
+    url_upvotes (url_id, user_id) {
+        url_id -> Text,
+        user_id -> Text,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
     urls (id) {
         id -> Text,
         created_at -> Timestamp,
@@ -56,12 +64,15 @@ table! {
 
 joinable!(logins -> users (user_id));
 joinable!(roles -> users (user_id));
+joinable!(url_upvotes -> urls (url_id));
+joinable!(url_upvotes -> users (user_id));
 joinable!(urls -> users (created_by));
 
 allow_tables_to_appear_in_same_query!(
     invites,
     logins,
     roles,
+    url_upvotes,
     urls,
     users,
 );

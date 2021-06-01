@@ -1,6 +1,6 @@
 use crate::db::id::{UrlID, UserID};
 use crate::db::models::User;
-use crate::schema::{urls, users};
+use crate::schema::{url_upvotes, urls, users};
 use crate::Context;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -42,6 +42,13 @@ impl Url {
         Ok(self.url.parse()?)
     }
 
+    /// Return the url as a `&str`. This always succeeds
+    /// but might return an invalid Uri, since it simply
+    /// returns the value found in the database.
+    pub fn url_str(&self) -> &str {
+        &self.url
+    }
+
     /// The title provided by the linked html document, if
     /// available.
     pub fn title(&self) -> Option<&str> {
@@ -78,6 +85,30 @@ impl Url {
             .find(self.created_by)
             .get_result(&*ctx.conn().await?)?;
         Ok(user)
+    }
+
+    pub async fn upvote_count(&self, ctx: &Context) -> Result<i64> {
+        let count = url_upvotes::table
+            .filter(url_upvotes::dsl::url_id.eq(self.id))
+            .select(diesel::dsl::count_star())
+            .get_result(&*ctx.conn().await?)?;
+        Ok(count)
+    }
+
+    pub async fn upvoted_by_viewer(&self, ctx: &Context) -> Result<bool> {
+        let count: i64 = url_upvotes::table
+            .filter(url_upvotes::dsl::url_id.eq(self.id))
+            .filter(url_upvotes::dsl::user_id.eq(ctx.user_id()?))
+            .select(diesel::dsl::count_star())
+            .get_result(&*ctx.conn().await?)?;
+        Ok(count == 1)
+    }
+}
+
+impl Url {
+    pub async fn find(ctx: &Context, url_id: UrlID) -> Result<Self> {
+        let url = urls::table.find(url_id).get_result(&*ctx.conn().await?)?;
+        Ok(url)
     }
 }
 
@@ -129,7 +160,34 @@ impl Url {
     /// Deletes the given URL from the database. URLs can only be deleted
     /// by moderators or the user who created them.
     pub async fn delete(&self, ctx: &Context) -> Result<()> {
+        if self.created_by != ctx.user_id()? {
+            ctx.user()
+                .await?
+                .check_permissions(ctx, |perm| perm.delete_any_url())
+                .await?;
+        }
         diesel::delete(self).execute(&*ctx.conn().await?)?;
+        Ok(())
+    }
+
+    /// Upvote the URL as the logged in user.
+    pub async fn upvote(&self, ctx: &Context) -> Result<()> {
+        diesel::insert_into(url_upvotes::table)
+            .values((
+                url_upvotes::dsl::user_id.eq(ctx.user_id()?),
+                url_upvotes::dsl::url_id.eq(self.id()),
+                url_upvotes::dsl::created_at.eq(ctx.now().naive_utc()),
+            ))
+            .execute(&*ctx.conn().await?)?;
+        Ok(())
+    }
+
+    /// Rescind an upvote for the URL as the logged in user.
+    pub async fn rescind_upvote(&self, ctx: &Context) -> Result<()> {
+        let upvote = url_upvotes::table
+            .filter(url_upvotes::dsl::url_id.eq(self.id()))
+            .filter(url_upvotes::dsl::user_id.eq(ctx.user_id()?));
+        diesel::delete(upvote).execute(&*ctx.conn().await?)?;
         Ok(())
     }
 }

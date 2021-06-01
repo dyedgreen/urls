@@ -30,6 +30,15 @@ impl Permission {
             Permission::Moderator => false,
         }
     }
+
+    /// Determine if this permission grants the ability to
+    /// delete urls not submitted by this user.
+    pub fn delete_any_url(&self) -> bool {
+        match *self {
+            Permission::Administrator => true,
+            Permission::Moderator => true,
+        }
+    }
 }
 
 impl<DB> ToSql<Text, DB> for Permission

@@ -1,4 +1,5 @@
 use super::viewer::Viewer;
+use crate::db::id::UrlID;
 use crate::db::models::{
     Invite, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput, Url, User,
 };
@@ -99,5 +100,27 @@ impl Mutation {
     /// meta data.
     async fn submit_url(ctx: &Context, input: NewUrlInput) -> FieldResult<Url> {
         Ok(Url::create(ctx, input, ctx.user_id()?).await?)
+    }
+
+    /// Deletes a submitted URL. URLs can only be deleted by moderators
+    /// or the user who originally submitted them.
+    async fn delete_url(ctx: &Context, url: UrlID) -> FieldResult<Url> {
+        let url = Url::find(ctx, url).await?;
+        url.delete(ctx).await?;
+        Ok(url)
+    }
+
+    /// Upvote the given URL as the viewer.
+    async fn upvote_url(ctx: &Context, url: UrlID) -> FieldResult<Url> {
+        let url = Url::find(ctx, url).await?;
+        url.upvote(ctx).await?;
+        Ok(url)
+    }
+
+    /// Rescind a previous upvote for the given URL.
+    async fn rescind_url_upvote(ctx: &Context, url: UrlID) -> FieldResult<Url> {
+        let url = Url::find(ctx, url).await?;
+        url.rescind_upvote(ctx).await?;
+        Ok(url)
     }
 }

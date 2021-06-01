@@ -3,6 +3,7 @@ use crate::db::models::{Url, User};
 use crate::Context;
 use juniper::{graphql_object, FieldResult};
 use juniper_relay::RelayConnectionNode;
+use std::convert::TryInto;
 
 impl RelayConnectionNode for Url {
     type Cursor = UrlID;
@@ -57,5 +58,15 @@ impl Url {
     /// The user who issued this invitation.
     async fn created_by(&self, ctx: &Context) -> FieldResult<User> {
         Ok(self.created_by(ctx).await?)
+    }
+
+    /// The total number of upvotes this submission has received.
+    async fn upvote_count(&self, ctx: &Context) -> FieldResult<i32> {
+        Ok(self.upvote_count(ctx).await?.try_into()?)
+    }
+
+    /// If the URL was upvoted by the current viewer.
+    async fn upvoted_by_viewer(&self, ctx: &Context) -> FieldResult<bool> {
+        Ok(self.upvoted_by_viewer(ctx).await?)
     }
 }

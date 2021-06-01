@@ -97,6 +97,20 @@ function Header() {
           </a>
           );
         })}
+        <div class="w-full flex justify-center">
+          {[1, 2, 3, "...", 7, 8, 9].map(id =>
+            <a
+              href={`page/${id}`}
+              class={`
+                block w-8 h-8 m-2 rounded
+                border-2 ${id !== 1 ? "border-blue-500" : "border-gray-400"}
+                ${id !== 1 ? "text-blue-500" : "text-gray-400"} text-center leading-7
+              `}
+            >
+              {id}
+            </a>
+          )}
+        </div>
     </div>
     <div class={containerClasses}>
       <div class="flex space-x-2 items-center">

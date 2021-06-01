@@ -1,3 +1,5 @@
+use crate::db::id::UrlID;
+use crate::db::models::{Url, User};
 use crate::pages::{error, ContextFilter};
 use crate::Context;
 use askama::Template;
@@ -8,6 +10,13 @@ use warp::{filters::BoxedFilter, reply::Response, Filter, Reply};
 struct Page<'a> {
     xsrf_token: &'a str,
     is_logged_in: bool,
+}
+
+#[derive(Template)]
+#[template(path = "partials/url.html")]
+struct UrlPartial<'a> {
+    url: &'a Url,
+    created_by: &'a User,
 }
 
 async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
