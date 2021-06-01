@@ -111,10 +111,18 @@ impl Url {
     }
 }
 
+/// Determine how to order and filter the url
+/// pagination.
 #[derive(Debug, Clone, Copy)]
 pub enum UrlOrdering {
+    /// Default ranking used on the home page.
     Ranked,
+    /// All time best submissions.
+    Best,
+    /// Submissions from the given user, ranked
+    /// chronologically.
     User(UserID),
+    /// All submissions, ranked chronologically.
     Recent,
 }
 
@@ -136,7 +144,7 @@ impl Url {
 
         let total_count_query = urls::table.select(diesel::dsl::count_star());
         let total_count: i64 = match order {
-            Ranked | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
+            Ranked | Best | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
             User(creator_id) => total_count_query
                 .filter(urls::dsl::created_by.eq(creator_id))
                 .get_result(&*ctx.conn().await?)?,
@@ -165,6 +173,15 @@ impl Url {
                     .limit(page_size)
                     .load(&*ctx.conn().await?)?
             }
+            Best => query
+                .left_outer_join(url_upvotes::table)
+                .group_by(urls::all_columns)
+                .order_by(diesel::dsl::count(urls::dsl::id).desc())
+                .then_order_by(urls::dsl::created_at.desc())
+                .select(urls::all_columns)
+                .offset(page * page_size)
+                .limit(page_size)
+                .load(&*ctx.conn().await?)?,
             User(creator_id) => query
                 .filter(urls::dsl::created_by.eq(creator_id))
                 .offset(page * page_size)

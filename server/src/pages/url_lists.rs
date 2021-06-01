@@ -79,6 +79,15 @@ pub fn ranked(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
         .boxed()
 }
 
+pub fn best(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
+    paginate()
+        .and(ctx)
+        .and_then(|page: u32, ctx: Context| async move {
+            error::reply(handle(ctx, UrlOrdering::Best, page, "best").await)
+        })
+        .boxed()
+}
+
 pub fn recent(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)

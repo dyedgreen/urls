@@ -40,6 +40,9 @@ pub fn global_routes(
     let recent = ctx.clone().with(warp::wrap_fn(pages::url_lists::recent));
     let recent = warp::path("recent").and(recent);
 
+    let best = ctx.clone().with(warp::wrap_fn(pages::url_lists::best));
+    let best = warp::path("best").and(best);
+
     let mine = ctx.clone().with(warp::wrap_fn(pages::url_lists::mine));
     let mine = warp::path("mine").and(mine);
 
@@ -67,6 +70,7 @@ pub fn global_routes(
 
     let routes = index
         .or(recent)
+        .or(best)
         .or(mine)
         .or(user)
         .or(login)
