@@ -1,5 +1,3 @@
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE users (
   id          VARCHAR(21) PRIMARY KEY NOT NULL,
   created_at  TIMESTAMP NOT NULL,

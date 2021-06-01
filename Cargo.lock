@@ -1700,6 +1700,7 @@ dependencies = [
  "anyhow",
  "askama",
  "askama_warp",
+ "async-trait",
  "bb8_diesel",
  "chrono",
  "diesel",
