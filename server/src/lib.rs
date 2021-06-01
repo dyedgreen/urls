@@ -35,16 +35,16 @@ pub fn global_routes(
     let ctx = pages::context(pool, mailer);
 
     let index = ctx.clone().with(warp::wrap_fn(pages::url_lists::ranked));
-    let index = warp::path::end().and(index);
+    let index = warp::any().and(index);
 
     let recent = ctx.clone().with(warp::wrap_fn(pages::url_lists::recent));
     let recent = warp::path("recent").and(recent);
 
-    let user = ctx.clone().with(warp::wrap_fn(pages::url_lists::user));
-    let user = warp::path("user").and(user);
-
     let mine = ctx.clone().with(warp::wrap_fn(pages::url_lists::mine));
     let mine = warp::path("mine").and(mine);
+
+    let user = ctx.clone().with(warp::wrap_fn(pages::url_lists::user));
+    let user = warp::path("user").and(user);
 
     let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
     let login = warp::path("login").and(login);

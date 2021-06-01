@@ -3,13 +3,15 @@ use crate::db::models::User;
 use crate::schema::{url_upvotes, urls, users};
 use crate::Context;
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use futures_util::StreamExt;
 use juniper::GraphQLInputObject;
 use meta_parser::Meta;
 use validator::Validate;
 use warp::http::Uri;
+
+const INCLUDE_DAYS_IN_RANKED: i64 = 7;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset, Associations)]
 #[belongs_to(User, foreign_key = "created_by")]
@@ -134,7 +136,16 @@ impl Url {
 
         let total_count_query = urls::table.select(diesel::dsl::count_star());
         let total_count: i64 = match order {
-            Ranked | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
+            Ranked => {
+                let count_vote_after = ctx.now() - Duration::days(INCLUDE_DAYS_IN_RANKED);
+                total_count_query
+                    .left_outer_join(url_upvotes::table)
+                    .filter(url_upvotes::dsl::created_at.ge(count_vote_after.naive_utc()))
+                    .group_by(urls::all_columns)
+                    .select(diesel::dsl::count_star())
+                    .get_result(&*ctx.conn().await?)?
+            }
+            Recent => total_count_query.get_result(&*ctx.conn().await?)?,
             User(creator_id) => total_count_query
                 .filter(urls::dsl::created_by.eq(creator_id))
                 .get_result(&*ctx.conn().await?)?,
@@ -147,7 +158,19 @@ impl Url {
 
         let query = urls::table.order_by(urls::dsl::created_at.desc());
         let page = match order {
-            Ranked => unimplemented!(),
+            Ranked => {
+                let count_vote_after = ctx.now() - Duration::days(INCLUDE_DAYS_IN_RANKED);
+                query
+                    .left_outer_join(url_upvotes::table)
+                    .filter(url_upvotes::dsl::created_at.ge(count_vote_after.naive_utc()))
+                    .group_by(urls::all_columns)
+                    .order_by(diesel::dsl::count(urls::dsl::id).desc())
+                    .then_order_by(urls::dsl::created_at.desc())
+                    .select(urls::all_columns)
+                    .offset(page * page_size)
+                    .limit(page_size)
+                    .load(&*ctx.conn().await?)?
+            }
             User(creator_id) => query
                 .filter(urls::dsl::created_by.eq(creator_id))
                 .offset(page * page_size)

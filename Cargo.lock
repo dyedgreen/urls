@@ -385,8 +385,7 @@ dependencies = [
 [[package]]
 name = "diesel"
 version = "1.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "047bfc4d5c3bd2ef6ca6f981941046113524b9a9f9a7cbdfdd7ff40f58e6f542"
+source = "git+https://github.com/diesel-rs/diesel?rev=a109351#a109351e222cd52ab4a16585f665bb8ce4c3de7b"
 dependencies = [
  "byteorder",
  "chrono",

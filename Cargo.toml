@@ -12,3 +12,4 @@ members = [
 [patch.crates-io]
 juniper = { git = "https://github.com/dyedgreen/juniper", branch = "master" }
 juniper_warp = { git = "https://github.com/dyedgreen/juniper", branch = "master" }
+diesel = { git = "https://github.com/diesel-rs/diesel", rev = "a109351" }

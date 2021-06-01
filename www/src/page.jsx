@@ -15,13 +15,6 @@ function Header() {
   if (showSubmit)
     containerClasses += " bg-gray-50 dark:bg-gray-900";
 
-  const test = [
-    { title: "Test title here", description: "Your description here.", url: "https://tilman.dev", image: "https://opengraph.githubassets.com/fc650ffe80c1f30447363840b1e7531d7ef69c492576ba8c0dbf9c9ac2c31ae8/dyedgreen/deno-sqlite" },
-    { title: "Test title here", didVote: true, description: "Your description here.", url: "https://tilman.dev" },
-    { title: "The Accidental Rush for Anthrax Island", description: "Gruinard Island, in the north-west of Scotland, was where Britain tested its biological weapons. That story&#39;s been told many times: but I found something in ...", url: "https://tilman.dev", image: "https://i.ytimg.com/vi/suAC_PDP3Sk/maxresdefault.jpg" },
-    { title: "Models of Generics and Metaprogramming: Go, Rust, Swift, D and More", description: "Your description here.", url: "https://tilman.dev", image: "https://opengraph.githubassets.com/fc650ffe80c1f30447363840b1e7531d7ef69c492576ba8c0dbf9c9ac2c31ae8/dyedgreen/deno-sqlite" },
-  ];
-
   return (
     <div class={containerClasses}>
       <div class="flex space-x-2 items-center">
