@@ -154,7 +154,9 @@ impl Url {
                     .filter(recent_or_null)
                     .group_by(urls::all_columns)
                     .select(diesel::dsl::count_star())
-                    .get_result(&*ctx.conn().await?)?
+                    .get_result(&*ctx.conn().await?)
+                    .optional()?
+                    .unwrap_or(0)
             }
             Best | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
             User(creator_id) => total_count_query
