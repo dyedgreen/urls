@@ -10,6 +10,10 @@
                 {{ url_partial|safe }}
             {% endfor %}
 
+            {% if url_list.is_empty() %}
+                <h1 class="w-full text-center text-lg font-semibold">There are no URLs here yet</h1>
+            {% endif %}
+
             <div class="w-full flex flex-wrap justify-center">
                 {% for idx in 0..page_count %}
                     <button
