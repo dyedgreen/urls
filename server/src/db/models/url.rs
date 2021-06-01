@@ -234,7 +234,10 @@ impl Url {
                 .check_permissions(ctx, |perm| perm.delete_any_url())
                 .await?;
         }
-        diesel::delete(self).execute(&*ctx.conn().await?)?;
+        let conn = ctx.conn().await?;
+        let upvotes = url_upvotes::table.filter(url_upvotes::dsl::url_id.eq(self.id));
+        diesel::delete(upvotes).execute(&*conn)?;
+        diesel::delete(self).execute(&*conn)?;
         Ok(())
     }
 
