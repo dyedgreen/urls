@@ -29,7 +29,7 @@
             {% if url.title().is_some() || url.description().is_some() %}
                 <p class="mt-1 leading-4 text-sm text-gray-600 dark:text-gray-500">
                     {% if url.title().is_some() %}
-                        <span class="text-gray-400 underline italic">{{ url.url_str() }}</span>
+                        <span class="text-gray-400 underline italic break-all">{{ url.url_str() }}</span>
                     {% endif %}
                     {% match url.description() %}
                         {% when Some with (text) %}
