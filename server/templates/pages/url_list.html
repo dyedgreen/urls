@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock title %}
+{% block content %}
+    <div class="w-full flex flex-col items-center p-8">
+        {% if is_logged_in %}
+        <div class="w-full max-w-screen-md" id="header"></div>
+        {% endif %}
+        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4">
+            {% for url_partial in url_list %}
+                {{ url_partial|safe }}
+            {% endfor %}
+
+            <div class="w-full flex flex-wrap justify-center">
+                {% for idx in 0..page_count %}
+                    <button
+                        onclick="window.location.href = window.location.href.replace(/(\/page\/\d+\/?)|(\/?$)/, '/page/{{ idx }}')"
+                        class="
+                            block flex-none w-8 h-8 m-2 rounded-md border-2 text-center leading-7
+                            {% if idx != page %}
+                                border-blue-500 text-blue-500
+                            {% else %}
+                                border-gray-400 text-gray-400
+                            {% endif %}
+                        "
+                    >
+                        {{ idx + 1 }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+    {% if is_logged_in %}
+        <script>
+            window.__xsrf_token = "{{ xsrf_token }}";
+        </script>
+        <script type="module" src="/dist/page.js"></script>
+    {% endif %}
+{% endblock scripts %}

@@ -96,19 +96,70 @@ impl Url {
     }
 
     pub async fn upvoted_by_viewer(&self, ctx: &Context) -> Result<bool> {
-        let count: i64 = url_upvotes::table
-            .filter(url_upvotes::dsl::url_id.eq(self.id))
-            .filter(url_upvotes::dsl::user_id.eq(ctx.user_id()?))
-            .select(diesel::dsl::count_star())
-            .get_result(&*ctx.conn().await?)?;
-        Ok(count == 1)
+        if let Some(user_id) = ctx.maybe_user_id() {
+            let count: i64 = url_upvotes::table
+                .filter(url_upvotes::dsl::url_id.eq(self.id))
+                .filter(url_upvotes::dsl::user_id.eq(user_id))
+                .select(diesel::dsl::count_star())
+                .get_result(&*ctx.conn().await?)?;
+            Ok(count == 1)
+        } else {
+            Ok(false)
+        }
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum UrlOrdering {
+    Ranked,
+    User(UserID),
+    Recent,
 }
 
 impl Url {
     pub async fn find(ctx: &Context, url_id: UrlID) -> Result<Self> {
         let url = urls::table.find(url_id).get_result(&*ctx.conn().await?)?;
         Ok(url)
+    }
+
+    /// Returns URLs ranked according to the given ordering, as well, as the total number of
+    /// available pages for the given ordering.
+    pub async fn paginate(
+        ctx: &Context,
+        order: UrlOrdering,
+        page: i64,
+        page_size: i64,
+    ) -> Result<(Vec<Self>, i64)> {
+        use UrlOrdering::*;
+
+        let total_count_query = urls::table.select(diesel::dsl::count_star());
+        let total_count: i64 = match order {
+            Ranked | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
+            User(creator_id) => total_count_query
+                .filter(urls::dsl::created_by.eq(creator_id))
+                .get_result(&*ctx.conn().await?)?,
+        };
+        let page_count = if total_count % page_size != 0 {
+            total_count / page_size + 1
+        } else {
+            total_count / page_size
+        };
+
+        let query = urls::table.order_by(urls::dsl::created_at.desc());
+        let page = match order {
+            Ranked => unimplemented!(),
+            User(creator_id) => query
+                .filter(urls::dsl::created_by.eq(creator_id))
+                .offset(page * page_size)
+                .limit(page_size)
+                .load(&*ctx.conn().await?)?,
+            Recent => query
+                .offset(page * page_size)
+                .limit(page_size)
+                .load(&*ctx.conn().await?)?,
+        };
+
+        Ok((page, page_count))
     }
 }
 

@@ -34,8 +34,17 @@ pub fn global_routes(
 ) -> impl Filter<Extract = (impl Reply,), Error = Infallible> + Clone {
     let ctx = pages::context(pool, mailer);
 
-    let index = ctx.clone().with(warp::wrap_fn(pages::index::page));
+    let index = ctx.clone().with(warp::wrap_fn(pages::url_lists::ranked));
     let index = warp::path::end().and(index);
+
+    let recent = ctx.clone().with(warp::wrap_fn(pages::url_lists::recent));
+    let recent = warp::path("recent").and(recent);
+
+    let user = ctx.clone().with(warp::wrap_fn(pages::url_lists::user));
+    let user = warp::path("user").and(user);
+
+    let mine = ctx.clone().with(warp::wrap_fn(pages::url_lists::mine));
+    let mine = warp::path("mine").and(mine);
 
     let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
     let login = warp::path("login").and(login);
@@ -57,6 +66,9 @@ pub fn global_routes(
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
 
     let routes = index
+        .or(recent)
+        .or(mine)
+        .or(user)
         .or(login)
         .or(register)
         .or(logout)

@@ -6,10 +6,10 @@ use web_session::Session;
 pub mod account;
 pub mod error;
 pub mod graphiql;
-pub mod index;
 pub mod login;
 pub mod logout;
 pub mod register;
+pub mod url_lists;
 pub mod xsrf;
 
 const XSRF_COOKIE_NAME: &'static str = "xsrf";

@@ -1,39 +1,84 @@
-<a class="block w-full sm:flex rounded hover:bg-gray-200 dark:hover:bg-gray-700" href="{{ url.url_str() }}">
-    <!-- <VoteButton initDidVote={didVote} initCount={42} /> -->
-    <div class="sm:flex-grow p-2">
-        <h1 class="leading-5 text-xl font-semibold">
-            {{ url.title().unwrap_or(url.url_str()) }}
-        </h1>
-        {% if url.title().is_some() || url.description().is_some() %}
-            <p class="mt-1 leading-4 text-sm text-gray-600 dark:text-gray-500">
-                {% if url.title().is_some() %}
-                    <span class="text-gray-400 underline italic">{{ url.url_str() }}</span> &middot;
-                {% endif %}
-                {% match url.description() %}
-                    {% when Some with (text) %}
-                    {{ text }}
-                    {% when None %}
-                {% endmatch %}
-            </p>
-        {% endif %}
-        <div class="flex items-center mt-1 italic leading-4 text-sm text-gray-400 dark:text-gray-500">
-            <a class="block p-1 -ml-1 rounded-xl flex items-center hover:bg-gray-300" href="/user/{{ created_by.id() }}">
+<div class="w-full sm:flex sm:space-x-2">
+    {% if is_logged_in %}
+        <div
+            data-hydrate-vote-button
+            data-id="{{ url.id() }}"
+            data-count="{{ upvote_count }}"
+            data-upvoted="{{ is_upvoted_by_viewer }}"
+        ></div>
+    {% else %}
+        <a
+            class="
+                block w-10 h-10 flex-none m-2 sm:mx-0
+                flex flex-col justify-center items-center
+                border-2 border-blue-500 rounded text-blue-500
+            "
+            href="/login"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-xs leading-none">{{ upvote_count }}</span>
+        </a>
+    {% endif %}
+    <div class="sm:flex-grow">
+        <a class="block p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" href="{{ url.url_str() }}">
+            <h1 class="leading-5 text-xl font-semibold">
+                {{ url.title().unwrap_or(url.url_str()) }}
+            </h1>
+            {% if url.title().is_some() || url.description().is_some() %}
+                <p class="mt-1 leading-4 text-sm text-gray-600 dark:text-gray-500">
+                    {% if url.title().is_some() %}
+                        <span class="text-gray-400 underline italic">{{ url.url_str() }}</span>
+                    {% endif %}
+                    {% match url.description() %}
+                        {% when Some with (text) %}
+                        {% if url.title().is_some() %}
+                            &middot;
+                        {% endif %}
+                        {{ text }}
+                        {% when None %}
+                    {% endmatch %}
+                </p>
+            {% endif %}
+        </a>
+        <div class="p-1 sm:flex sm:items-center italic leading-4 text-sm text-gray-400 dark:text-gray-500">
+            <a
+                class="block p-1 rounded-xl flex items-center hover:bg-gray-300"
+                href="/user/{{ created_by.id() }}"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
                 </svg>
                 {{ created_by.name() }}
             </a>
-            &middot;
-            <a class="block p-1 rounded-xl flex items-center hover:bg-gray-300" href="/comments/{{ url.id() }}">
+            <span class="sm:block hidden">&middot;</span>
+            <a
+                class="block p-1 rounded-xl flex items-center hover:bg-gray-300"
+                href="/comments/{{ url.id() }}"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                     <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
                 </svg>
                 0 Comments
             </a>
-            &middot;
-            {{ "{}"|format(url.created_at().format("%A %e. %b %Y")) }}
+            <span class="sm:block hidden">&middot;</span>
+            <div class="p-1 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                </svg>
+                {{ "{}"|format(url.created_at().format("%A %e. %b %Y")) }}
+            </div>
         </div>
     </div>
-    {image && <img class="w-full sm:w-40 sm:h-20 max-w-full rounded shadow-xl" src={image} />}
-</a>
+    {% match url.image() %}
+        {% when Ok with (maybe_img) %}
+        {% match maybe_img %}
+            {% when Some with (img_url) %}
+            <img class="sm:block hidden sm:w-40 sm:h-20 rounded shadow-xl" src="{{ img_url }}" />
+            {% when _ %}
+        {% endmatch %}
+        {% when _ %}
+    {% endmatch %}
+</div>

@@ -9,5 +9,5 @@ pub use invite::Invite;
 pub use login::Login;
 pub use permission::Permission;
 pub use role::Role;
-pub use url::{NewUrlInput, Url};
+pub use url::{NewUrlInput, Url, UrlOrdering};
 pub use user::{NewUserInput, UpdateUserInput, User};
