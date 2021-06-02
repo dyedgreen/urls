@@ -72,13 +72,4 @@
             </div>
         </div>
     </div>
-    {% match url.image() %}
-        {% when Ok with (maybe_img) %}
-        {% match maybe_img %}
-            {% when Some with (img_url) %}
-            <img class="sm:block hidden sm:max-w-40 sm:max-h-20 rounded shadow-xl" src="{{ img_url }}" />
-            {% when _ %}
-        {% endmatch %}
-        {% when _ %}
-    {% endmatch %}
 </div>

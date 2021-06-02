@@ -60,7 +60,9 @@ async fn handle(
         is_logged_in: ctx.is_logged_in(),
         xsrf_token: ctx.xsrf_token(),
     };
-    Ok(page.into_response())
+
+    let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+    Ok(resp.into_response())
 }
 
 fn paginate() -> impl Filter<Extract = (u32,), Error = Rejection> + Clone + Copy {
