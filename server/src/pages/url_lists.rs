@@ -12,6 +12,8 @@ const PAGE_SIZE: i64 = 10;
 #[template(path = "pages/url_list.html")]
 struct Page<'a> {
     title: &'a str,
+
+    list_header: Option<ListHeader<'a>>,
     url_list: &'a [UrlPartial],
 
     page: u32,
@@ -19,6 +21,11 @@ struct Page<'a> {
 
     is_logged_in: bool,
     xsrf_token: &'a str,
+}
+
+struct ListHeader<'a> {
+    heading: &'a str,
+    sub_heading: &'a str,
 }
 
 #[derive(Template)]
@@ -50,8 +57,31 @@ async fn handle(
         });
     }
 
+    let user_heading;
+    let list_header = match order {
+        UrlOrdering::Ranked => None,
+        UrlOrdering::Best => Some(ListHeader {
+            heading: "Best",
+            sub_heading: "All time best submissions",
+        }),
+        UrlOrdering::Recent => Some(ListHeader {
+            heading: "Recent",
+            sub_heading: "The most recent submissions",
+        }),
+        UrlOrdering::User(user_id) => {
+            let user = User::find(&ctx, user_id).await?;
+            user_heading = format!("By {}", user.name());
+            Some(ListHeader {
+                heading: &user_heading,
+                sub_heading: "Recent submissions",
+            })
+        }
+    };
+
     let page = Page {
         title,
+
+        list_header,
         url_list: &url_list,
 
         page,

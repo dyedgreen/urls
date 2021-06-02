@@ -6,6 +6,15 @@
         <div class="w-full max-w-screen-md" id="header"></div>
         {% endif %}
         <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4">
+            {% match list_header %}
+                {% when Some with (header) %}
+                <div>
+                    <h1 class="text-2xl font-semibold leading-none">{{ header.heading }}</h1>
+                    <h2 class="text-xl text-gray-500 mb-4">{{ header.sub_heading }}</h2>
+                </div>
+                {% when None %}
+            {% endmatch %}
+
             {% for url_partial in url_list %}
                 {{ url_partial|safe }}
             {% endfor %}
