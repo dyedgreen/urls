@@ -144,21 +144,7 @@ impl Url {
 
         let total_count_query = urls::table.select(diesel::dsl::count_star());
         let total_count: i64 = match order {
-            Ranked => {
-                let count_vote_after = ctx.now() - Duration::days(INCLUDE_DAYS_IN_RANKED);
-                let recent_or_null = url_upvotes::dsl::created_at
-                    .ge(count_vote_after.naive_utc())
-                    .or(url_upvotes::dsl::created_at.is_null());
-                total_count_query
-                    .left_outer_join(url_upvotes::table)
-                    .filter(recent_or_null)
-                    .group_by(urls::all_columns)
-                    .select(diesel::dsl::count_star())
-                    .get_result(&*ctx.conn().await?)
-                    .optional()?
-                    .unwrap_or(0)
-            }
-            Best | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
+            Ranked | Best | Recent => total_count_query.get_result(&*ctx.conn().await?)?,
             User(creator_id) => total_count_query
                 .filter(urls::dsl::created_by.eq(creator_id))
                 .get_result(&*ctx.conn().await?)?,
@@ -173,12 +159,11 @@ impl Url {
         let page = match order {
             Ranked => {
                 let count_vote_after = ctx.now() - Duration::days(INCLUDE_DAYS_IN_RANKED);
-                let recent_or_null = url_upvotes::dsl::created_at
-                    .ge(count_vote_after.naive_utc())
-                    .or(url_upvotes::dsl::created_at.is_null());
+                let join_on_recent = url_upvotes::dsl::url_id
+                    .eq(urls::dsl::id)
+                    .and(url_upvotes::dsl::created_at.ge(count_vote_after.naive_utc()));
                 query
-                    .left_outer_join(url_upvotes::table)
-                    .filter(recent_or_null)
+                    .left_outer_join(url_upvotes::table.on(join_on_recent))
                     .group_by(urls::all_columns)
                     .order_by(diesel::dsl::count(urls::dsl::id).desc())
                     .then_order_by(urls::dsl::created_at.desc())
