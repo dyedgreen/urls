@@ -166,6 +166,7 @@ impl Url {
                     .left_outer_join(url_upvotes::table.on(join_on_recent))
                     .group_by(urls::all_columns)
                     .order_by(diesel::dsl::count(urls::dsl::id).desc())
+                    .then_order_by(url_upvotes::dsl::created_at.is_null().asc()) // order 1 higher than none
                     .then_order_by(urls::dsl::created_at.desc())
                     .select(urls::all_columns)
                     .offset(page * page_size)
@@ -176,6 +177,7 @@ impl Url {
                 .left_outer_join(url_upvotes::table)
                 .group_by(urls::all_columns)
                 .order_by(diesel::dsl::count(urls::dsl::id).desc())
+                .then_order_by(url_upvotes::dsl::created_at.is_null().asc()) // order 1 higher than none
                 .then_order_by(urls::dsl::created_at.desc())
                 .select(urls::all_columns)
                 .offset(page * page_size)
