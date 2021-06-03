@@ -29,11 +29,11 @@ function Header() {
   );
 
   const toggleSubmit = () => {
-    setShowSubmit(!(showSubmit || showMenu));
+    setShowSubmit(!showSubmit);
     setShowMenu(false);
   };
   const toggleMenu = () => {
-    setShowMenu(!(showSubmit || showMenu));
+    setShowMenu(!showMenu);
     setShowSubmit(false);
   };
 
