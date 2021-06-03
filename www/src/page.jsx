@@ -1,4 +1,4 @@
-import { render, h } from "preact";
+import { render, h, Fragment } from "preact";
 import { useState } from "preact/hooks";
 import { graphql, useMutation } from "picoql";
 
@@ -8,23 +8,48 @@ import Link from "@app/Link";
 import SubmitUrl from "@app/header/SubmitUrl";
 
 
+const MENU_ITEM = <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+  <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM9 15a1 1 0 011-1h6a1 1 0 110 2h-6a1 1 0 01-1-1z" clip-rule="evenodd" />
+</svg>;
+
 function Header() {
   const [showSubmit, setShowSubmit] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   let containerClasses = "w-full rounded-t-lg pb-8 -mb-6 p-2";
-  if (showSubmit)
+  if (showSubmit || showMenu)
     containerClasses += " bg-gray-50 dark:bg-gray-900";
+
+  const links = (
+    <>
+      <Link title="home" href="/" />
+      <Link title="recent" href="/recent" />
+      <Link title="mine" href="/mine" />
+    </>
+  );
+
+  const toggleSubmit = () => {
+    setShowSubmit(!(showSubmit || showMenu));
+    setShowMenu(false);
+  };
+  const toggleMenu = () => {
+    setShowMenu(!(showSubmit || showMenu));
+    setShowSubmit(false);
+  };
 
   return (
     <div class={containerClasses}>
-      <div class="flex space-x-2 items-center">
-        <Button title="Submit a url" onClick={() => setShowSubmit(!showSubmit)} />
-        <Link title="/recent" href="/recent" />
-        <Link title="/mine" href="/mine" />
+      <div class="flex items-center justify-between">
+        <Button title="Submit url" onClick={toggleSubmit} style="mr-2 whitespace-nowrap" />
+        <div class="w-full sm:flex hidden">
+          {links}
+        </div>
+        <Button title={MENU_ITEM} onClick={toggleMenu} type="flat" style="sm:hidden block" />
       </div>
       <div class="mt-4" style={{ display: showSubmit ? undefined : "none" }}>
         <SubmitUrl />
       </div>
+      {showMenu && <div class="mt-4">{links}</div>}
     </div>
   );
 }
