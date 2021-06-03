@@ -2127,8 +2127,7 @@ dependencies = [
 [[package]]
 name = "validator"
 version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be110dc66fa015b8b1d2c4eae40c495a27fae55f82b9cae3efb8178241ed20eb"
+source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
 dependencies = [
  "idna",
  "lazy_static",
@@ -2144,8 +2143,7 @@ dependencies = [
 [[package]]
 name = "validator_derive"
 version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68f14fe757e2894ce4271991901567be07fbc3eac6b24246122214e1d5a16554"
+source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
 dependencies = [
  "if_chain",
  "lazy_static",
@@ -2160,8 +2158,7 @@ dependencies = [
 [[package]]
 name = "validator_types"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad9680608df133af2c1ddd5eaf1ddce91d60d61b6bc51494ef326458365a470a"
+source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
 
 [[package]]
 name = "vcpkg"

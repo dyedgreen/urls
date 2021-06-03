@@ -32,9 +32,9 @@ pub struct NewUserInput {
 
 #[derive(Debug, Clone, Validate, GraphQLInputObject)]
 pub struct UpdateUserInput {
-    #[validate(length(min = 1, max = 256, message = "Invalid name"))]
+    #[validate(length(min = 1, max = 256, message = "A name is required"))]
     name: Option<String>,
-    #[validate(email(message = "Invalid email"))]
+    #[validate(email(message = "A valid email address is required"))]
     email: Option<String>,
 }
 

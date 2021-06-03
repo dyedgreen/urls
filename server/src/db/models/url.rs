@@ -29,7 +29,7 @@ pub struct Url {
 
 #[derive(Debug, Clone, Validate, GraphQLInputObject)]
 pub struct NewUrlInput {
-    #[validate(url)]
+    #[validate(url(message = "Please submit a valid URL"))]
     url: String,
 }
 
