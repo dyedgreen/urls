@@ -1,3 +1,4 @@
+use html_escape::decode_html_entities;
 use nom::{error::ErrorKind, Err};
 use parser::Tag;
 
@@ -58,21 +59,18 @@ impl Meta {
                         match tag {
                             Tag::Meta(meta_tag) => match meta_tag.name {
                                 b"twitter:title" | b"og:title" => {
-                                    self.title =
-                                        Some(String::from_utf8_lossy(meta_tag.content).into());
+                                    self.title = Some(decode_str_bytes(meta_tag.content));
                                 }
                                 b"twitter:description" | b"og:description" => {
-                                    self.description =
-                                        Some(String::from_utf8_lossy(meta_tag.content).into());
+                                    self.description = Some(decode_str_bytes(meta_tag.content));
                                 }
                                 b"twitter:image" | b"twitter:image:src" | b"og:image" => {
-                                    self.image =
-                                        Some(String::from_utf8_lossy(meta_tag.content).into());
+                                    self.image = Some(decode_str_bytes(meta_tag.content));
                                 }
                                 _ => {}
                             },
                             Tag::Title(title_tag) => {
-                                self.title = Some(String::from_utf8_lossy(title_tag.title).into());
+                                self.title = Some(decode_str_bytes(title_tag.title));
                             }
                         }
                         // clean up used buffer
@@ -94,6 +92,11 @@ impl Meta {
             self.buffer.truncate(MAX_BUFFER_SIZE);
         }
     }
+}
+
+fn decode_str_bytes(bytes: &[u8]) -> String {
+    let html = String::from_utf8_lossy(bytes);
+    decode_html_entities(&html).trim().into()
 }
 
 #[cfg(test)]
@@ -147,5 +150,29 @@ mod tests {
             Some("How much does culture influence creative thinking?".into())
         );
         assert_eq!(meta.image, Some("http://static01.nyt.com/images/2015/02/19/arts/international/19iht-btnumbers19A/19iht-btnumbers19A-facebookJumbo-v2.jpg".into()));
+    }
+
+    #[test]
+    fn test_html_entities() {
+        let html_entities_example = r#"
+            <title>Hello &middot; world!</title>
+        "#;
+
+        let mut meta = Meta::new();
+        meta.parse(html_entities_example.as_bytes());
+
+        assert_eq!(meta.title, Some("Hello · world!".into()));
+    }
+
+    #[test]
+    fn test_white_space() {
+        let html_entities_example = r#"
+            <title> Badly Aligned </title>
+        "#;
+
+        let mut meta = Meta::new();
+        meta.parse(html_entities_example.as_bytes());
+
+        assert_eq!(meta.title, Some("Badly Aligned".into()));
     }
 }

@@ -6,4 +6,5 @@ authors = ["Tilman Roeder"]
 edition = "2018"
 
 [dependencies]
+html-escape = "0.2.9"
 nom = "6.1"
