@@ -1,6 +1,7 @@
-import { render, h } from "preact";
+import { render, h, Component } from "preact";
 import { useState } from "preact/hooks";
 import { graphql, useMutation } from "picoql";
+import { errorToString } from "@app/ErrorBoundary";
 
 function VoteButton({ urlID, initDidVote, initCount }) {
   const [didVote, setDidVote] = useState(initDidVote ?? false);
@@ -60,11 +61,44 @@ function VoteButton({ urlID, initDidVote, initCount }) {
   );
 }
 
+class VoteErrorBoundary extends Component {
+  constructor() {
+    super();
+    this.state = { error: false };
+  }
+
+  componentDidCatch(error) {
+    console.error(error);
+    this.setState({ error });
+  }
+
+  render({ children }, { error }) {
+    if (error !== false) {
+      return (
+        <div
+          class="block w-10 h-10 flex-none m-2 sm:mx-0 flex justify-center items-center rounded bg-red-500 text-white"
+          title={errorToString(error)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+      );
+    }
+    return children;
+  }
+}
+
 export default function hydrate() {
   for (const element of document.querySelectorAll("[data-hydrate-vote-button]")) {
     const urlID = element.dataset.id;
     const count = parseInt(element.dataset.count);
     const upvoted = element.dataset.upvoted === "true";
-    render(<VoteButton urlID={urlID} initDidVote={upvoted} initCount={count} />, element);
+    const button = (
+      <VoteErrorBoundary>
+        <VoteButton urlID={urlID} initDidVote={upvoted} initCount={count} />
+      </VoteErrorBoundary>
+    );
+    render(button, element);
   }
 }

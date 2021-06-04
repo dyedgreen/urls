@@ -5,7 +5,7 @@ function reload() {
   window.location.href = window.location.href;
 }
 
-function errorToString(err) {
+export function errorToString(err) {
   const obj = {};
   for (const key of Object.getOwnPropertyNames(err)) {
     obj[key] = err[key];
