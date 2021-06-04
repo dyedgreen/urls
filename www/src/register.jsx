@@ -22,7 +22,7 @@ function Register() {
     }
   `, {
     onCommit: () => window.location.href = "/login",
-    onError: ([{message}]) => setError(`Failed to register: ${message}`),
+    onError: ([{message}]) => setError(`Failed to register: ${message.replace(/\n/g, ", ")}`),
   });
   const submit = e => {
     e.preventDefault();

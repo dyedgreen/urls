@@ -13,8 +13,9 @@ export default {
   optimize: {
     entrypoints: [
       "src/account.jsx",
+      "src/header.jsx",
+      "src/comments.jsx",
       "src/login.jsx",
-      "src/page.jsx",
       "src/register.jsx",
     ],
     bundle: true,

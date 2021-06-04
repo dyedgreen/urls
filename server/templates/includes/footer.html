@@ -1,5 +1,7 @@
 <div class="w-full flex flex-wrap space-x-4 justify-center my-16 px-4">
   <a href="/" class="font-semibold hover:underline">urls.fyi</a>
+  <a href="/recent" class="text-gray-500 hover:underline">recent</a>
+  <a href="/best" class="text-gray-500 hover:underline">best</a>
   {% if is_logged_in %}
     <a href="/account" class="text-gray-500 hover:underline">account</a>
     <a href="/logout" class="text-gray-500 hover:underline">logout</a>
@@ -7,7 +9,6 @@
     <a href="/login" class="text-gray-500 hover:underline">login</a>
     <a href="/register" class="text-gray-500 hover:underline">register</a>
   {% endif %}
-  <a href="/best" class="text-gray-500 hover:underline">best</a>
   <a href="/graphql/playground" class="text-gray-500 hover:underline">graphql api</a>
   <a href="https://www.github.com/dyedgreen/urls" class="text-gray-500 hover:underline">open source</a>
 </div>

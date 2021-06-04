@@ -74,6 +74,13 @@ impl Url {
         Ok(maybe_uri)
     }
 
+    /// Return the image uri as a `&str`. This always succeeds
+    /// but might return an invalid Uri, since it simply
+    /// returns the value found in the database.
+    pub fn image_str(&self) -> Option<&str> {
+        self.image.as_ref().map(AsRef::as_ref)
+    }
+
     pub fn created_at(&self) -> DateTime<Utc> {
         DateTime::from_utc(self.created_at, Utc)
     }

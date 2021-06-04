@@ -49,6 +49,9 @@ pub fn global_routes(
     let user = ctx.clone().with(warp::wrap_fn(pages::url_lists::user));
     let user = warp::path("user").and(user);
 
+    let comments = ctx.clone().with(warp::wrap_fn(pages::comments::page));
+    let comments = warp::path("comments").and(comments);
+
     let login = ctx.clone().with(warp::wrap_fn(pages::login::page));
     let login = warp::path("login").and(login);
 
@@ -73,6 +76,7 @@ pub fn global_routes(
         .or(best)
         .or(mine)
         .or(user)
+        .or(comments)
         .or(login)
         .or(register)
         .or(logout)

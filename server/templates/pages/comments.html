@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}comments{% endblock title %}
+{% block content %}
+    <div class="w-full flex flex-col items-center p-8">
+        {% if is_logged_in %}
+        <div class="w-full max-w-screen-md" id="header"></div>
+        {% endif %}
+        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4">
+            {% match url_partial.url.image_str() %}
+                {% when Some with (src) %}
+                <img class="w-full h-40 rounded shadow" src="{{ src }}" style="object-fit: cover" />
+                {% when None %}
+            {% endmatch %}
+            {{ url_partial|safe }}
+           <div id="comments"></div>
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+    <script>
+        window.__xsrf_token = "{{ xsrf_token }}";
+    </script>
+    {% if is_logged_in %}
+        <script type="module" src="/dist/header.js"></script>
+    {% endif %}
+    <script type="module" src="/dist/comments.js"></script>
+{% endblock scripts %}
