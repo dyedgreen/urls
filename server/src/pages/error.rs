@@ -14,7 +14,6 @@ pub enum ServerError {
 #[template(path = "pages/error.html")]
 struct ErrorPage {
     status: http::StatusCode,
-    is_logged_in: bool,
 }
 
 impl<E> From<E> for ServerError
@@ -57,10 +56,7 @@ where
                 ServerError::Request => http::StatusCode::BAD_REQUEST,
                 ServerError::NotFound => http::StatusCode::NOT_FOUND,
             };
-            let page = ErrorPage {
-                status,
-                is_logged_in: false,
-            };
+            let page = ErrorPage { status };
             Ok(warp::reply::with_status(page, status).into_response())
         })
 }
