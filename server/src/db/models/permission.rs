@@ -41,6 +41,15 @@ impl Permission {
     }
 
     /// Determine if this permission grants the ability to
+    /// delete comments not created by this user.
+    pub fn delete_any_comment(&self) -> bool {
+        match *self {
+            Permission::Administrator => true,
+            Permission::Moderator => true,
+        }
+    }
+
+    /// Determine if this permission grants the ability to
     /// access database backups.
     pub fn access_admin_backups(&self) -> bool {
         match *self {

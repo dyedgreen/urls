@@ -1,7 +1,8 @@
 use super::viewer::Viewer;
-use crate::db::id::UrlID;
+use crate::db::id::{CommentID, UrlID};
 use crate::db::models::{
-    Invite, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput, Url, User,
+    Comment, Invite, NewCommentInput, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput,
+    Url, User,
 };
 use crate::{Config, Context};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
@@ -122,5 +123,18 @@ impl Mutation {
         let url = Url::find(ctx, url).await?;
         url.rescind_upvote(ctx).await?;
         Ok(url)
+    }
+
+    /// Comment on the given URL as the viewer.
+    async fn comment(ctx: &Context, input: NewCommentInput) -> FieldResult<Comment> {
+        Ok(Comment::create(ctx, input).await?)
+    }
+
+    /// Delete the given comment. Only the original author, or a moderator
+    /// is allowed to delete comments.
+    async fn delete_comment(ctx: &Context, comment: CommentID) -> FieldResult<Comment> {
+        let mut comment = Comment::find(ctx, comment).await?;
+        comment.delete(ctx).await?;
+        Ok(comment)
     }
 }

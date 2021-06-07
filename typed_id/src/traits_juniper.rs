@@ -5,7 +5,7 @@ use juniper::{
     parser::ScalarToken,
     DefaultScalarValue, ExecutionResult, Executor, FromInputValue, GraphQLType, GraphQLValue,
     GraphQLValueAsync, InputValue, ParseScalarResult, ParseScalarValue, Registry, ScalarValue,
-    Selection,
+    Selection, ToInputValue,
 };
 use std::convert::TryInto;
 
@@ -67,6 +67,12 @@ impl<S: ScalarValue, const KIND: u64> FromInputValue<S> for ID<KIND> {
 impl<S: ScalarValue, const KIND: u64> ParseScalarValue<S> for ID<KIND> {
     fn from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
         <String as ParseScalarValue<S>>::from_str(value)
+    }
+}
+
+impl<S: ScalarValue, const KIND: u64> ToInputValue<S> for ID<KIND> {
+    fn to_input_value(&self) -> InputValue<S> {
+        self.as_str().to_input_value()
     }
 }
 

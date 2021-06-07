@@ -1,6 +1,6 @@
 use crate::db::id::{UrlID, UserID};
 use crate::db::models::User;
-use crate::schema::{url_upvotes, urls, users};
+use crate::schema::{comments, url_upvotes, urls, users};
 use crate::Context;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
@@ -261,7 +261,9 @@ impl Url {
         }
         let conn = ctx.conn().await?;
         let upvotes = url_upvotes::table.filter(url_upvotes::dsl::url_id.eq(self.id));
+        let comments = comments::table.filter(comments::dsl::url_id.eq(self.id));
         diesel::delete(upvotes).execute(&*conn)?;
+        diesel::delete(comments).execute(&*conn)?;
         diesel::delete(self).execute(&*conn)?;
         Ok(())
     }

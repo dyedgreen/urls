@@ -1,4 +1,16 @@
 table! {
+    comments (id) {
+        id -> Text,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        comment -> Text,
+        url_id -> Text,
+        created_by -> Text,
+        replies_to -> Nullable<Text>,
+    }
+}
+
+table! {
     invites (id) {
         id -> Text,
         created_at -> Timestamp,
@@ -62,6 +74,8 @@ table! {
     }
 }
 
+joinable!(comments -> urls (url_id));
+joinable!(comments -> users (created_by));
 joinable!(logins -> users (user_id));
 joinable!(roles -> users (user_id));
 joinable!(url_upvotes -> urls (url_id));
@@ -69,6 +83,7 @@ joinable!(url_upvotes -> users (user_id));
 joinable!(urls -> users (created_by));
 
 allow_tables_to_appear_in_same_query!(
+    comments,
     invites,
     logins,
     roles,

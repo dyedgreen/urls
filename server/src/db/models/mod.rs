@@ -1,3 +1,4 @@
+mod comment;
 mod invite;
 mod login;
 mod permission;
@@ -5,6 +6,7 @@ mod role;
 mod url;
 mod user;
 
+pub use comment::{Comment, NewCommentInput};
 pub use invite::Invite;
 pub use login::Login;
 pub use permission::Permission;
