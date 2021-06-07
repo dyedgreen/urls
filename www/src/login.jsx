@@ -68,6 +68,7 @@ function Login() {
         <TextInput
           label="Email Address"
           placeholder="ada.lovelace@urls.fyi"
+          type="email"
           style="mt-2"
           value={email}
           onChange={setEmail}

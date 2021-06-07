@@ -22,9 +22,9 @@ export default function Invite({ id, token, claimedBy }) {
         {
           claimedBy == null ?
           <div class="p-4">
-            <pre class="w-full text-center p-2 bg-yellow-500 rounded-md">
+            <div class="w-full font-mono text-center select-all break-all p-2 bg-yellow-500 rounded-md">
               {token}
-            </pre>
+            </div>
           </div> : <div />
         }
       </div>

@@ -46,6 +46,7 @@ export default function ChangeEmail({}) {
     <TextInput
       label="New email address"
       placeholder="ada.lovelace@urls.fyi"
+      type="email"
       value={email}
       onChange={setEmail}
       style="mb-2"
@@ -53,6 +54,7 @@ export default function ChangeEmail({}) {
     <TextInput
       label="Confirm email address"
       placeholder="ada.lovelace@urls.fyi"
+      type="email"
       value={confirmEmail}
       onChange={setConfirmEmail}
       style="mb-2"

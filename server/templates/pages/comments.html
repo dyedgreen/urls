@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}comments{% endblock title %}
+{% block title %}{{ url_partial.url.title().unwrap_or("comments") }}{% endblock title %}
 {% block content %}
     <div class="w-full flex flex-col items-center p-8">
         {% if is_logged_in %}
