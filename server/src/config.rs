@@ -53,9 +53,20 @@ impl Config {
         }
     }
 
-    /// SQLite database file.
+    /// SQLite database URI.
     pub fn database(&self) -> &str {
         self.database_url.as_str()
+    }
+
+    /// Extract the database file from the
+    /// SQLite URI.
+    pub fn database_file(&self) -> &Path {
+        let uri = self.database();
+        let path = match uri.get(0..5) {
+            Some("file:") => uri[5..].split_once('?').map(|p| p.0).unwrap_or(&uri[5..]),
+            Some(_) | None => uri,
+        };
+        Path::new(path)
     }
 
     /// Directory to serve static files

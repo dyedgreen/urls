@@ -39,6 +39,15 @@ impl Permission {
             Permission::Moderator => true,
         }
     }
+
+    /// Determine if this permission grants the ability to
+    /// access database backups.
+    pub fn access_admin_backups(&self) -> bool {
+        match *self {
+            Permission::Administrator => true,
+            Permission::Moderator => false,
+        }
+    }
 }
 
 impl<DB> ToSql<Text, DB> for Permission

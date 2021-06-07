@@ -4,6 +4,7 @@ use warp::Filter;
 use web_session::Session;
 
 pub mod account;
+pub mod admin;
 pub mod comments;
 pub mod error;
 pub mod graphiql;
