@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup
-      run: cp .env.example .env
+      run: cp .env.example .env && touch database.db
     - name: Build
       run: cargo build --verbose
     - name: Run tests
