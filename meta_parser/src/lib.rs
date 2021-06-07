@@ -59,18 +59,18 @@ impl Meta {
                         match tag {
                             Tag::Meta(meta_tag) => match meta_tag.name {
                                 b"twitter:title" | b"og:title" => {
-                                    self.title = Some(decode_str_bytes(meta_tag.content));
+                                    self.title = decode_str_bytes(meta_tag.content);
                                 }
                                 b"twitter:description" | b"og:description" => {
-                                    self.description = Some(decode_str_bytes(meta_tag.content));
+                                    self.description = decode_str_bytes(meta_tag.content);
                                 }
                                 b"twitter:image" | b"twitter:image:src" | b"og:image" => {
-                                    self.image = Some(decode_str_bytes(meta_tag.content));
+                                    self.image = decode_str_bytes(meta_tag.content);
                                 }
                                 _ => {}
                             },
                             Tag::Title(title_tag) => {
-                                self.title = Some(decode_str_bytes(title_tag.title));
+                                self.title = decode_str_bytes(title_tag.title);
                             }
                         }
                         // clean up used buffer
@@ -94,9 +94,14 @@ impl Meta {
     }
 }
 
-fn decode_str_bytes(bytes: &[u8]) -> String {
+fn decode_str_bytes(bytes: &[u8]) -> Option<String> {
     let html = String::from_utf8_lossy(bytes);
-    decode_html_entities(&html).trim().into()
+    let clean = decode_html_entities(&html).trim().to_string();
+    if clean.is_empty() {
+        None
+    } else {
+        Some(clean)
+    }
 }
 
 #[cfg(test)]
@@ -174,5 +179,17 @@ mod tests {
         meta.parse(html_entities_example.as_bytes());
 
         assert_eq!(meta.title, Some("Badly Aligned".into()));
+    }
+
+    #[test]
+    fn test_empty_meta() {
+        let html_entities_example = r#"
+            <meta name="twitter:title" content="  " />
+        "#;
+
+        let mut meta = Meta::new();
+        meta.parse(html_entities_example.as_bytes());
+
+        assert_eq!(meta.title, None);
     }
 }
