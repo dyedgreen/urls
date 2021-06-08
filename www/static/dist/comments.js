@@ -46,5 +46,5 @@ var u,N,Y,K,F={},U=[],Ne=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|
         name
       }
     }
-  `,{url:t});return l("div",{class:"w-full flex flex-col items-center justify-center space-y-1"},((c=(o=(i=(r=e==null?void 0:e.url)==null?void 0:r.comments)==null?void 0:i.edges)==null?void 0:o.length)!=null?c:0)>0&&l("h2",{class:"w-full text-xl font-semibold"},"Comments"),n?l(I,{size:"large"}):(p=(m=(f=e==null?void 0:e.url)==null?void 0:f.comments)==null?void 0:m.edges)==null?void 0:p.map(({node:s})=>l(D,{...s})),((d=(_=e==null?void 0:e.viewer)==null?void 0:_.user)==null?void 0:d.id)&&l(X,{urlID:t}))}var Se=document.getElementById("comments");R(l(Ce,null,l(ze,{urlID:Se.dataset.urlId})),Se);
+  `,{url:t});return l("div",{class:"w-full flex flex-col items-center justify-center space-y-1 sm:pl-14"},((c=(o=(i=(r=e==null?void 0:e.url)==null?void 0:r.comments)==null?void 0:i.edges)==null?void 0:o.length)!=null?c:0)>0&&l("h2",{class:"w-full text-xl font-semibold"},"Comments"),n?l(I,{size:"large"}):(p=(m=(f=e==null?void 0:e.url)==null?void 0:f.comments)==null?void 0:m.edges)==null?void 0:p.map(({node:s})=>l(D,{...s})),((d=(_=e==null?void 0:e.viewer)==null?void 0:_.user)==null?void 0:d.id)&&l(X,{urlID:t}))}var Se=document.getElementById("comments");R(l(Ce,null,l(ze,{urlID:Se.dataset.urlId})),Se);
 //# sourceMappingURL=comments.js.map
