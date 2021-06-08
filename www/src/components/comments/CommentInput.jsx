@@ -58,7 +58,7 @@ export default function CommentInput({ urlID, repliesToID }) {
         {error && <Notice message={error} type="error" style="mb-2" />}
         <div class="w-full p-2 rounded bg-gray-200 dark:bg-gray-600">
           <textarea
-            class="w-full bg-transparent"
+            class="w-full h-14 resize-none bg-transparent leading-none"
             placeholder="Your thoughts, formatted with *markdown* ..."
             onInput={e => setText(e.target.value)}
             value={text}

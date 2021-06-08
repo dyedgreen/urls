@@ -18,7 +18,7 @@ var u,N,Y,K,F={},U=[],Ne=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|
         name
       }
     }
-  `,{onCommit:({comment:s})=>{r(""),o(null),f([...c,s])},onError:([{message:s}])=>{o(s)}}),_=n.trim().length==0||p,d=s=>{s.preventDefault(),!_&&m({text:n.trim(),url:t})};return l(j,null,c.map(s=>l(D,{...s})),l("form",{class:"w-full",onSubmit:d},i&&l(G,{message:i,type:"error",style:"mb-2"}),l("div",{class:"w-full p-2 rounded bg-gray-200 dark:bg-gray-600"},l("textarea",{class:"w-full bg-transparent",placeholder:"Your thoughts, formatted with *markdown* ...",onInput:s=>r(s.target.value),value:n},n),l(A,{title:l("div",{class:"flex items-center"},Ue," Comment"),onClick:d,disabled:_,loading:p}))))}function ze({urlID:t}){var r,i,o,c,f,m,p,_,d;let{data:e,loading:n}=xe(O`
+  `,{onCommit:({comment:s})=>{r(""),o(null),f([...c,s])},onError:([{message:s}])=>{o(s)}}),_=n.trim().length==0||p,d=s=>{s.preventDefault(),!_&&m({text:n.trim(),url:t})};return l(j,null,c.map(s=>l(D,{...s})),l("form",{class:"w-full",onSubmit:d},i&&l(G,{message:i,type:"error",style:"mb-2"}),l("div",{class:"w-full p-2 rounded bg-gray-200 dark:bg-gray-600"},l("textarea",{class:"w-full h-14 resize-none bg-transparent leading-none",placeholder:"Your thoughts, formatted with *markdown* ...",onInput:s=>r(s.target.value),value:n},n),l(A,{title:l("div",{class:"flex items-center"},Ue," Comment"),onClick:d,disabled:_,loading:p}))))}function ze({urlID:t}){var r,i,o,c,f,m,p,_,d;let{data:e,loading:n}=xe(O`
     query CommentsQuery($url: ID!) {
       viewer {
         user {
