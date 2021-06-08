@@ -38,10 +38,13 @@ function Comments({ urlID }) {
   `, { url: urlID });
   return (
     <div class="w-full flex flex-col items-center justify-center space-y-1">
-      <h2 class="w-full text-xl font-semibold">Comments</h2>
+      {
+        (data?.url?.comments?.edges?.length ?? 0) > 0 &&
+        <h2 class="w-full text-xl font-semibold">Comments</h2>
+      }
       {
         loading ? <ActivityIndicator size="large" /> :
-        data.url.comments.edges.map(({ node }) => <Comment {...node} />)
+        data?.url?.comments?.edges?.map(({ node }) => <Comment {...node} />)
       }
       {data?.viewer?.user?.id && <CommentInput urlID={urlID} />}
     </div>
