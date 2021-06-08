@@ -4,7 +4,7 @@ use crate::schema::comments;
 use crate::Context;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use juniper::{graphql_object, FieldResult};
+use juniper::{graphql_object, FieldResult, Nullable};
 use juniper_relay::{RelayConnection, RelayConnectionNode};
 use std::convert::TryInto;
 
@@ -77,8 +77,10 @@ impl Url {
         Ok(self.upvoted_by_viewer(ctx).await?)
     }
 
-    /// List comments and optionally filter by replies-to
-    /// thread.
+    /// List comments and optionally filter by `repliesTo`
+    /// thread. If `repliesTo` is explicitly provided as
+    /// `null`, it will filter for all comments which do not
+    /// reply to any specific other thread.
     async fn comments(
         &self,
         ctx: &Context,
@@ -86,7 +88,7 @@ impl Url {
         after: Option<String>,
         last: Option<i32>,
         before: Option<String>,
-        replies_to: Option<CommentID>,
+        replies_to: Nullable<CommentID>,
     ) -> FieldResult<RelayConnection<Comment>> {
         let conn = ctx.conn().await?;
         RelayConnection::new(first, after, last, before, |after, before, limit| {
@@ -109,9 +111,13 @@ impl Url {
                 query = query.limit(limit);
             }
 
-            if let Some(replies_to) = replies_to {
-                query = query.filter(comments::dsl::replies_to.eq(replies_to));
-            }
+            query = match replies_to {
+                Nullable::Some(comment_id) => {
+                    query.filter(comments::dsl::replies_to.eq(comment_id))
+                }
+                Nullable::ExplicitNull => query.filter(comments::dsl::replies_to.is_null()),
+                Nullable::ImplicitNull => query,
+            };
 
             Ok(query.load(&*conn)?)
         })

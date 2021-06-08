@@ -12,7 +12,7 @@
                 {% when None %}
             {% endmatch %}
             {{ url_partial|safe }}
-           <div id="comments"></div>
+           <div id="comments" data-url-id="{{ url_partial.url.id() }}"></div>
         </div>
     </div>
 {% endblock content %}

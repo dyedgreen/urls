@@ -1,9 +1,11 @@
 use crate::db::id::CommentID;
 use crate::db::models::{Comment, Url, User};
+use crate::schema::comments;
 use crate::Context;
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult};
-use juniper_relay::RelayConnectionNode;
+use juniper_relay::{RelayConnection, RelayConnectionNode};
 
 impl RelayConnectionNode for Comment {
     type Cursor = CommentID;
@@ -60,5 +62,39 @@ impl Comment {
     /// is any.
     async fn replies_to(&self, ctx: &Context) -> FieldResult<Option<Comment>> {
         Ok(self.replies_to(ctx).await?)
+    }
+
+    /// Comments which directly reply to this comment.
+    async fn replies(
+        &self,
+        ctx: &Context,
+        first: Option<i32>,
+        after: Option<String>,
+        last: Option<i32>,
+        before: Option<String>,
+    ) -> FieldResult<RelayConnection<Comment>> {
+        let conn = ctx.conn().await?;
+        RelayConnection::new(first, after, last, before, |after, before, limit| {
+            let mut query = comments::table
+                .filter(comments::dsl::replies_to.eq(self.id()))
+                .order_by(comments::dsl::created_at.asc())
+                .into_boxed();
+
+            if let Some(after) = after {
+                let after: Comment = comments::table.find(after).get_result(&*conn)?;
+                query = query.filter(comments::dsl::created_at.gt(after.created_at().naive_utc()));
+            }
+
+            if let Some(before) = before {
+                let before: Comment = comments::table.find(before).get_result(&*conn)?;
+                query = query.filter(comments::dsl::created_at.lt(before.created_at().naive_utc()));
+            }
+
+            if let Some(limit) = limit {
+                query = query.limit(limit);
+            }
+
+            Ok(query.load(&*conn)?)
+        })
     }
 }

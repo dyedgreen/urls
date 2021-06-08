@@ -43,7 +43,7 @@ export function useQuery(query, args) {
       }
     })
     .catch(err => setErrors(err));
-  }, [query, args, refetchID]);
+  }, [query, refetchID]);
 
   return {
     data,

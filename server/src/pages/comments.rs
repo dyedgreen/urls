@@ -20,6 +20,7 @@ struct UrlPartial {
     created_by: User,
     upvote_count: i64,
     is_upvoted_by_viewer: bool,
+    comment_count: i64,
     is_logged_in: bool,
 }
 
@@ -30,6 +31,7 @@ async fn handle(ctx: Context, url_id: UrlID) -> Result<Response, error::ServerEr
             created_by: url.created_by(&ctx).await?,
             upvote_count: url.upvote_count(&ctx).await?,
             is_upvoted_by_viewer: url.upvoted_by_viewer(&ctx).await?,
+            comment_count: url.comment_count(&ctx).await?,
             is_logged_in: ctx.is_logged_in(),
             url,
         },

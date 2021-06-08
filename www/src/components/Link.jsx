@@ -1,7 +1,7 @@
 import { h } from "preact";
 import ActivityIndicator from "@app/ActivityIndicator";
 
-export default function Button({
+export default function Link({
   title,
   href,
   disabled = false,

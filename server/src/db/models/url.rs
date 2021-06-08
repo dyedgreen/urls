@@ -116,6 +116,14 @@ impl Url {
             Ok(false)
         }
     }
+
+    pub async fn comment_count(&self, ctx: &Context) -> Result<i64> {
+        let count = comments::table
+            .filter(comments::dsl::url_id.eq(self.id))
+            .select(diesel::dsl::count_star())
+            .get_result(&*ctx.conn().await?)?;
+        Ok(count)
+    }
 }
 
 /// Determine how to order and filter the url
