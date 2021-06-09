@@ -19,7 +19,8 @@ function formatDate(dateStr) {
 export default function Comment({ id, html, createdAt, createdBy }) {
   return (
     <div class="w-full">
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <style>{".markdown a { text-decoration: underline; }"}</style>
+      <div class="text-sm leading-tight markdown" dangerouslySetInnerHTML={{ __html: html }} />
       <div
         class="
           flex justify-start items-center
