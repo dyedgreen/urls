@@ -112,7 +112,7 @@ impl User {
     pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
         let conn = ctx.conn().await?;
         let user = users::table
-            .filter(users::dsl::email.eq(email))
+            .filter(users::dsl::email.eq(email.to_ascii_lowercase()))
             .get_result(&*conn)?;
         Ok(user)
     }
@@ -126,7 +126,7 @@ impl User {
     pub async fn create(ctx: &Context, input: NewUserInput) -> Result<Self> {
         let input = NewUserInput {
             name: input.name.trim().into(),
-            email: input.email.trim().into(),
+            email: input.email.trim().to_ascii_lowercase(),
         };
         input.validate()?;
         let NewUserInput { name, email } = input;
@@ -170,7 +170,7 @@ impl User {
     pub async fn update(&mut self, ctx: &Context, input: UpdateUserInput) -> Result<()> {
         let input = UpdateUserInput {
             name: input.name.map(|name| name.trim().into()),
-            email: input.email.map(|email| email.trim().into()),
+            email: input.email.map(|email| email.trim().to_ascii_lowercase()),
         };
         input.validate()?;
         let UpdateUserInput { name, email } = input;
