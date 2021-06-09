@@ -2,12 +2,12 @@ use super::ID;
 use juniper::{
     marker::{IsInputType, IsOutputType},
     meta::MetaType,
-    parser::ScalarToken,
+    parser::{ParseError, ScalarToken},
     DefaultScalarValue, ExecutionResult, Executor, FromInputValue, GraphQLType, GraphQLValue,
     GraphQLValueAsync, InputValue, ParseScalarResult, ParseScalarValue, Registry, ScalarValue,
     Selection, ToInputValue,
 };
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 
 impl<S: ScalarValue, const KIND: u64> GraphQLValue<S> for ID<KIND> {
     type Context = ();
@@ -62,11 +62,21 @@ impl<S: ScalarValue, const KIND: u64> FromInputValue<S> for ID<KIND> {
     fn from_input_value(v: &InputValue<S>) -> Option<Self> {
         v.as_string_value().and_then(|s: &str| s.try_into().ok())
     }
+
+    fn from_implicit_null() -> Self {
+        // TODO(dyedgreen): Investigate into this ...
+        Self::new()
+    }
 }
 
 impl<S: ScalarValue, const KIND: u64> ParseScalarValue<S> for ID<KIND> {
     fn from_str<'a>(value: ScalarToken<'a>) -> ParseScalarResult<'a, S> {
-        <String as ParseScalarValue<S>>::from_str(value)
+        let scalar = <String as ParseScalarValue<S>>::from_str(value)?;
+        let scalar_str = scalar.as_string().ok_or(ParseError::ExpectedScalarError(
+            "Invalid scalar value for type ID",
+        ))?;
+        Self::try_from(scalar_str.as_str()).map_err(|msg| ParseError::ExpectedScalarError(msg))?;
+        Ok(scalar)
     }
 }
 
