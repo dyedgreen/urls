@@ -59,3 +59,19 @@ fn blog_discord_com() {
         Some("https://miro.medium.com/max/1200/1*PyM5eBfN3YXjuZzKgyRa_g.png".into())
     );
 }
+
+#[test]
+fn dev_to() {
+    let html = include_bytes!("dev.to.html");
+    let mut meta = Meta::new();
+    meta.parse(html);
+    assert_eq!(
+        meta.title,
+        Some("Buckle Up For a Wild Decade in Cloud Computing".into())
+    );
+    assert_eq!(meta.description, Some("I’m sure you were affected by the Fastly outage yesterday. The company responded quickly, and it wasn...".into()));
+    assert_eq!(
+        meta.image,
+        Some("https://res.cloudinary.com/practicaldev/image/fetch/s--yJJt-vDA--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/z7hv4g9221qw4qq5wi56.jpeg".into())
+    );
+}

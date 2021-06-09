@@ -70,7 +70,9 @@ impl Meta {
                                 _ => {}
                             },
                             Tag::Title(title_tag) => {
-                                self.title = decode_str_bytes(title_tag.title);
+                                if self.title.is_none() {
+                                    self.title = decode_str_bytes(title_tag.title);
+                                }
                             }
                         }
                         // clean up used buffer
