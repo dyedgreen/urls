@@ -23,7 +23,7 @@ function Login() {
     }
   `, {
     onCommit: () => {
-      setNotice(`A login code was sent to ${email}.`);
+      setNotice(`A login code was sent to ${email}`);
       setError(null);
       setShowCode(true);
     },

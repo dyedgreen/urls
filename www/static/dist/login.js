@@ -4,7 +4,7 @@ var c,E,Q,X,H={},q=[],ke=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|
         ok
       }
     }
-  `,{onCommit:()=>{h(`A login code was sent to ${e}.`),u(null),o(!0)},onError:d=>{u(`Could not request code: ${d[0].message}`)}}),v=()=>r.commit({email:e}),f=V(z`
+  `,{onCommit:()=>{h(`A login code was sent to ${e}`),u(null),o(!0)},onError:d=>{u(`Could not request code: ${d[0].message}`)}}),v=()=>r.commit({email:e}),f=V(z`
     mutation Login($email: String!, $code: String!) {
       login(email: $email, token: $code)
     }
