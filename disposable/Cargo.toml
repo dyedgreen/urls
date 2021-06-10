@@ -1,0 +1,8 @@
+[package]
+name = "disposable"
+version = "0.1.0"
+authors = ["Tilman Roeder"]
+edition = "2018"
+
+[dependencies]
+once_cell = "1.7"

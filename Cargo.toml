@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "bb8_diesel",
+  "disposable",
   "juniper_relay",
   "meta_parser",
   "server",
