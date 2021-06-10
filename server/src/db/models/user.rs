@@ -9,7 +9,7 @@ use juniper::GraphQLInputObject;
 use lettre::address::Address;
 use lettre::message::{Mailbox, Message};
 use std::str::FromStr;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 use web_session::Session;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset)]
@@ -26,7 +26,13 @@ pub struct User {
 pub struct NewUserInput {
     #[validate(length(min = 1, max = 256, message = "A name is required"))]
     pub name: String,
-    #[validate(email(message = "A valid email address is required"))]
+    #[validate(
+        email(message = "A valid email address is required"),
+        custom(
+            function = "disposable_email",
+            message = "A disposable email address is not allowed"
+        )
+    )]
     pub email: String,
 }
 
@@ -34,8 +40,22 @@ pub struct NewUserInput {
 pub struct UpdateUserInput {
     #[validate(length(min = 1, max = 256, message = "A name is required"))]
     name: Option<String>,
-    #[validate(email(message = "A valid email address is required"))]
+    #[validate(
+        email(message = "A valid email address is required"),
+        custom(
+            function = "disposable_email",
+            message = "A disposable email address is not allowed"
+        )
+    )]
     email: Option<String>,
+}
+
+fn disposable_email(email: &str) -> Result<(), ValidationError> {
+    if disposable::is_disposable(email) {
+        Err(ValidationError::new("disposable_email"))
+    } else {
+        Ok(())
+    }
 }
 
 impl User {
