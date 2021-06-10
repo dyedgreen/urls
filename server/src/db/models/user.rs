@@ -132,7 +132,7 @@ impl User {
     pub async fn find_by_email(ctx: &Context, email: &str) -> Result<Self> {
         let conn = ctx.conn().await?;
         let user = users::table
-            .filter(users::dsl::email.eq(email.to_ascii_lowercase()))
+            .filter(users::dsl::email.eq(email.trim().to_ascii_lowercase()))
             .get_result(&*conn)?;
         Ok(user)
     }
