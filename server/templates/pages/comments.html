@@ -8,7 +8,30 @@
         <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4">
             {% match url_partial.url.image_str() %}
                 {% when Some with (src) %}
-                <img class="w-full h-40 rounded shadow" src="{{ src }}" style="object-fit: cover" />
+                <img id="url-img" class="w-full h-40 rounded shadow" src="{{ src }}" style="object-fit: cover" />
+                {# Interactive expand/ collapse button #}
+                <button id="expand-url-img-button" class="block h-8 w-8 ml-auto mr-2" style="margin-top: -2.5rem">
+                    <div class="h-8 w-8 flex justify-center items-center rounded bg-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path stroke="#374151" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8V4m0 0h4M3 4l4 4m8 0V4m0 0h-4m4 0l-4 4m-8 4v4m0 0h4m-4 0l4-4m8 4l-4-4m4 4v-4m0 4h-4" />
+                        </svg>
+                    </div>
+                </button>
+                <script>
+                    (function setupButton() {
+                        var button = document.getElementById("expand-url-img-button");
+                        var img = document.getElementById("url-img");
+                        var isExpanded = false;
+                        button.onclick = function onClick() {
+                            if (isExpanded) {
+                                img.style.height = null;
+                            } else {
+                                img.style.height = "auto";
+                            }
+                            isExpanded = !isExpanded;
+                        };
+                    })();
+                </script>
                 {% when None %}
             {% endmatch %}
             {{ url_partial|safe }}
