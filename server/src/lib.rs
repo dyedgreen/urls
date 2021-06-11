@@ -12,6 +12,7 @@ pub mod context;
 pub mod db;
 pub mod email;
 pub mod graphql;
+pub mod jobs;
 pub mod pages;
 pub mod schema;
 pub mod setup;

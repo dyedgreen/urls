@@ -18,6 +18,13 @@ async fn main() {
         .map_err(|err| log::error!("Failed to run setup: {}", err))
         .unwrap();
 
+    let job_schedule_handle = jobs::watch_thread(
+        tokio::runtime::Handle::current(),
+        pool.clone(),
+        mailer.clone(),
+    );
+
     let server = global_routes(Config::env(), pool, mailer);
     warp::serve(server).run(([0, 0, 0, 0], 8080)).await;
+    job_schedule_handle.stop();
 }

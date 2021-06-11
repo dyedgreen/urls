@@ -1,3 +1,5 @@
+use std::convert::TryInto;
+
 use crate::db::id::{UrlID, UserID};
 use crate::db::models::User;
 use crate::schema::{comments, url_upvotes, urls, users};
@@ -9,7 +11,7 @@ use futures_util::StreamExt;
 use juniper::GraphQLInputObject;
 use meta_parser::Meta;
 use validator::Validate;
-use warp::http::Uri;
+use warp::http::{StatusCode, Uri};
 
 const INCLUDE_DAYS_IN_RANKED: i64 = 7;
 
@@ -21,6 +23,7 @@ pub struct Url {
     updated_at: NaiveDateTime,
 
     url: String,
+    status_code: i32,
     title: Option<String>,
     description: Option<String>,
     image: Option<String>,
@@ -42,6 +45,13 @@ impl Url {
     /// succeed, unless the database was corrupted.
     pub fn url(&self) -> Result<Uri> {
         Ok(self.url.parse()?)
+    }
+
+    /// The status code which was returned when last
+    /// trying to fetch the given URL.
+    pub fn status(&self) -> Result<StatusCode> {
+        let status = StatusCode::from_u16(self.status_code.try_into()?)?;
+        Ok(status)
     }
 
     /// Return the url as a `&str`. This always succeeds
@@ -230,8 +240,9 @@ impl Url {
         }
 
         let resp = ctx.http_client().get(&url).send().await?;
-        if !resp.status().is_success() {
-            return Err(anyhow!("Failed to load url with status {}", resp.status()));
+        let status = resp.status();
+        if !status.is_success() {
+            return Err(anyhow!("Failed to load url with status {}", status));
         }
 
         let mut meta = Meta::new();
@@ -246,6 +257,7 @@ impl Url {
             updated_at: ctx.now().naive_utc(),
 
             url,
+            status_code: status.as_u16().into(),
             title: meta.title,
             description: meta.description,
             image: meta.image,
@@ -256,6 +268,29 @@ impl Url {
             .values(&url)
             .execute(&*ctx.conn().await?)?;
         Ok(url)
+    }
+
+    /// Fetch the current contents of the URL and
+    /// update the meta information and status code.
+    pub async fn update_url_meta(&mut self, ctx: &Context) -> Result<()> {
+        let resp = ctx.http_client().get(self.url.as_str()).send().await?;
+        let status = resp.status();
+        self.status_code = status.as_u16().into();
+        self.updated_at = ctx.now().naive_utc();
+
+        if status.is_success() {
+            let mut meta = Meta::new();
+            let mut stream = resp.bytes_stream();
+            while let Some(part) = stream.next().await {
+                meta.parse(&part?);
+            }
+            self.title = meta.title.or(self.title.clone());
+            self.description = meta.description.or(self.description.clone());
+            self.image = meta.image.or(self.image.clone());
+        }
+
+        *self = self.save_changes(&*ctx.conn().await?)?;
+        Ok(())
     }
 
     /// Deletes the given URL from the database. URLs can only be deleted

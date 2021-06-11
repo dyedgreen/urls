@@ -12,6 +12,7 @@ async-trait = "0.1.42"
 bb8_diesel = { path = "../bb8_diesel" }
 disposable = { path = "../disposable" }
 chrono =  "0.4"
+clokwerk = "0.3.5"
 dotenv = "0.15"
 diesel = { version = "1.4", features = ["sqlite", "chrono"] }
 diesel_migrations = "1.4"

@@ -57,6 +57,7 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         url -> Text,
+        status_code -> Integer,
         title -> Nullable<Text>,
         description -> Nullable<Text>,
         image -> Nullable<Text>,

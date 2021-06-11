@@ -37,6 +37,12 @@ impl Url {
         Ok(self.url()?.to_string())
     }
 
+    /// The HTTP status code returned when
+    /// attempting to load this url.
+    fn status(&self) -> FieldResult<i32> {
+        Ok(self.status()?.as_u16().into())
+    }
+
     /// The title of the linked page. This is parsed
     /// from the page when the url is submitted.
     fn title(&self) -> Option<&str> {
