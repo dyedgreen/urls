@@ -14,5 +14,7 @@ CREATE TABLE urls_status_code (
 INSERT INTO urls_status_code
 SELECT id, created_at, updated_at, url, 200, title, description, image, created_by FROM urls;
 
+PRAGMA foreign_keys = OFF;
 DROP TABLE urls;
 ALTER TABLE urls_status_code RENAME TO urls;
+PRAGMA foreign_keys = ON;

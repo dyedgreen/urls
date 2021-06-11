@@ -13,5 +13,7 @@ CREATE TABLE urls_no_status_code (
 INSERT INTO urls_no_status_code
 SELECT id, created_at, updated_at, url, title, description, image, created_by FROM urls;
 
+PRAGMA foreign_keys = OFF;
 DROP TABLE urls;
 ALTER TABLE urls_no_status_code RENAME TO urls;
+PRAGMA foreign_keys = ON;
