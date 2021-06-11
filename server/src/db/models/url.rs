@@ -49,9 +49,9 @@ impl Url {
 
     /// The status code which was returned when last
     /// trying to fetch the given URL.
-    pub fn status(&self) -> Result<StatusCode> {
-        let status = StatusCode::from_u16(self.status_code.try_into()?)?;
-        Ok(status)
+    pub fn status(&self) -> StatusCode {
+        StatusCode::from_u16(self.status_code.try_into().unwrap_or(500))
+            .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
     }
 
     /// Return the url as a `&str`. This always succeeds

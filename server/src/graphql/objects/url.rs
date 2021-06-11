@@ -39,8 +39,8 @@ impl Url {
 
     /// The HTTP status code returned when
     /// attempting to load this url.
-    fn status(&self) -> FieldResult<i32> {
-        Ok(self.status()?.as_u16().into())
+    fn status(&self) -> i32 {
+        self.status().as_u16().into()
     }
 
     /// The title of the linked page. This is parsed
