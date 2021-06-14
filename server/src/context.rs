@@ -12,7 +12,7 @@ const HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     use ::std::time::Duration;
 
     reqwest::Client::builder()
-        .user_agent("urls.fyi")
+        .user_agent("Mozilla/5.0 (compatible; Urlsbot/0.1.0; +https://urls.fyi/bot.html)")
         .connect_timeout(Duration::from_secs(5))
         .timeout(Duration::from_secs(60))
         .redirect(reqwest::redirect::Policy::limited(10))

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>urls :: bot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/dist/tailwind.css" />
+</head>
+<body class="bg-gray-100 dark:bg-gray-700 dark:text-white">
+    <div class="w-full flex flex-col items-center p-8">
+        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+            <h1 class="text-2xl font-semibold leading-none">Urls Bot</h1>
+            <h2 class="text-xl text-gray-500 mb-4">Website metadata crawler</h2>
+            <p class="leading-tight mb-2">
+                This website will crawl urls submitted by it's users for meta information such as
+                title, or description. This is accomplished by making an automated HTTP request, and
+                then parsing the returned HTML document.
+            </p>
+            <p class="leading-tight mb-2">
+                The bot supports the standard HTML
+                <span class="text-gray-500">&lt;title&gt;</span>title<span class="text-gray-500">&lt;/title&gt;</span>
+                tag, as well as
+                <a class="text-blue-500" href="https://developer.twitter.com/en/docs/twitter-for-websites/cards/overview/abouts-cards">Twitter cards</a>
+                and <a class="text-blue-500" href="https://developers.facebook.com/docs/sharing/webmasters">Facebook Open Graph</a>.
+            </p>
+            <p class="leading-tight mb-2">
+                The code for the parser used can be found
+                <a class="text-blue-500" href="https://github.com/dyedgreen/urls/tree/master/meta_parser">on GitHub</a>.
+                It's user-agent is:
+            </p>
+            <div class="w-full rounded p-2 px-4 font-mono break-all text-center bg-gray-200">
+                Mozilla/5.0 (compatible; Urlsbot/0.1.0; +https://urls.fyi/bot.html)
+            </div>
+        </div>
+    </div>
+    <div class="w-full flex flex-wrap space-x-4 justify-center my-16 px-4">
+        <a href="/" class="font-semibold hover:underline">urls.fyi</a>
+        <a href="/recent" class="text-gray-500 hover:underline">recent</a>
+        <a href="/best" class="text-gray-500 hover:underline">best</a>
+        <a href="/graphql/playground" class="text-gray-500 hover:underline">graphql api</a>
+        <a href="https://www.github.com/dyedgreen/urls" class="text-gray-500 hover:underline">open source</a>
+    </div>
+</body>
+</html>
