@@ -11,6 +11,7 @@ Build with (among other things):
   Diesel (https://diesel.rs)
   Askama (https://github.com/djc/askama)
   Nom (https://github.com/Geal/nom)
+  Juniper (https://github.com/graphql-rust/juniper)
 
   Snowpack (http://snowpack.dev)
   Preact (http://preactjs.com)
