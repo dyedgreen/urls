@@ -3,7 +3,6 @@ use crate::{Config, Context};
 use warp::{filters::BoxedFilter, Filter, Rejection, Reply};
 
 async fn check_backup_permissions(ctx: Context) -> Result<(), Rejection> {
-    println!("Checking permissions ...");
     let log_err = |err| {
         log::warn!("Unauthorized attempt to download database backup: {}", err);
         warp::reject::not_found()
@@ -14,7 +13,6 @@ async fn check_backup_permissions(ctx: Context) -> Result<(), Rejection> {
         .check_permissions(&ctx, |perm| perm.access_admin_backups())
         .await
         .map_err(log_err)?;
-    println!("Permissions OK!");
     Ok(())
 }
 
