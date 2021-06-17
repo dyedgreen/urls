@@ -11,6 +11,7 @@ const PAGE_SIZE: i64 = 10;
 #[derive(Template)]
 #[template(path = "pages/url_list.html")]
 struct Page<'a> {
+    route: &'a str,
     title: &'a str,
 
     list_header: Option<ListHeader<'a>>,
@@ -43,6 +44,7 @@ async fn handle(
     ctx: Context,
     order: UrlOrdering,
     page: u32,
+    route: &str,
     title: &str,
 ) -> Result<Response, error::ServerError> {
     let (urls, page_count) = Url::paginate(&ctx, order, page.into(), PAGE_SIZE).await?;
@@ -81,6 +83,7 @@ async fn handle(
     };
 
     let page = Page {
+        route,
         title,
 
         list_header,
@@ -108,7 +111,7 @@ pub fn ranked(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Ranked, page, "home").await)
+            error::reply(handle(ctx, UrlOrdering::Ranked, page, "", "home").await)
         })
         .boxed()
 }
@@ -117,7 +120,7 @@ pub fn best(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Best, page, "best").await)
+            error::reply(handle(ctx, UrlOrdering::Best, page, "/best", "best").await)
         })
         .boxed()
 }
@@ -126,7 +129,7 @@ pub fn recent(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Recent, page, "recent").await)
+            error::reply(handle(ctx, UrlOrdering::Recent, page, "/recent", "recent").await)
         })
         .boxed()
 }
@@ -136,7 +139,16 @@ pub fn user(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
         .and(paginate())
         .and(ctx)
         .and_then(|user_id: UserID, page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::User(user_id), page, "user").await)
+            error::reply(
+                handle(
+                    ctx,
+                    UrlOrdering::User(user_id),
+                    page,
+                    &format!("/user/{}", user_id),
+                    "user",
+                )
+                .await,
+            )
         })
         .boxed()
 }
@@ -146,9 +158,9 @@ pub fn mine(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
             match ctx.maybe_user_id() {
-                Some(user_id) => {
-                    error::reply(handle(ctx, UrlOrdering::User(user_id), page, "mine").await)
-                }
+                Some(user_id) => error::reply(
+                    handle(ctx, UrlOrdering::User(user_id), page, "/mine", "mine").await,
+                ),
                 None => Ok(warp::redirect::temporary(Uri::from_static("/login")).into_response()),
             }
         })
