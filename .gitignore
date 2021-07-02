@@ -1,6 +1,7 @@
 target
 node_modules
 emails
+index
 
 *.db
 .DS_Store

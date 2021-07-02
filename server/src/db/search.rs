@@ -23,7 +23,7 @@ pub struct SearchIndex {
 
 impl SearchIndex {
     /// Creates the search index.
-    pub fn new(conf: &Config) -> Result<SearchIndex> {
+    pub async fn new(conf: &Config) -> Result<SearchIndex> {
         use tantivy::schema::{STORED, TEXT};
         let mut builder = Schema::builder();
         let f_id = builder.add_bytes_field("id", STORED);
@@ -32,6 +32,7 @@ impl SearchIndex {
         let schema = builder.build();
 
         let index = if let Some(path) = conf.search_index() {
+            tokio::fs::create_dir_all(path).await?;
             Index::create_in_dir(path, schema)?
         } else {
             Index::create_in_ram(schema)

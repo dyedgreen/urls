@@ -51,7 +51,7 @@ pub async fn connect(config: &Config) -> Result<Pool> {
         .build(manager)
         .await?;
 
-    let search = SearchIndex::new(config)?;
+    let search = SearchIndex::new(config).await?;
 
     {
         // Run migrations
