@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use crate::db::id::{UrlID, UserID};
 use crate::db::models::User;
 use crate::schema::{comments, url_upvotes, urls, users};
@@ -10,6 +8,7 @@ use diesel::prelude::*;
 use futures_util::StreamExt;
 use juniper::GraphQLInputObject;
 use meta_parser::Meta;
+use std::convert::TryInto;
 use validator::Validate;
 use warp::http::{StatusCode, Uri};
 
@@ -267,6 +266,8 @@ impl Url {
         diesel::insert_into(urls::table)
             .values(&url)
             .execute(&*ctx.conn().await?)?;
+
+        ctx.search().index_url(&url).ok();
         Ok(url)
     }
 
@@ -290,6 +291,7 @@ impl Url {
         }
 
         *self = self.save_changes(&*ctx.conn().await?)?;
+        ctx.search().index_url(self).ok();
         Ok(())
     }
 

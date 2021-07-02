@@ -31,6 +31,7 @@ pulldown-cmark = "0.8"
 reqwest = { version = "0.11", features = ["gzip", "brotli", "stream"] }
 validator = { version = "0.13.0", features = ["derive"] }
 web_session = { path = "../web_session" }
+tantivy = "0.15.2"
 tokio = { version = "1", features = ["full"] }
 typed_id = { path = "../typed_id" }
 warp = "0.3"

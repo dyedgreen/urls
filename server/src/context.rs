@@ -1,6 +1,6 @@
 use crate::db::id::UserID;
 use crate::db::models::User;
-use crate::db::{Pool, PooledConnection};
+use crate::db::{Pool, PooledConnection, SearchIndex};
 use crate::email::Mailer;
 use crate::schema::users;
 use anyhow::{anyhow, Result};
@@ -30,7 +30,7 @@ const HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
 /// The context can be extracted from any request, and used to
 /// generate static pages. It is also available to most GraphQL
 /// resolvers.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Context {
     pool: Pool,
     mailer: Mailer,
@@ -59,7 +59,12 @@ impl Context {
     /// Retrieve a database connection from the
     /// connection pool.
     pub async fn conn(&self) -> Result<PooledConnection<'_>> {
-        Ok(self.pool.get().await?)
+        Ok(self.pool.db.get().await?)
+    }
+
+    /// Retrieve a handle to the search index.
+    pub fn search(&self) -> &SearchIndex {
+        &self.pool.search
     }
 
     /// Retrieve the mailer to send an email

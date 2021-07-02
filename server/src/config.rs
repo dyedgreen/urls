@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 
 static DEFAULT_WWW: &str = "www/static";
 static DEFAULT_SMTP_PORT: u16 = 587;
+static DEFAULT_INDEX: &str = "index";
 
 static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
     Ok(conf) => conf,
@@ -18,6 +19,7 @@ static ENV: Lazy<Config> = Lazy::new(|| match load_from_env() {
 #[derive(Debug, Clone)]
 pub struct Config {
     database_url: String,
+    search_idx: Option<PathBuf>,
     www_dir: PathBuf,
     session_key: Vec<u8>,
     hostname: String,
@@ -46,6 +48,7 @@ impl Config {
     pub fn test() -> Self {
         Self {
             database_url: format!("file:{}?mode=memory&cache=shared", nanoid!(16)),
+            search_idx: None,
             www_dir: DEFAULT_WWW.into(),
             session_key: random_session_key(),
             hostname: "localhost".into(),
@@ -67,6 +70,13 @@ impl Config {
             Some(_) | None => uri,
         };
         Path::new(path)
+    }
+
+    /// Search index path, if defined. (`None`,
+    /// should be interpreted as running the index
+    /// in memory).
+    pub fn search_index(&self) -> Option<&Path> {
+        self.search_idx.as_ref().map(|p| p.as_ref())
     }
 
     /// Directory to serve static files
@@ -117,6 +127,16 @@ fn random_session_key() -> Vec<u8> {
 fn load_from_env() -> Result<Config> {
     let database_url = var("DATABASE_URL")?;
 
+    let search_idx: PathBuf = var("INDEX_DIR")
+        .unwrap_or_else(|_| {
+            log::info!(
+                "INDEX_DIR configuration not set, using default '{}'",
+                DEFAULT_INDEX
+            );
+            DEFAULT_INDEX.to_string()
+        })
+        .into();
+
     let www_dir = var("WWW_DIR")
         .unwrap_or_else(|_| {
             log::info!(
@@ -155,6 +175,7 @@ fn load_from_env() -> Result<Config> {
 
     Ok(Config {
         database_url,
+        search_idx: Some(search_idx),
         www_dir,
         smtp,
         session_key,
