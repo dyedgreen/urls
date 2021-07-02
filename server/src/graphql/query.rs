@@ -1,6 +1,6 @@
 use crate::db::id::{CommentID, UrlID};
 use crate::db::models::{Comment, Url};
-use crate::graphql::viewer::Viewer;
+use crate::graphql::{search::Search, viewer::Viewer};
 use crate::Context;
 use juniper::{graphql_object, FieldResult};
 
@@ -14,6 +14,11 @@ impl Query {
     /// current viewer.
     fn viewer() -> Viewer {
         Viewer
+    }
+
+    /// Search through all submitted urls.
+    async fn search(query: String) -> Search {
+        Search::new(query)
     }
 
     #[graphql(name = "fetch__Url")]

@@ -5,10 +5,11 @@ use anyhow::Result;
 use std::convert::TryInto;
 use tantivy::{
     collector::TopDocs,
+    directory::MmapDirectory,
     doc,
     query::{BooleanQuery, FuzzyTermQuery},
     schema::{Field, Schema},
-    Index, IndexReader, Term,
+    Index, IndexReader, IndexSettings, Term,
 };
 use tokio::task::block_in_place;
 
@@ -33,7 +34,7 @@ impl SearchIndex {
 
         let index = if let Some(path) = conf.search_index() {
             tokio::fs::create_dir_all(path).await?;
-            Index::create_in_dir(path, schema)?
+            Index::create(MmapDirectory::open(path)?, schema, IndexSettings::default())?
         } else {
             Index::create_in_ram(schema)
         };
@@ -73,7 +74,7 @@ impl SearchIndex {
 
     /// Searches the index and returns all url IDs
     /// matching the given query.
-    pub fn find(&self, query: &str, offset: usize, limit: usize) -> Result<Vec<UrlID>> {
+    pub fn find(&self, query: &str) -> Result<Vec<UrlID>> {
         block_in_place(|| {
             let title = Term::from_field_text(self.f_title, query);
             let title = FuzzyTermQuery::new(title, 2, false);
@@ -82,7 +83,7 @@ impl SearchIndex {
             let query = BooleanQuery::union(vec![Box::new(title), Box::new(desc)]);
 
             let searcher = self.reader.searcher();
-            let top_docs = TopDocs::with_limit(limit).and_offset(offset);
+            let top_docs = TopDocs::with_limit(64); // TODO(dyedgreen): Fix this ...
             let docs = searcher.search(&query, &top_docs)?;
             let ids = docs
                 .into_iter()

@@ -6,6 +6,7 @@ use warp::{filters::BoxedFilter, Filter};
 mod mutation;
 mod objects;
 mod query;
+mod search;
 mod viewer;
 
 type Schema = RootNode<'static, query::Query, mutation::Mutation, EmptySubscription<Context>>;
