@@ -17,8 +17,9 @@ impl Search {
 
 #[graphql_object(context = Context)]
 impl Search {
+    /// An `ID` which uniquely identifies this search.
     pub fn id(&self) -> ID {
-        self.0.clone().into()
+        format!("search-{}", self.0).into()
     }
 
     /// The list of results returned by this search.
