@@ -1,12 +1,13 @@
 use crate::db::id::UrlID;
 use crate::db::models::Url;
 use crate::Config;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use std::convert::TryInto;
 use tantivy::{
     collector::TopDocs,
     directory::MmapDirectory,
     doc,
+    query::Query,
     query::{BooleanQuery, FuzzyTermQuery},
     schema::{Field, Schema},
     Index, IndexReader, Term,
@@ -98,12 +99,21 @@ impl SearchIndex {
     /// Searches the index and returns all url IDs
     /// matching the given query.
     pub fn find(&self, query: &str) -> Result<Vec<UrlID>> {
+        if query.len() > 1024 {
+            return Err(anyhow!("The search query is too long"));
+        }
+
         block_in_place(|| {
-            let title = Term::from_field_text(self.f_title, query);
-            let title = FuzzyTermQuery::new(title, 2, true);
-            let desc = Term::from_field_text(self.f_description, query);
-            let desc = FuzzyTermQuery::new(desc, 2, true);
-            let query = BooleanQuery::union(vec![Box::new(title), Box::new(desc)]);
+            let mut terms: Vec<Box<dyn Query>> = vec![];
+            for term in query.split_whitespace() {
+                let title = Term::from_field_text(self.f_title, term);
+                let title = FuzzyTermQuery::new(title, 2, true);
+                let desc = Term::from_field_text(self.f_description, term);
+                let desc = FuzzyTermQuery::new(desc, 2, true);
+                terms.push(Box::new(title));
+                terms.push(Box::new(desc));
+            }
+            let query = BooleanQuery::union(terms);
 
             let searcher = self.reader.searcher();
             let top_docs = TopDocs::with_limit(64); // TODO(dyedgreen): Fix this ...
