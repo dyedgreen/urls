@@ -9,6 +9,7 @@ anyhow = "1.0"
 askama = { version = "0.10.5", features = ["with-warp"] }
 askama_warp = "0.11.0"
 async-trait = "0.1.42"
+base64 = "0.13"
 bb8_diesel = { path = "../bb8_diesel" }
 disposable = { path = "../disposable" }
 chrono =  "0.4"

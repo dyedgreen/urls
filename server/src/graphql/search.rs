@@ -19,7 +19,7 @@ impl Search {
 impl Search {
     /// An `ID` which uniquely identifies this search.
     pub fn id(&self) -> ID {
-        format!("search-{}", self.0).into()
+        format!("search-{}", base64::encode(self.0.as_bytes())).into()
     }
 
     /// The list of results returned by this search.

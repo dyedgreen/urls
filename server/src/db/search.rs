@@ -9,9 +9,11 @@ use tantivy::{
     doc,
     query::{BooleanQuery, FuzzyTermQuery},
     schema::{Field, Schema},
-    Index, IndexReader, IndexSettings, Term,
+    Index, IndexReader, Term,
 };
 use tokio::task::block_in_place;
+
+const WRITER_HEAP: usize = 100_000_000;
 
 #[derive(Clone)]
 pub struct SearchIndex {
@@ -34,7 +36,7 @@ impl SearchIndex {
 
         let index = if let Some(path) = conf.search_index() {
             tokio::fs::create_dir_all(path).await?;
-            Index::create(MmapDirectory::open(path)?, schema, IndexSettings::default())?
+            Index::open_or_create(MmapDirectory::open(path)?, schema)?
         } else {
             Index::create_in_ram(schema)
         };
@@ -59,7 +61,7 @@ impl SearchIndex {
         I: std::iter::Iterator<Item = &'a Url>,
     {
         block_in_place(|| {
-            let mut writer = self.index.writer(100_000_000)?;
+            let mut writer = self.index.writer(WRITER_HEAP)?;
             for url in urls {
                 writer.add_document(doc! {
                     self.f_id => url.id().as_bytes(),
@@ -72,14 +74,35 @@ impl SearchIndex {
         })
     }
 
+    /// Deletes a given `Url` from the index.
+    pub fn delete_url(&self, url: &Url) -> Result<()> {
+        self.delete_urls(std::iter::once(url))
+    }
+
+    /// Deletes a list of given `Url`s from the index.
+    pub fn delete_urls<'a, I>(&self, urls: I) -> Result<()>
+    where
+        I: std::iter::Iterator<Item = &'a Url>,
+    {
+        block_in_place(|| {
+            let mut writer = self.index.writer(WRITER_HEAP)?;
+            for url in urls {
+                let id_term = Term::from_field_bytes(self.f_id, url.id().as_bytes());
+                writer.delete_term(id_term);
+            }
+            writer.commit()?;
+            Ok(())
+        })
+    }
+
     /// Searches the index and returns all url IDs
     /// matching the given query.
     pub fn find(&self, query: &str) -> Result<Vec<UrlID>> {
         block_in_place(|| {
             let title = Term::from_field_text(self.f_title, query);
-            let title = FuzzyTermQuery::new(title, 2, false);
+            let title = FuzzyTermQuery::new(title, 2, true);
             let desc = Term::from_field_text(self.f_description, query);
-            let desc = FuzzyTermQuery::new(desc, 2, false);
+            let desc = FuzzyTermQuery::new(desc, 2, true);
             let query = BooleanQuery::union(vec![Box::new(title), Box::new(desc)]);
 
             let searcher = self.reader.searcher();

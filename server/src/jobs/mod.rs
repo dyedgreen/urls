@@ -6,6 +6,28 @@ use tokio::runtime::Handle;
 const BG_XSRF_TOKEN: &str = "background_job_xsrf";
 
 mod check_old_urls;
+mod index_urls;
+
+fn schedule<J, F>(
+    scheduler: &mut Scheduler,
+    interval: Interval,
+    pool: &db::Pool,
+    mailer: &email::Mailer,
+    runtime: &Handle,
+    job: J,
+) where
+    J: Fn(Context) -> F + Send + 'static,
+    F: std::future::Future + Send + 'static,
+    F::Output: Send + 'static,
+{
+    let pool = pool.clone();
+    let mailer = mailer.clone();
+    let runtime = runtime.clone();
+    scheduler.every(interval).run(move || {
+        let ctx = Context::new(&pool, &mailer, BG_XSRF_TOKEN.to_string(), None);
+        runtime.spawn((job)(ctx));
+    });
+}
 
 /// Run scheduled background jobs.
 pub fn watch_thread(
@@ -15,10 +37,23 @@ pub fn watch_thread(
 ) -> ScheduleHandle {
     let mut scheduler = Scheduler::new();
 
-    scheduler.every(Interval::Days(1)).run(move || {
-        let ctx = Context::new(&pool, &mailer, BG_XSRF_TOKEN.to_string(), None);
-        async_runtime.spawn(check_old_urls::job(ctx));
-    });
+    schedule(
+        &mut scheduler,
+        Interval::Days(1),
+        &pool,
+        &mailer,
+        &async_runtime,
+        check_old_urls::job,
+    );
+
+    schedule(
+        &mut scheduler,
+        Interval::Minutes(1),
+        &pool,
+        &mailer,
+        &async_runtime,
+        index_urls::job,
+    );
 
     scheduler.watch_thread(Duration::from_millis(1000))
 }

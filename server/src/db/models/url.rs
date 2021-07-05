@@ -267,7 +267,6 @@ impl Url {
             .values(&url)
             .execute(&*ctx.conn().await?)?;
 
-        ctx.search().index_url(&url).ok();
         Ok(url)
     }
 
@@ -291,7 +290,6 @@ impl Url {
         }
 
         *self = self.save_changes(&*ctx.conn().await?)?;
-        ctx.search().index_url(self).ok();
         Ok(())
     }
 
@@ -310,6 +308,7 @@ impl Url {
         diesel::delete(upvotes).execute(&*conn)?;
         diesel::delete(comments).execute(&*conn)?;
         diesel::delete(self).execute(&*conn)?;
+        ctx.search().delete_url(&self)?;
         Ok(())
     }
 

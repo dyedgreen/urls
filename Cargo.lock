@@ -2003,6 +2003,7 @@ dependencies = [
  "askama",
  "askama_warp",
  "async-trait",
+ "base64",
  "bb8_diesel",
  "chrono",
  "clokwerk",
