@@ -1,33 +1,47 @@
 import { render, h } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { graphql, useQuery } from "picoql";
 
 import ActivityIndicator from "@app/ActivityIndicator";
 import ErrorBoundary from "@app/ErrorBoundary";
 import BigInput from "@app/search/BigInput";
+import SearchResult from "@app/search/SearchResult";
 
 import useSearch from "@app/search/useSearch";
 
 function Search() {
   const [search, searchDebounced, setSearch] = useSearch();
 
-  const { data, loading } = useQuery(graphql`
-    query SearchQuery {
-      viewer {
+  const { data, loading, refetch } = useQuery(graphql`
+    query SearchQuery($query: String!) {
+      search(query: $query) {
         id
-        user {
-          id
-          name
+        results(first: 20) {
+          edges {
+            node {
+              id
+              url
+              title
+              upvoteCount
+            }
+          }
         }
       }
     }
-  `);
+  `, { query: searchDebounced });
+  useEffect(() => refetch({ query: searchDebounced }), [searchDebounced]);
 
+  const hasResults = data?.search?.results?.edges?.length > 0;
   return (
-    <div class="w-full flex justify-center p-8">
-      <div class="w-full flex flex-col items-center max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4">
-        <BigInput placeholder="Search ..." value={search} onChange={setSearch} loading={false} />
-      </div>
+    <div class="w-full flex flex-col items-center">
+      <BigInput placeholder="Search ..." value={search} onChange={setSearch} loading={loading} style="mb-2" />
+      {
+        hasResults ?
+        data.search.results.edges.map(({node}) => {
+          return <SearchResult {...node} />
+        }) :
+        <h3 class="text-gray-500 my-4">No matching results found</h3>
+      }
     </div>
   );
 }

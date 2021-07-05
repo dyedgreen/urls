@@ -1,11 +1,19 @@
 {% extends "base.html" %}
 {% block title %}search{% endblock title %}
 {% block content %}
-    <div id="search"></div>
+    <div class="w-full flex flex-col items-center p-8">
+        {% if is_logged_in %}
+            <div class="w-full max-w-screen-md" id="header"></div>
+        {% endif %}
+        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4" id="search"></div>
+    </div>
 {% endblock content %}
 {% block scripts %}
     <script>
         window.__xsrf_token = "{{ xsrf_token }}";
     </script>
+    {% if is_logged_in %}
+        <script type="module" src="/dist/header.js"></script>
+    {% endif %}
     <script type="module" src="/dist/search.js"></script>
 {% endblock scripts %}
