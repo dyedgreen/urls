@@ -104,15 +104,16 @@ impl SearchIndex {
         }
 
         block_in_place(|| {
-            let mut terms: Vec<Box<dyn Query>> = vec![];
-            for term in query.split_whitespace() {
-                let title = Term::from_field_text(self.f_title, term);
-                let title = FuzzyTermQuery::new(title, 2, true);
-                let desc = Term::from_field_text(self.f_description, term);
-                let desc = FuzzyTermQuery::new(desc, 2, true);
-                terms.push(Box::new(title));
-                terms.push(Box::new(desc));
-            }
+            let terms: Vec<Box<dyn Query>> = query
+                .split_whitespace()
+                .flat_map(|term| -> Vec<Box<dyn Query>> {
+                    let title = Term::from_field_text(self.f_title, term);
+                    let title = FuzzyTermQuery::new(title, 2, true);
+                    let desc = Term::from_field_text(self.f_description, term);
+                    let desc = FuzzyTermQuery::new(desc, 2, true);
+                    vec![Box::new(title), Box::new(desc)]
+                })
+                .collect();
             let query = BooleanQuery::union(terms);
 
             let searcher = self.reader.searcher();
