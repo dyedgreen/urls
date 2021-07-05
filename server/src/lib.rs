@@ -64,6 +64,9 @@ pub fn global_routes(
     let account = ctx.clone().with(warp::wrap_fn(pages::account::page));
     let account = warp::path("account").and(account);
 
+    let search = ctx.clone().with(warp::wrap_fn(pages::search::page));
+    let search = warp::path("search").and(search);
+
     let admin = ctx.clone().with(warp::wrap_fn(pages::admin::backup));
     let admin = warp::path!("admin" / "backup").and(admin);
 
@@ -85,6 +88,7 @@ pub fn global_routes(
         .or(register)
         .or(logout)
         .or(account)
+        .or(search)
         .or(admin)
         .or(api)
         .or(graphiql)

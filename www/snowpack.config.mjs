@@ -13,10 +13,11 @@ export default {
   optimize: {
     entrypoints: [
       "src/account.jsx",
-      "src/header.jsx",
       "src/comments.jsx",
+      "src/header.jsx",
       "src/login.jsx",
       "src/register.jsx",
+      "src/search.jsx",
     ],
     bundle: true,
     minify: true,

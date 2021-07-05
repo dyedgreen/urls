@@ -11,6 +11,7 @@ pub mod graphiql;
 pub mod login;
 pub mod logout;
 pub mod register;
+pub mod search;
 pub mod url_lists;
 pub mod xsrf;
 
