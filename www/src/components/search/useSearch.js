@@ -13,7 +13,10 @@ function getUrlSearch() {
 }
 
 function setUrlSearch(query) {
-  window.history.replaceState(null, "", `?q=${encodeURIComponent(query)}`);
+  const path = `/search${
+    query.length ? `?q=${encodeURIComponent(query)}` : ""
+  }`;
+  window.history.replaceState(null, "", path);
 }
 
 export default function useSearch(debounce = 500) {
