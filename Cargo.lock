@@ -1097,8 +1097,9 @@ dependencies = [
 
 [[package]]
 name = "juniper"
-version = "0.15.5"
-source = "git+https://github.com/dyedgreen/juniper?branch=master#15733b4724f86720d3381040bd8d508bc660a396"
+version = "0.15.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "637ffa8a8d8a05aed3331449e311f145864adcd82442d82e54d0522decb7cecf"
 dependencies = [
  "async-trait",
  "bson",
@@ -1118,8 +1119,9 @@ dependencies = [
 
 [[package]]
 name = "juniper_codegen"
-version = "0.15.5"
-source = "git+https://github.com/dyedgreen/juniper?branch=master#15733b4724f86720d3381040bd8d508bc660a396"
+version = "0.15.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a040e09482a45e77dd2dafa0d9d2651d17faf0ac674da0c93eabc3075ee24997"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
@@ -1136,8 +1138,9 @@ dependencies = [
 
 [[package]]
 name = "juniper_warp"
-version = "0.6.3"
-source = "git+https://github.com/dyedgreen/juniper?branch=master#15733b4724f86720d3381040bd8d508bc660a396"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d167107f6634c92f90daae1a298133377373e935d455042f90efc480fae4a52"
 dependencies = [
  "anyhow",
  "futures",
@@ -2539,8 +2542,9 @@ dependencies = [
 
 [[package]]
 name = "validator"
-version = "0.13.0"
-source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d0f08911ab0fee2c5009580f04615fa868898ee57de10692a45da0c3bcc3e5e"
 dependencies = [
  "idna",
  "lazy_static",
@@ -2555,8 +2559,9 @@ dependencies = [
 
 [[package]]
 name = "validator_derive"
-version = "0.13.0"
-source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d85135714dba11a1bd0b3eb1744169266f1a38977bf4e3ff5e2e1acb8c2b7eee"
 dependencies = [
  "if_chain",
  "lazy_static",
@@ -2570,8 +2575,13 @@ dependencies = [
 
 [[package]]
 name = "validator_types"
-version = "0.12.0"
-source = "git+https://github.com/dyedgreen/validator?branch=display#ac11a56af48b36066bab6fe516e63655d24fa3be"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ded9d97e1d42327632f5f3bae6403c04886e2de3036261ef42deebd931a6a291"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
 
 [[package]]
 name = "vcpkg"

@@ -9,9 +9,5 @@ members = [
   "web_session",
 ]
 
-# Fast-track juniper update to tokio 1.0
 [patch.crates-io]
 diesel = { git = "https://github.com/diesel-rs/diesel", rev = "a109351" }
-juniper = { git = "https://github.com/dyedgreen/juniper", branch = "master" }
-juniper_warp = { git = "https://github.com/dyedgreen/juniper", branch = "master" }
-validator = { git = "https://github.com/dyedgreen/validator", branch = "display" }
