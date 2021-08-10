@@ -27,7 +27,7 @@ impl Query {
     }
 
     #[graphql(name = "fetch__Comment")]
-    async fn fetch_url(ctx: &Context, id: CommentID) -> FieldResult<Comment> {
+    async fn fetch_comment(ctx: &Context, id: CommentID) -> FieldResult<Comment> {
         Ok(Comment::find(ctx, id).await?)
     }
 }
