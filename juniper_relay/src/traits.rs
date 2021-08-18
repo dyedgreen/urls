@@ -113,6 +113,7 @@ where
     {
         let fields = &[
             registry.field::<&Vec<RelayConnectionEdge<N>>>("edges", info),
+            registry.field::<&Vec<&N>>("nodes", info),
             registry.field::<&RelayConnectionPageInfo>("pageInfo", &()),
         ];
         registry.build_object_type::<Self>(info, fields).into_meta()
@@ -145,6 +146,10 @@ where
     ) -> ExecutionResult<S> {
         match field_name {
             "edges" => executor.resolve_with_ctx(info, &self.edges),
+            "nodes" => {
+                let nodes: Vec<&N> = self.edges.iter().map(|edge| &edge.node).collect();
+                executor.resolve_with_ctx(info, &nodes)
+            }
             "pageInfo" => executor.resolve_with_ctx(&(), &self.page_info),
             _ => panic!("Field {} not found on type RelayConnectionEdge", field_name),
         }
@@ -168,6 +173,10 @@ where
         let f = async move {
             match field_name {
                 "edges" => executor.resolve_with_ctx_async(info, &self.edges).await,
+                "nodes" => {
+                    let nodes: Vec<&N> = self.edges.iter().map(|edge| &edge.node).collect();
+                    executor.resolve_with_ctx_async(info, &nodes).await
+                }
                 "pageInfo" => executor.resolve_with_ctx(&(), &self.page_info),
                 _ => panic!("Field {} not found on type RelayConnectionEdge", field_name),
             }
