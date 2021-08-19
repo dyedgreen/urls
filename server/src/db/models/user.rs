@@ -10,7 +10,6 @@ use lettre::address::Address;
 use lettre::message::{Mailbox, Message};
 use std::str::FromStr;
 use validator::{Validate, ValidationError};
-use web_session::Session;
 
 #[derive(Debug, Clone, Queryable, Identifiable, Insertable, AsChangeset)]
 pub struct User {
@@ -222,18 +221,18 @@ impl User {
                 Code: {token}\n\n\
                 If you did not request the code, you may safely ignore this email.",
                 email = self.email,
-                token = login.token(),
+                token = login.email_token(),
             ))?;
         ctx.mailer().send(email).await?;
         Ok(())
     }
 
-    /// Login this user by consuming a login token and returning a web
-    /// session.
-    pub async fn login(&self, ctx: &Context, token: &str) -> Result<Session<UserID>> {
+    /// Login this user by consuming a login token and returning a
+    /// session token.
+    pub async fn login(&self, ctx: &Context, token: &str) -> Result<String> {
         let mut login: Login = Login::belonging_to(self)
-            .filter(logins::dsl::token.eq(token))
-            .filter(logins::dsl::valid_until.gt(ctx.now().naive_utc()))
+            .filter(logins::dsl::email_token.eq(token))
+            .filter(logins::dsl::claim_until.gt(ctx.now().naive_utc()))
             .get_result(&*ctx.conn().await?)?;
         let session = login.claim(ctx, token).await?;
         Ok(session)

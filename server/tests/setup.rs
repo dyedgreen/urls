@@ -77,6 +77,7 @@ pub async fn session_token(ctx: &Context, email: &str) -> String {
     let user = db::models::User::find_by_email(ctx, email)
         .await
         .expect("Missing user");
-    let sess = web_session::Session::new(user.id(), chrono::Utc::now() + chrono::Duration::days(1));
-    sess.base64(Config::env().session_key()).unwrap()
+    let mut login = db::models::Login::create(ctx, user.id()).await.unwrap();
+    let email_token = login.email_token().to_string();
+    login.claim(ctx, &email_token).await.unwrap()
 }

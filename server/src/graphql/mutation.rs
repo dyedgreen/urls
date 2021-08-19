@@ -4,7 +4,7 @@ use crate::db::models::{
     Comment, Invite, NewCommentInput, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput,
     Url, User,
 };
-use crate::{Config, Context};
+use crate::Context;
 use juniper::{graphql_object, FieldResult, GraphQLObject};
 use validator::Validate;
 
@@ -88,7 +88,7 @@ impl Mutation {
     async fn login(ctx: &Context, email: String, token: String) -> FieldResult<String> {
         let user = User::find_by_email(ctx, &email).await?;
         let session = user.login(ctx, &token).await?;
-        Ok(session.base64(Config::env().session_key())?)
+        Ok(session)
     }
 
     /// Create a new invite, issued by the currently logged in user.

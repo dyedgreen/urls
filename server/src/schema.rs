@@ -27,9 +27,11 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         user_id -> Text,
-        token -> Text,
-        valid_until -> Timestamp,
+        email_token -> Text,
+        claim_until -> Timestamp,
         claimed -> Bool,
+        session_token -> Nullable<Text>,
+        last_used -> Timestamp,
     }
 }
 

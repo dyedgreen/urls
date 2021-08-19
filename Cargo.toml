@@ -6,7 +6,6 @@ members = [
   "meta_parser",
   "server",
   "typed_id",
-  "web_session",
 ]
 
 [patch.crates-io]

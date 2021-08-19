@@ -21,7 +21,6 @@ pub struct Config {
     database_url: String,
     search_idx: Option<PathBuf>,
     www_dir: PathBuf,
-    session_key: Vec<u8>,
     hostname: String,
     smtp: Option<SmtpConfig>,
 }
@@ -50,7 +49,6 @@ impl Config {
             database_url: format!("file:{}?mode=memory&cache=shared", nanoid!(16)),
             search_idx: None,
             www_dir: DEFAULT_WWW.into(),
-            session_key: random_session_key(),
             hostname: "localhost".into(),
             smtp: None,
         }
@@ -90,11 +88,6 @@ impl Config {
         self.smtp.as_ref()
     }
 
-    /// Key to sign session strings.
-    pub fn session_key(&self) -> &[u8] {
-        &self.session_key[..]
-    }
-
     /// Host name to use in communications and things
     /// like API responses. E.g. `http://localhost:8080`.
     pub fn hostname(&self) -> &str {
@@ -118,10 +111,6 @@ impl SmtpConfig {
     pub fn password(&self) -> &str {
         &self.password
     }
-}
-
-fn random_session_key() -> Vec<u8> {
-    nanoid!(64).into()
 }
 
 fn load_from_env() -> Result<Config> {
@@ -166,11 +155,6 @@ fn load_from_env() -> Result<Config> {
         }
     };
 
-    let session_key = var("SESSION_KEY").map(Into::into).unwrap_or_else(|_| {
-        log::warn!("SESSION_KEY configuration not set, using random key");
-        random_session_key()
-    });
-
     let hostname = var("HOSTNAME")?;
 
     Ok(Config {
@@ -178,7 +162,6 @@ fn load_from_env() -> Result<Config> {
         search_idx: Some(search_idx),
         www_dir,
         smtp,
-        session_key,
         hostname,
     })
 }

@@ -56,6 +56,13 @@ impl Context {
         }
     }
 
+    /// Updates the user associated with this context.
+    /// This exists to be used when constructing the
+    /// context, and is probably not what you want.
+    pub fn set_logged_in_user(&mut self, user: UserID) {
+        self.logged_in_user = Some(user);
+    }
+
     /// Retrieve a database connection from the
     /// connection pool.
     pub async fn conn(&self) -> Result<PooledConnection<'_>> {
