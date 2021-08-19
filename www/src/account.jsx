@@ -1,6 +1,6 @@
-import { render, h } from "preact";
+import { h, render } from "preact";
 import { useState } from "preact/hooks";
-import { graphql, useQuery, useMutation } from "picoql";
+import { graphql, useMutation, useQuery } from "picoql";
 
 import ActivityIndicator from "@app/ActivityIndicator";
 import ErrorBoundary from "@app/ErrorBoundary";
@@ -9,6 +9,7 @@ import Section from "@app/account/Section";
 import ManageInvites from "@app/account/ManageInvites";
 import ChangeName from "@app/account/ChangeName";
 import ChangeEmail from "@app/account/ChangeEmail";
+import ManageLogins from "@app/account/ManageLogins";
 
 function Account() {
   const { data, loading } = useQuery(graphql`
@@ -25,11 +26,13 @@ function Account() {
 
   return (
     <div class="w-full flex justify-center p-8">
-      {
-        loading ?
-        <ActivityIndicator size="large" /> :
-        <div class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4">
-          <h1 class="text-2xl font-semibold leading-none">Account Settings</h1>
+      {loading ? <ActivityIndicator size="large" /> : (
+        <div
+          class="w-full max-w-screen-md bg-white dark:bg-gray-800 shadow rounded-lg p-4"
+        >
+          <h1 class="text-2xl font-semibold leading-none">
+            Account Settings
+          </h1>
           <h2 class="text-xl text-gray-500 mb-4">
             Welcome back {data?.viewer?.user?.name}
           </h2>
@@ -40,13 +43,21 @@ function Account() {
           <Section title="Change email" initiallyExpanded={false}>
             <ChangeEmail />
           </Section>
-          <Section title="Invite a friend">
+          <Section title="Active sessions" initiallyExpanded={false}>
+            <ManageLogins />
+          </Section>
+          <Section title="Invite a friend" initiallyExpanded={false}>
             <ManageInvites />
           </Section>
         </div>
-      }
+      )}
     </div>
   );
 }
 
-render(<ErrorBoundary><Account /></ErrorBoundary>, document.getElementById("account"));
+render(
+  <ErrorBoundary>
+    <Account />
+  </ErrorBoundary>,
+  document.getElementById("account"),
+);

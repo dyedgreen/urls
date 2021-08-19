@@ -9,7 +9,7 @@ use nanoid::nanoid;
 
 const LOGIN_LIMIT_PER_HOUR: i64 = 3;
 const LOGIN_VALID_MINUTES: i64 = 60;
-const WEB_SESSION_MAX_UNUSED_DAYS: i64 = 30;
+const WEB_SESSION_MAX_UNUSED_DAYS: i64 = 90;
 const EMAIL_TOKEN_ALPHABET: &[char] = &[
     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
     'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',

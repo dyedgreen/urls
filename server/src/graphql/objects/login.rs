@@ -23,8 +23,11 @@ impl RelayConnectionNode for Login {
 
 #[derive(GraphQLObject)]
 struct UserAgent<'a> {
+    /// The raw user agent string.
     raw: &'a str,
+    /// The name of the user agent (e.g. the browser used).
     name: &'a str,
+    /// The name of the user agents operating system.
     operating_system: &'a str,
 }
 

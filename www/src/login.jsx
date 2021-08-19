@@ -1,4 +1,4 @@
-import { render, h } from "preact";
+import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import { graphql, useMutation } from "picoql";
 
@@ -15,41 +15,47 @@ function Login() {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
 
-  const request = useMutation(graphql`
+  const request = useMutation(
+    graphql`
     mutation RequestLogin($email: String!) {
       requestLogin(email: $email) {
         ok
       }
     }
-  `, {
-    onCommit: () => {
-      setNotice(`A login code was sent to ${email}`);
-      setError(null);
-      setShowCode(true);
+  `,
+    {
+      onCommit: () => {
+        setNotice(`A login code was sent to ${email}`);
+        setError(null);
+        setShowCode(true);
+      },
+      onError: (errors) => {
+        setError(`Could not request code: ${errors[0].message}`);
+      },
     },
-    onError: (errors) => {
-      setError(`Could not request code: ${errors[0].message}`);
-    },
-  });
+  );
   const commitRequest = () => request.commit({ email });
 
-  const login = useMutation(graphql`
+  const login = useMutation(
+    graphql`
     mutation Login($email: String!, $code: String!) {
       login(email: $email, token: $code)
     }
-  `, {
-    onCommit: ({login}) => {
-      document.cookie = `session=${login};path=/;max-age=604800`;
-      window.location.href = "/";
+  `,
+    {
+      onCommit: ({ login }) => {
+        document.cookie = `session=${login};path=/;max-age=2147483647`;
+        window.location.href = "/";
+      },
+      onError: (errors) => {
+        setError(`Failed to log in: ${errors[0].message}`);
+      },
     },
-    onError: (errors) => {
-      setError(`Failed to log in: ${errors[0].message}`);
-    },
-  });
+  );
   const commitLogin = () => login.commit({ email, code });
 
   const loading = request.inFlight || login.inFlight;
-  const submit = e => {
+  const submit = (e) => {
     e.preventDefault();
     if (showCode) {
       commitLogin();
@@ -60,7 +66,10 @@ function Login() {
 
   return (
     <div class="w-full flex justify-center p-8">
-      <form class="w-full max-w-md bg-white dark:bg-gray-800 shadow rounded-lg p-4" onSubmit={submit}>
+      <form
+        class="w-full max-w-md bg-white dark:bg-gray-800 shadow rounded-lg p-4"
+        onSubmit={submit}
+      >
         <h1 class="text-2xl font-semibold">Login</h1>
         {notice && <Notice message={notice} type="info" style="mt-2" />}
         {error && <Notice message={error} type="error" style="mt-2" />}
@@ -73,16 +82,16 @@ function Login() {
           value={email}
           onChange={setEmail}
         />
-        {
-          showCode &&
-          <TextInput
-            label="Login Code"
-            placeholder="12 digit code"
-            style="mt-2"
-            value={code}
-            onChange={setCode}
-          />
-        }
+        {showCode &&
+          (
+            <TextInput
+              label="Login Code"
+              placeholder="12 digit code"
+              style="mt-2"
+              value={code}
+              onChange={setCode}
+            />
+          )}
 
         <Button
           title={showCode ? "Login" : "Request Code"}
@@ -91,10 +100,13 @@ function Login() {
           disabled={loading}
           loading={loading}
         />
-        <button onClick={e => {
-          e.preventDefault();
-          setShowCode(!showCode);
-        }} class="w-full mt-2 text-center text-blue-500">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setShowCode(!showCode);
+          }}
+          class="w-full mt-2 text-center text-blue-500"
+        >
           {showCode ? "I need a login code" : "I already have a login code"}
         </button>
       </form>
@@ -102,4 +114,9 @@ function Login() {
   );
 }
 
-render(<ErrorBoundary><Login /></ErrorBoundary>, document.getElementById("login"));
+render(
+  <ErrorBoundary>
+    <Login />
+  </ErrorBoundary>,
+  document.getElementById("login"),
+);
