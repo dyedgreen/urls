@@ -103,6 +103,99 @@ async fn test_login() {
             },
         })
     );
+
+    // test the session can be revoked
+    let query = "
+        query IsLoggedIn {
+            viewer {
+                logins {
+                    nodes {
+                        id
+                    }
+                }
+            }
+        }
+    ";
+
+    let res = request(query, json!(null), session).reply(&server).await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).expect("Invalid JSON");
+    let login_id = body
+        .as_object()
+        .unwrap()
+        .get("data")
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("viewer")
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("logins")
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("nodes")
+        .unwrap()
+        .as_array()
+        .unwrap()
+        .first()
+        .unwrap()
+        .as_object()
+        .unwrap()
+        .get("id")
+        .unwrap()
+        .as_str()
+        .unwrap()
+        .to_string();
+
+    // revoke the login
+    let query = "
+        mutation RevokeLogin($login: ID!) {
+            revokeLogin(login: $login) {
+                ok
+            }
+        }
+    ";
+    let vars = json!({
+        "login": login_id,
+    });
+
+    let res = request(query, vars, session).reply(&server).await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).expect("Invalid JSON");
+    assert_eq!(
+        body,
+        json!({
+            "data": {
+                "revokeLogin": { "ok": true },
+            },
+        })
+    );
+
+    // test the session was revoked
+    let query = "
+        query IsLoggedIn {
+            viewer {
+                email
+            }
+        }
+    ";
+
+    let res = request(query, json!(null), session).reply(&server).await;
+    assert_eq!(res.status(), 200);
+
+    let body: Value = serde_json::from_slice(res.body()).expect("Invalid JSON");
+    assert_eq!(
+        body,
+        json!({
+            "data": {
+                "viewer": { "email": null },
+            },
+        })
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]

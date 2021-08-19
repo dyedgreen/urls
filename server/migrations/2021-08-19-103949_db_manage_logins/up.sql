@@ -1,0 +1,2 @@
+ALTER TABLE logins ADD COLUMN last_user_agent TEXT;
+ALTER TABLE logins ADD COLUMN revoked BOOLEAN NOT NULL;

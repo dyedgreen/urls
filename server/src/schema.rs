@@ -32,6 +32,8 @@ table! {
         claimed -> Bool,
         session_token -> Nullable<Text>,
         last_used -> Timestamp,
+        last_user_agent -> Nullable<Text>,
+        revoked -> Bool,
     }
 }
 

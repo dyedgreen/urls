@@ -30,6 +30,8 @@ pub struct Login {
     claimed: bool,
     session_token: Option<String>,
     last_used: NaiveDateTime,
+    last_user_agent: Option<String>,
+    revoked: bool,
 }
 
 impl Login {
@@ -57,12 +59,29 @@ impl Login {
         DateTime::from_utc(self.last_used, Utc)
     }
 
+    pub fn last_user_agent(&self) -> Option<&str> {
+        self.last_user_agent.as_ref().map(|s| s.as_str())
+    }
+
+    pub fn is_valid(&self, now: DateTime<Utc>) -> bool {
+        self.is_claimed()
+            && !self.revoked
+            && self.last_used() + Duration::days(WEB_SESSION_MAX_UNUSED_DAYS) >= now
+    }
+
     pub fn created_at(&self) -> DateTime<Utc> {
         DateTime::from_utc(self.created_at, Utc)
     }
 
     pub fn updated_at(&self) -> DateTime<Utc> {
         DateTime::from_utc(self.updated_at, Utc)
+    }
+}
+
+impl Login {
+    /// Load by ID.
+    pub async fn find(ctx: &Context, id: LoginID) -> Result<Self> {
+        Ok(logins::table.find(id).get_result(&*ctx.conn().await?)?)
     }
 }
 
@@ -95,6 +114,8 @@ impl Login {
             claimed: false,
             session_token: None,
             last_used: ctx.now().naive_utc(),
+            last_user_agent: None,
+            revoked: false,
 
             created_at: ctx.now().naive_utc(),
             updated_at: ctx.now().naive_utc(),
@@ -105,6 +126,19 @@ impl Login {
             .execute(&*conn)?;
 
         Ok(login)
+    }
+
+    /// Revoke a given login session. Only the user for whom the login
+    /// session was issued can revoke it.
+    pub async fn revoke(&mut self, ctx: &Context) -> Result<()> {
+        if self.user_id != ctx.user_id()? {
+            Err(anyhow!("Invalid logged in user"))
+        } else {
+            self.revoked = true;
+            self.updated_at = ctx.now().naive_utc();
+            *self = self.save_changes(&*ctx.conn().await?)?;
+            Ok(())
+        }
     }
 
     /// Claims the login token and returns a session token. The session can be
@@ -132,16 +166,20 @@ impl Login {
     /// user session. This function would typically be called to construct
     /// a request context. If the session token is invalid, this returns an
     /// error.
-    pub async fn use_session(ctx: &mut Context, session_token: &str) -> Result<()> {
+    pub async fn use_session(
+        ctx: &mut Context,
+        session_token: &str,
+        user_agent: Option<String>,
+    ) -> Result<()> {
         let conn = ctx.conn().await?;
         let mut login: Self = logins::table
             .filter(logins::dsl::session_token.eq(session_token))
-            .filter(logins::dsl::claimed.eq(true))
             .get_result(&*conn)?;
-        if login.last_used() + Duration::days(WEB_SESSION_MAX_UNUSED_DAYS) < ctx.now() {
-            Err(anyhow!("The login session is expired"))
+        if !login.is_valid(ctx.now()) {
+            Err(anyhow!("Invalid login session"))
         } else {
             login.last_used = ctx.now().naive_utc();
+            login.last_user_agent = user_agent;
             login.updated_at = ctx.now().naive_utc();
             login.save_changes::<Login>(&*conn)?;
             drop(conn);

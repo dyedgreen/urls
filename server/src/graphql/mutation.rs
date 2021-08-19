@@ -1,8 +1,8 @@
 use super::viewer::Viewer;
-use crate::db::id::{CommentID, UrlID};
+use crate::db::id::{CommentID, LoginID, UrlID};
 use crate::db::models::{
-    Comment, Invite, NewCommentInput, NewUrlInput, NewUserInput, Permission, Role, UpdateUserInput,
-    Url, User,
+    Comment, Invite, Login, NewCommentInput, NewUrlInput, NewUserInput, Permission, Role,
+    UpdateUserInput, Url, User,
 };
 use crate::Context;
 use juniper::{graphql_object, FieldResult, GraphQLObject};
@@ -89,6 +89,14 @@ impl Mutation {
         let user = User::find_by_email(ctx, &email).await?;
         let session = user.login(ctx, &token).await?;
         Ok(session)
+    }
+
+    /// Revoke a login session for the currently logged in
+    /// user.
+    async fn revoke_login(ctx: &Context, login: LoginID) -> FieldResult<Void> {
+        let mut login = Login::find(ctx, login).await?;
+        login.revoke(ctx).await?;
+        Void::ok()
     }
 
     /// Create a new invite, issued by the currently logged in user.

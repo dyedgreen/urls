@@ -24,9 +24,12 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
     async fn attempt_login(
         mut ctx: Context,
         session: Option<String>,
+        user_agent: Option<String>,
     ) -> Result<Context, Infallible> {
         if let Some(session_token) = session {
-            Login::use_session(&mut ctx, &session_token).await.ok();
+            Login::use_session(&mut ctx, &session_token, user_agent)
+                .await
+                .ok();
         }
         Ok(ctx)
     }
@@ -35,10 +38,17 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
         .or(warp::any().map(|| None))
         .unify()
         .and(xsrf::token())
-        .and_then(move |session: Option<String>, xsrf: String| {
-            let ctx = Context::new(&pool, &mailer, xsrf, None);
-            attempt_login(ctx, session)
-        })
+        .and(
+            warp::header::optional("user-agent")
+                .or(warp::any().map(|| None))
+                .unify(),
+        )
+        .and_then(
+            move |session: Option<String>, xsrf: String, user_agent: Option<String>| {
+                let ctx = Context::new(&pool, &mailer, xsrf, None);
+                attempt_login(ctx, session, user_agent)
+            },
+        )
 }
 
 /// A shorthand for filters which can be used to extract a request context
