@@ -99,7 +99,7 @@ impl Viewer {
     ) -> FieldResult<RelayConnection<Login>> {
         if let Some(user_id) = ctx.maybe_user_id() {
             let conn = ctx.conn().await?;
-            RelayConnection::new(first, after, last, before, |after, before, limit| {
+            RelayConnection::new(first, after, last, before, |after, before, _| {
                 let mut query = logins::table
                     .filter(logins::dsl::user_id.eq(user_id))
                     .filter(logins::dsl::claimed.eq(true))
@@ -116,9 +116,6 @@ impl Viewer {
                     let before: Login = logins::table.find(before).get_result(&*conn)?;
                     query =
                         query.filter(logins::dsl::created_at.lt(before.created_at().naive_utc()));
-                }
-                if let Some(limit) = limit {
-                    query = query.limit(limit);
                 }
 
                 let edges = query
