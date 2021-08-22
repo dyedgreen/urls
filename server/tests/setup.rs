@@ -1,7 +1,8 @@
+use serde_json::{json, Value};
 use server::*;
 use std::convert::Infallible;
 use std::env;
-use warp::{Filter, Reply};
+use warp::{test::RequestBuilder, Filter, Reply};
 
 fn set_work_dir() {
     let mut dir = env::current_dir().unwrap();
@@ -55,10 +56,26 @@ pub async fn mock() -> (
         .await
         .expect("Failed to connect to test mailer");
 
-    let ctx = Context::new(&pool, &mailer, "".into(), None);
+    let ctx = Context::for_server(&pool, &mailer);
     generate_mock_users(&ctx).await;
 
     (global_routes(&test_conf, pool, mailer.clone()), ctx)
+}
+
+/// Constructs a GraphQL request.
+#[allow(dead_code)]
+pub fn graphql(query: &str, variables: Value, session: &str) -> RequestBuilder {
+    let body: Value = json!({
+        "query": query,
+        "variables": variables,
+    });
+    warp::test::request()
+        .path("/graphql")
+        .method("POST")
+        .header("Cookie", format!("xsrf=fake_xsrf; session={}", session))
+        .header("X-XSRF-Token", "fake_xsrf")
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
 }
 
 /// Return the last sent email message.

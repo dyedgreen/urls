@@ -1,5 +1,6 @@
 use crate::{db::models::Login, db::Pool, email::Mailer, Context};
 use std::convert::Infallible;
+use std::net::{IpAddr, SocketAddr};
 use warp::Filter;
 
 pub mod account;
@@ -24,31 +25,36 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
     async fn attempt_login(
         mut ctx: Context,
         session: Option<String>,
-        user_agent: Option<String>,
     ) -> Result<Context, Infallible> {
         if let Some(session_token) = session {
-            Login::use_session(&mut ctx, &session_token, user_agent)
-                .await
-                .ok();
+            Login::use_session(&mut ctx, &session_token).await.ok();
         }
         Ok(ctx)
     }
-    warp::cookie(AUTH_COOKIE_NAME)
-        .map(|session: String| Some(session))
+
+    let session_cookie = warp::cookie::optional::<String>(AUTH_COOKIE_NAME);
+    let user_agent = warp::header::optional::<String>("user-agent")
         .or(warp::any().map(|| None))
-        .unify()
+        .unify();
+    let remote_address = warp::header("x-forwarded-for")
+        .map(|fwd_for: String| {
+            fwd_for
+                .parse::<SocketAddr>()
+                .map(|addr| addr.ip())
+                .or_else(|_| fwd_for.parse::<IpAddr>())
+                .ok()
+        })
+        .or(warp::addr::remote().map(|remote: Option<SocketAddr>| remote.map(|addr| addr.ip())))
+        .unify();
+
+    session_cookie
         .and(xsrf::token())
-        .and(
-            warp::header::optional("user-agent")
-                .or(warp::any().map(|| None))
-                .unify(),
-        )
-        .and_then(
-            move |session: Option<String>, xsrf: String, user_agent: Option<String>| {
-                let ctx = Context::new(&pool, &mailer, xsrf, None);
-                attempt_login(ctx, session, user_agent)
-            },
-        )
+        .and(user_agent)
+        .and(remote_address)
+        .and_then(move |session, xsrf, user_agent, remote_address| {
+            let ctx = Context::for_request(&pool, &mailer, xsrf, None, user_agent, remote_address);
+            attempt_login(ctx, session)
+        })
 }
 
 /// A shorthand for filters which can be used to extract a request context

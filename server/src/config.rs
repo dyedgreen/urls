@@ -89,7 +89,7 @@ impl Config {
     }
 
     /// Host name to use in communications and things
-    /// like API responses. E.g. `http://localhost:8080`.
+    /// like API responses. E.g. `localhost:8080`.
     pub fn hostname(&self) -> &str {
         &self.hostname
     }

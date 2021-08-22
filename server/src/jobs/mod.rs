@@ -3,8 +3,6 @@ use clokwerk::{Interval, ScheduleHandle, Scheduler};
 use std::time::Duration;
 use tokio::runtime::Handle;
 
-const BG_XSRF_TOKEN: &str = "background_job_xsrf";
-
 mod check_old_urls;
 mod index_urls;
 
@@ -24,7 +22,7 @@ fn schedule<J, F>(
     let mailer = mailer.clone();
     let runtime = runtime.clone();
     scheduler.every(interval).run(move || {
-        let ctx = Context::new(&pool, &mailer, BG_XSRF_TOKEN.to_string(), None);
+        let ctx = Context::for_server(&pool, &mailer);
         runtime.spawn((job)(ctx));
     });
 }

@@ -166,11 +166,7 @@ impl Login {
     /// user session. This function would typically be called to construct
     /// a request context. If the session token is invalid, this returns an
     /// error.
-    pub async fn use_session(
-        ctx: &mut Context,
-        session_token: &str,
-        user_agent: Option<String>,
-    ) -> Result<()> {
+    pub async fn use_session(ctx: &mut Context, session_token: &str) -> Result<()> {
         let conn = ctx.conn().await?;
         let mut login: Self = logins::table
             .filter(logins::dsl::session_token.eq(session_token))
@@ -179,7 +175,7 @@ impl Login {
             Err(anyhow!("Invalid login session"))
         } else {
             login.last_used = ctx.now().naive_utc();
-            login.last_user_agent = user_agent;
+            login.last_user_agent = ctx.user_agent().map(str::to_string);
             login.updated_at = ctx.now().naive_utc();
             login.save_changes::<Login>(&*conn)?;
             drop(conn);

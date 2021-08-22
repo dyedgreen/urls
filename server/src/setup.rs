@@ -11,7 +11,7 @@ use std::io::{stdin, stdout, Write};
 /// start an interactive registration flow in the terminal
 /// on startup.
 pub async fn run(pool: &Pool, mailer: &Mailer) -> Result<()> {
-    let ctx = Context::new(pool, mailer, "".into(), None);
+    let ctx = Context::for_server(pool, mailer);
 
     let admin_count: i64 = roles::table
         .filter(roles::dsl::permission.eq(Permission::Administrator))

@@ -7,7 +7,9 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use diesel::{query_dsl::methods::FindDsl, RunQueryDsl};
 use once_cell::sync::Lazy;
+use std::net::IpAddr;
 
+const SERVER_XSRF_TOKEN: &str = "server_xsrt_token";
 const HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     use ::std::time::Duration;
 
@@ -37,15 +39,19 @@ pub struct Context {
     xsrf_token: String,
     logged_in_user: Option<UserID>,
     request_time: DateTime<Utc>,
+    user_agent: Option<String>,
+    remote_ip: Option<IpAddr>,
 }
 
 impl Context {
     /// Create a new request context.
-    pub fn new(
+    pub fn for_request(
         pool: &Pool,
         mailer: &Mailer,
         xsrf_token: String,
         logged_in_user: Option<UserID>,
+        user_agent: Option<String>,
+        remote_ip: Option<IpAddr>,
     ) -> Self {
         Self {
             pool: pool.clone(),
@@ -53,6 +59,22 @@ impl Context {
             xsrf_token,
             logged_in_user,
             request_time: Utc::now(),
+            user_agent,
+            remote_ip,
+        }
+    }
+
+    /// Create a new context for operations
+    /// initiated by the server.
+    pub fn for_server(pool: &Pool, mailer: &Mailer) -> Self {
+        Self {
+            pool: pool.clone(),
+            mailer: mailer.clone(),
+            xsrf_token: SERVER_XSRF_TOKEN.to_string(),
+            logged_in_user: None,
+            request_time: Utc::now(),
+            user_agent: None,
+            remote_ip: None,
         }
     }
 
@@ -162,6 +184,18 @@ impl Context {
     /// Check if a given XSRF token is valid.
     pub fn check_xsrf_token(&self, token: &str) -> bool {
         self.xsrf_token == token
+    }
+
+    /// Return the user-agent of the request
+    /// which created this context.
+    pub fn user_agent(&self) -> Option<&str> {
+        self.user_agent.as_deref()
+    }
+
+    /// Return the IP address of the remote
+    /// request which created this context.
+    pub fn remote_ip_address(&self) -> Option<IpAddr> {
+        self.remote_ip
     }
 }
 
