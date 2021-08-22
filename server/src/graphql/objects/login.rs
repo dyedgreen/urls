@@ -69,7 +69,7 @@ impl Login {
 
     /// The last known location from where this
     /// login session was used. This information
-    /// is approximate and based on the used IP
+    /// is approximate and based on the remote IP
     /// address.
     async fn last_location(&self, ctx: &Context) -> FieldResult<Option<LoginLocation>> {
         if let Some(ip_addr) = self.last_remote_ip() {

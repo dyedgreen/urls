@@ -30,7 +30,9 @@ const FINGER_PRINT_ICON = (
   </svg>
 );
 
-export default function Invite({ id, lastUsed, lastUserAgent, onRevoke }) {
+export default function Invite(
+  { id, lastUsed, lastUserAgent, lastLocation, onRevoke },
+) {
   const date = new Date(lastUsed);
 
   const [error, setError] = useState(null);
@@ -58,8 +60,16 @@ export default function Invite({ id, lastUsed, lastUserAgent, onRevoke }) {
             <h1 class="leading-5 mb-1">
               {lastUserAgent.name} &mdash; {lastUserAgent.operatingSystem}
             </h1>
-            <h2 class="leading-none text-gray-500">
-              Last used {date.toDateString()} at {date.toTimeString()}
+            {lastLocation?.countryName != null &&
+              (
+                <h2 class="leading-tight text-gray-500 dark:text-gray-300">
+                  {lastLocation.cityName}, {lastLocation.countryName} &mdash;
+                  {" "}
+                  {lastLocation.ipAddress}
+                </h2>
+              )}
+            <h2 class="leading-tight text-gray-500 dark:text-gray-300">
+              Last seen {date.toDateString()} at {date.toTimeString()}
             </h2>
             <Button
               title="Revoke"

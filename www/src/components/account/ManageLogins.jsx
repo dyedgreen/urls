@@ -5,7 +5,7 @@ import { graphql, useQuery } from "picoql";
 import ActivityIndicator from "@app/ActivityIndicator";
 import LoginSession from "@app/account/LoginSession";
 
-export default function ManageLogins({}) {
+export default function ManageLogins() {
   const { data, loading, refetch } = useQuery(graphql`
     query ManageLoginsQuery {
       viewer {
@@ -16,6 +16,11 @@ export default function ManageLogins({}) {
             lastUserAgent {
               name
               operatingSystem
+            }
+            lastLocation {
+              ipAddress
+              countryName
+              cityName
             }
           }
         }
