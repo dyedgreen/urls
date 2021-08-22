@@ -34,6 +34,7 @@ table! {
         last_used -> Timestamp,
         last_user_agent -> Nullable<Text>,
         revoked -> Bool,
+        last_remote_ip -> Nullable<Text>,
     }
 }
 

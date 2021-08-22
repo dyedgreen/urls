@@ -2,8 +2,9 @@ use crate::db::id::LoginID;
 use crate::db::models::Login;
 use crate::Context;
 use chrono::{DateTime, Utc};
-use juniper::{graphql_object, GraphQLObject};
+use juniper::{graphql_object, FieldResult, GraphQLObject};
 use juniper_relay::RelayConnectionNode;
+use serde::Deserialize;
 
 impl RelayConnectionNode for Login {
     type Cursor = LoginID;
@@ -31,6 +32,14 @@ struct UserAgent<'a> {
     operating_system: &'a str,
 }
 
+#[derive(GraphQLObject, Deserialize)]
+struct LoginLocation {
+    ip_address: String,
+    country_code: Option<String>,
+    country_name: Option<String>,
+    city_name: Option<String>,
+}
+
 #[graphql_object(context = Context)]
 impl Login {
     /// A globally unique identifier for this
@@ -56,5 +65,24 @@ impl Login {
                 operating_system: res.os,
             })
         })
+    }
+
+    /// The last known location from where this
+    /// login session was used. This information
+    /// is approximate and based on the used IP
+    /// address.
+    async fn last_location(&self, ctx: &Context) -> FieldResult<Option<LoginLocation>> {
+        if let Some(ip_addr) = self.last_remote_ip() {
+            let location: LoginLocation = ctx
+                .http_client()
+                .get(format!("https://api.geoip.rs/?ip={}", ip_addr))
+                .send()
+                .await?
+                .json()
+                .await?;
+            Ok(Some(location))
+        } else {
+            Ok(None)
+        }
     }
 }

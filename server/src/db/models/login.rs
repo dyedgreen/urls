@@ -6,6 +6,7 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use nanoid::nanoid;
+use std::net::IpAddr;
 
 const LOGIN_LIMIT_PER_HOUR: i64 = 3;
 const LOGIN_VALID_MINUTES: i64 = 60;
@@ -32,6 +33,7 @@ pub struct Login {
     last_used: NaiveDateTime,
     last_user_agent: Option<String>,
     revoked: bool,
+    last_remote_ip: Option<String>,
 }
 
 impl Login {
@@ -61,6 +63,10 @@ impl Login {
 
     pub fn last_user_agent(&self) -> Option<&str> {
         self.last_user_agent.as_ref().map(|s| s.as_str())
+    }
+
+    pub fn last_remote_ip(&self) -> Option<IpAddr> {
+        self.last_remote_ip.as_ref().and_then(|ip| ip.parse().ok())
     }
 
     pub fn is_valid(&self, now: DateTime<Utc>) -> bool {
@@ -116,6 +122,7 @@ impl Login {
             last_used: ctx.now().naive_utc(),
             last_user_agent: None,
             revoked: false,
+            last_remote_ip: None,
 
             created_at: ctx.now().naive_utc(),
             updated_at: ctx.now().naive_utc(),
@@ -176,6 +183,7 @@ impl Login {
         } else {
             login.last_used = ctx.now().naive_utc();
             login.last_user_agent = ctx.user_agent().map(str::to_string);
+            login.last_remote_ip = ctx.remote_ip_address().map(|ip| ip.to_string());
             login.updated_at = ctx.now().naive_utc();
             login.save_changes::<Login>(&*conn)?;
             drop(conn);
