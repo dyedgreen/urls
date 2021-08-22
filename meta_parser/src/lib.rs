@@ -64,6 +64,12 @@ impl Meta {
                                 b"twitter:description" | b"og:description" => {
                                     self.description = decode_str_bytes(meta_tag.content);
                                 }
+                                b"description" => {
+                                    // prefer the social meta if available
+                                    if self.description.is_none() {
+                                        self.description = decode_str_bytes(meta_tag.content)
+                                    }
+                                }
                                 b"twitter:image" | b"twitter:image:src" | b"og:image" => {
                                     self.image = decode_str_bytes(meta_tag.content);
                                 }

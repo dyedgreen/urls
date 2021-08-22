@@ -2,7 +2,7 @@ use meta_parser::Meta;
 
 #[test]
 fn tilman_dev() {
-    let html = include_bytes!("tilman.dev.html");
+    let html = include_bytes!("html/tilman.dev.html");
     let mut meta = Meta::new();
     meta.parse(html);
     assert_eq!(meta.title, Some("Click here to accept Cookies".into()));
@@ -15,7 +15,7 @@ fn tilman_dev() {
 
 #[test]
 fn github_com() {
-    let html = include_bytes!("github.com.html");
+    let html = include_bytes!("html/github.com.html");
     let mut meta = Meta::new();
     meta.parse(html);
     assert_eq!(meta.title, Some("rust-lang/rust".into()));
@@ -30,7 +30,7 @@ fn github_com() {
 
 #[test]
 fn thume_ca() {
-    let html = include_bytes!("thume.ca.html");
+    let html = include_bytes!("html/thume.ca.html");
     let mut meta = Meta::new();
     meta.parse(html);
     assert_eq!(
@@ -46,7 +46,7 @@ fn thume_ca() {
 
 #[test]
 fn blog_discord_com() {
-    let html = include_bytes!("blog.discord.com.html");
+    let html = include_bytes!("html/blog.discord.com.html");
     let mut meta = Meta::new();
     meta.parse(html);
     assert_eq!(
@@ -62,7 +62,7 @@ fn blog_discord_com() {
 
 #[test]
 fn dev_to() {
-    let html = include_bytes!("dev.to.html");
+    let html = include_bytes!("html/dev.to.html");
     let mut meta = Meta::new();
     meta.parse(html);
     assert_eq!(
@@ -74,4 +74,14 @@ fn dev_to() {
         meta.image,
         Some("https://res.cloudinary.com/practicaldev/image/fetch/s--yJJt-vDA--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/z7hv4g9221qw4qq5wi56.jpeg".into())
     );
+}
+
+#[test]
+fn www_nushell_sh() {
+    let html = include_bytes!("html/www.nushell.sh.html");
+    let mut meta = Meta::new();
+    meta.parse(html);
+    assert_eq!(meta.title, Some("Nushell".into()));
+    assert_eq!(meta.description, Some("A new type of shell.".into()));
+    assert_eq!(meta.image, None);
 }

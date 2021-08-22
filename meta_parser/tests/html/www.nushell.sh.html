@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="English">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Nushell</title>
+    <meta name="generator" content="VuePress 1.8.2">
+    <link rel="icon" href="/icon.png">
+    <meta name="description" content="A new type of shell.">
+    <meta name="theme-color" content="#3eaf7c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="preload" href="/assets/css/0.styles.9747aa62.css" as="style">
+    <link rel="preload" href="/assets/js/app.fc89fe24.js" as="script">
+    <link rel="preload" href="/assets/js/9.d6a1d11f.js" as="script">
+    <link rel="preload" href="/assets/js/2.aa512501.js" as="script">
+    <link rel="preload" href="/assets/js/29.90f75209.js" as="script">
+    <link rel="prefetch" href="/assets/js/10.4a033bfb.js">
+    <link rel="prefetch" href="/assets/js/100.1d959cba.js">
+    <link rel="prefetch" href="/assets/js/101.35fbd5d6.js">
+    <link rel="prefetch" href="/assets/js/102.fdfbd9f6.js">
+    <link rel="prefetch" href="/assets/js/103.1b17988d.js">
+    <link rel="prefetch" href="/assets/js/104.2e0e95ed.js">
+    <link rel="prefetch" href="/assets/js/105.b2ca7092.js">
+    <link rel="prefetch" href="/assets/js/106.e8fe33cb.js">
+    <link rel="prefetch" href="/assets/js/107.69612b3d.js">
+    <link rel="prefetch" href="/assets/js/108.341a2a1c.js">
+    <link rel="prefetch" href="/assets/js/109.201af818.js">
+    <link rel="prefetch" href="/assets/js/11.2ac368ac.js">
+    <link rel="prefetch" href="/assets/js/110.214f5cbf.js">
+    <link rel="prefetch" href="/assets/js/111.db24b05c.js">
+    <link rel="prefetch" href="/assets/js/112.04a4445d.js">
+    <link rel="prefetch" href="/assets/js/113.c8b4a551.js">
+    <link rel="prefetch" href="/assets/js/114.c57db0d0.js">
+    <link rel="prefetch" href="/assets/js/115.f8514f6b.js">
+    <link rel="prefetch" href="/assets/js/116.f3bc729a.js">
+    <link rel="prefetch" href="/assets/js/117.70c46c1b.js">
+    <link rel="prefetch" href="/assets/js/118.6e39d38a.js">
+    <link rel="prefetch" href="/assets/js/119.760a2c97.js">
+    <link rel="prefetch" href="/assets/js/12.14ac586c.js">
+    <link rel="prefetch" href="/assets/js/120.f634444b.js">
+    <link rel="prefetch" href="/assets/js/121.a8aff548.js">
+    <link rel="prefetch" href="/assets/js/122.6535af74.js">
+    <link rel="prefetch" href="/assets/js/123.62ed7148.js">
+    <link rel="prefetch" href="/assets/js/124.a248eeb3.js">
+    <link rel="prefetch" href="/assets/js/125.c90e71cc.js">
+    <link rel="prefetch" href="/assets/js/126.7d181431.js">
+    <link rel="prefetch" href="/assets/js/127.020f1ff5.js">
+    <link rel="prefetch" href="/assets/js/128.6c48796f.js">
+    <link rel="prefetch" href="/assets/js/129.b41c8a44.js">
+    <link rel="prefetch" href="/assets/js/13.d12305e8.js">
+    <link rel="prefetch" href="/assets/js/130.6b07cb9b.js">
+    <link rel="prefetch" href="/assets/js/131.aa6331cf.js">
+    <link rel="prefetch" href="/assets/js/132.8b4c3b87.js">
+    <link rel="prefetch" href="/assets/js/133.cff4c54b.js">
+    <link rel="prefetch" href="/assets/js/134.1bfc8c63.js">
+    <link rel="prefetch" href="/assets/js/135.8cd2a244.js">
+    <link rel="prefetch" href="/assets/js/136.904265b5.js">
+    <link rel="prefetch" href="/assets/js/137.9384e7c6.js">
+    <link rel="prefetch" href="/assets/js/138.1ac8b4d9.js">
+    <link rel="prefetch" href="/assets/js/139.882bfe14.js">
+    <link rel="prefetch" href="/assets/js/14.e3765dc8.js">
+    <link rel="prefetch" href="/assets/js/140.635667c9.js">
+    <link rel="prefetch" href="/assets/js/141.aa6046b1.js">
+    <link rel="prefetch" href="/assets/js/142.846dea19.js">
+    <link rel="prefetch" href="/assets/js/143.03a0234f.js">
+    <link rel="prefetch" href="/assets/js/144.db0c81c6.js">
+    <link rel="prefetch" href="/assets/js/145.1985aafb.js">
+    <link rel="prefetch" href="/assets/js/146.9c2ca06d.js">
+    <link rel="prefetch" href="/assets/js/147.f617e7f8.js">
+    <link rel="prefetch" href="/assets/js/148.f65717d9.js">
+    <link rel="prefetch" href="/assets/js/149.031d9e9d.js">
+    <link rel="prefetch" href="/assets/js/15.97ee15be.js">
+    <link rel="prefetch" href="/assets/js/150.8e12456a.js">
+    <link rel="prefetch" href="/assets/js/151.e968e186.js">
+    <link rel="prefetch" href="/assets/js/152.a0b9c6fe.js">
+    <link rel="prefetch" href="/assets/js/153.784c3099.js">
+    <link rel="prefetch" href="/assets/js/154.fdd20cf2.js">
+    <link rel="prefetch" href="/assets/js/155.20d37531.js">
+    <link rel="prefetch" href="/assets/js/156.b1bc844f.js">
+    <link rel="prefetch" href="/assets/js/157.43e6d851.js">
+    <link rel="prefetch" href="/assets/js/158.5808a9e2.js">
+    <link rel="prefetch" href="/assets/js/159.b0872d04.js">
+    <link rel="prefetch" href="/assets/js/16.7c261489.js">
+    <link rel="prefetch" href="/assets/js/160.59b33f8a.js">
+    <link rel="prefetch" href="/assets/js/161.e5640b81.js">
+    <link rel="prefetch" href="/assets/js/162.e6379fee.js">
+    <link rel="prefetch" href="/assets/js/163.0f142584.js">
+    <link rel="prefetch" href="/assets/js/164.ca747369.js">
+    <link rel="prefetch" href="/assets/js/165.5c996e31.js">
+    <link rel="prefetch" href="/assets/js/166.8c89bf50.js">
+    <link rel="prefetch" href="/assets/js/167.04d75bc5.js">
+    <link rel="prefetch" href="/assets/js/168.f433240a.js">
+    <link rel="prefetch" href="/assets/js/169.ec6b31ae.js">
+    <link rel="prefetch" href="/assets/js/17.c7f9a933.js">
+    <link rel="prefetch" href="/assets/js/170.0471f5d9.js">
+    <link rel="prefetch" href="/assets/js/171.a2ae6219.js">
+    <link rel="prefetch" href="/assets/js/172.e11c8121.js">
+    <link rel="prefetch" href="/assets/js/173.3af0b6f3.js">
+    <link rel="prefetch" href="/assets/js/174.87665c8e.js">
+    <link rel="prefetch" href="/assets/js/175.2cede32a.js">
+    <link rel="prefetch" href="/assets/js/176.22d66853.js">
+    <link rel="prefetch" href="/assets/js/177.e47997cf.js">
+    <link rel="prefetch" href="/assets/js/178.2f7dd411.js">
+    <link rel="prefetch" href="/assets/js/179.58a17317.js">
+    <link rel="prefetch" href="/assets/js/18.8d291aae.js">
+    <link rel="prefetch" href="/assets/js/180.602e4df3.js">
+    <link rel="prefetch" href="/assets/js/181.d024c0e7.js">
+    <link rel="prefetch" href="/assets/js/182.adf63821.js">
+    <link rel="prefetch" href="/assets/js/183.c1feec6c.js">
+    <link rel="prefetch" href="/assets/js/184.61012701.js">
+    <link rel="prefetch" href="/assets/js/185.e3e5cf24.js">
+    <link rel="prefetch" href="/assets/js/186.f0a126c7.js">
+    <link rel="prefetch" href="/assets/js/187.d2f55e99.js">
+    <link rel="prefetch" href="/assets/js/188.929cc955.js">
+    <link rel="prefetch" href="/assets/js/189.f395ec10.js">
+    <link rel="prefetch" href="/assets/js/19.e331c146.js">
+    <link rel="prefetch" href="/assets/js/190.acef5bf3.js">
+    <link rel="prefetch" href="/assets/js/191.021b9195.js">
+    <link rel="prefetch" href="/assets/js/192.3a745fbc.js">
+    <link rel="prefetch" href="/assets/js/193.fc629c8e.js">
+    <link rel="prefetch" href="/assets/js/194.1a9274de.js">
+    <link rel="prefetch" href="/assets/js/195.c8c032ce.js">
+    <link rel="prefetch" href="/assets/js/196.163ca886.js">
+    <link rel="prefetch" href="/assets/js/197.aa1a3f4f.js">
+    <link rel="prefetch" href="/assets/js/198.5c249efd.js">
+    <link rel="prefetch" href="/assets/js/199.4d55f089.js">
+    <link rel="prefetch" href="/assets/js/20.f2edbf61.js">
+    <link rel="prefetch" href="/assets/js/200.fd5a32b3.js">
+    <link rel="prefetch" href="/assets/js/201.1dae6a72.js">
+    <link rel="prefetch" href="/assets/js/202.76b09f4c.js">
+    <link rel="prefetch" href="/assets/js/203.f394a1c5.js">
+    <link rel="prefetch" href="/assets/js/204.9fcb5469.js">
+    <link rel="prefetch" href="/assets/js/205.eaacf3d1.js">
+    <link rel="prefetch" href="/assets/js/206.65bb5761.js">
+    <link rel="prefetch" href="/assets/js/207.8e92172c.js">
+    <link rel="prefetch" href="/assets/js/208.f12bea3e.js">
+    <link rel="prefetch" href="/assets/js/209.27961fbb.js">
+    <link rel="prefetch" href="/assets/js/21.4e595d27.js">
+    <link rel="prefetch" href="/assets/js/210.e17b19cb.js">
+    <link rel="prefetch" href="/assets/js/211.f356cb73.js">
+    <link rel="prefetch" href="/assets/js/212.a51f2bd5.js">
+    <link rel="prefetch" href="/assets/js/213.17cd4ab4.js">
+    <link rel="prefetch" href="/assets/js/214.8a87132c.js">
+    <link rel="prefetch" href="/assets/js/215.251172db.js">
+    <link rel="prefetch" href="/assets/js/216.cd63c432.js">
+    <link rel="prefetch" href="/assets/js/217.7afc1895.js">
+    <link rel="prefetch" href="/assets/js/218.7f643b8c.js">
+    <link rel="prefetch" href="/assets/js/219.17a84eae.js">
+    <link rel="prefetch" href="/assets/js/22.0135b431.js">
+    <link rel="prefetch" href="/assets/js/220.2e0358f9.js">
+    <link rel="prefetch" href="/assets/js/221.93b1753d.js">
+    <link rel="prefetch" href="/assets/js/222.99d5d87c.js">
+    <link rel="prefetch" href="/assets/js/223.43dca867.js">
+    <link rel="prefetch" href="/assets/js/224.81506dd3.js">
+    <link rel="prefetch" href="/assets/js/225.3d4c69d9.js">
+    <link rel="prefetch" href="/assets/js/226.c67b77ee.js">
+    <link rel="prefetch" href="/assets/js/227.af3b1b0a.js">
+    <link rel="prefetch" href="/assets/js/228.02c148f4.js">
+    <link rel="prefetch" href="/assets/js/229.ff619ae3.js">
+    <link rel="prefetch" href="/assets/js/23.6ae5b2b1.js">
+    <link rel="prefetch" href="/assets/js/230.c6ce16d0.js">
+    <link rel="prefetch" href="/assets/js/231.2659cb14.js">
+    <link rel="prefetch" href="/assets/js/232.ab901793.js">
+    <link rel="prefetch" href="/assets/js/233.566ba894.js">
+    <link rel="prefetch" href="/assets/js/234.e7fac843.js">
+    <link rel="prefetch" href="/assets/js/235.44cb7ea5.js">
+    <link rel="prefetch" href="/assets/js/236.c71f8fee.js">
+    <link rel="prefetch" href="/assets/js/237.fa5d87f6.js">
+    <link rel="prefetch" href="/assets/js/238.d06a983f.js">
+    <link rel="prefetch" href="/assets/js/239.55ab0b4e.js">
+    <link rel="prefetch" href="/assets/js/24.7c5cf3a2.js">
+    <link rel="prefetch" href="/assets/js/240.437551eb.js">
+    <link rel="prefetch" href="/assets/js/241.3596d830.js">
+    <link rel="prefetch" href="/assets/js/242.0f895cb3.js">
+    <link rel="prefetch" href="/assets/js/243.b7e6d3d4.js">
+    <link rel="prefetch" href="/assets/js/244.ff7ecf20.js">
+    <link rel="prefetch" href="/assets/js/245.b22835cb.js">
+    <link rel="prefetch" href="/assets/js/246.d2c4bf37.js">
+    <link rel="prefetch" href="/assets/js/247.35fc2769.js">
+    <link rel="prefetch" href="/assets/js/248.82fc28e2.js">
+    <link rel="prefetch" href="/assets/js/249.8cb01693.js">
+    <link rel="prefetch" href="/assets/js/25.4ba48502.js">
+    <link rel="prefetch" href="/assets/js/250.53b0e4a0.js">
+    <link rel="prefetch" href="/assets/js/251.21f0d9a0.js">
+    <link rel="prefetch" href="/assets/js/252.8b6b8025.js">
+    <link rel="prefetch" href="/assets/js/253.239d8761.js">
+    <link rel="prefetch" href="/assets/js/254.525d1ec9.js">
+    <link rel="prefetch" href="/assets/js/255.d8a88ed4.js">
+    <link rel="prefetch" href="/assets/js/256.17628e2c.js">
+    <link rel="prefetch" href="/assets/js/257.f28ac3a3.js">
+    <link rel="prefetch" href="/assets/js/258.df51be31.js">
+    <link rel="prefetch" href="/assets/js/259.c2b25fe1.js">
+    <link rel="prefetch" href="/assets/js/26.70389107.js">
+    <link rel="prefetch" href="/assets/js/260.76e87f69.js">
+    <link rel="prefetch" href="/assets/js/261.a5af20a6.js">
+    <link rel="prefetch" href="/assets/js/262.35aa5ad8.js">
+    <link rel="prefetch" href="/assets/js/263.34242054.js">
+    <link rel="prefetch" href="/assets/js/264.d8d63e18.js">
+    <link rel="prefetch" href="/assets/js/265.efefc0e4.js">
+    <link rel="prefetch" href="/assets/js/266.5329e24f.js">
+    <link rel="prefetch" href="/assets/js/267.ea600fda.js">
+    <link rel="prefetch" href="/assets/js/268.684405f2.js">
+    <link rel="prefetch" href="/assets/js/269.99ab26e1.js">
+    <link rel="prefetch" href="/assets/js/27.01ccb2ba.js">
+    <link rel="prefetch" href="/assets/js/270.894a1195.js">
+    <link rel="prefetch" href="/assets/js/271.7ff5a76c.js">
+    <link rel="prefetch" href="/assets/js/272.0a8762bd.js">
+    <link rel="prefetch" href="/assets/js/273.ac75c680.js">
+    <link rel="prefetch" href="/assets/js/274.5e880721.js">
+    <link rel="prefetch" href="/assets/js/275.d87e79e6.js">
+    <link rel="prefetch" href="/assets/js/276.13e173a2.js">
+    <link rel="prefetch" href="/assets/js/277.35d88feb.js">
+    <link rel="prefetch" href="/assets/js/278.e811c571.js">
+    <link rel="prefetch" href="/assets/js/279.77f15d47.js">
+    <link rel="prefetch" href="/assets/js/28.51b8eee7.js">
+    <link rel="prefetch" href="/assets/js/280.76343c5a.js">
+    <link rel="prefetch" href="/assets/js/281.6668c390.js">
+    <link rel="prefetch" href="/assets/js/282.9e82391e.js">
+    <link rel="prefetch" href="/assets/js/283.b5e12394.js">
+    <link rel="prefetch" href="/assets/js/284.da130427.js">
+    <link rel="prefetch" href="/assets/js/285.5b968ec5.js">
+    <link rel="prefetch" href="/assets/js/286.c3c6e2bb.js">
+    <link rel="prefetch" href="/assets/js/287.a1bb7e52.js">
+    <link rel="prefetch" href="/assets/js/288.04df7b8c.js">
+    <link rel="prefetch" href="/assets/js/289.8e0ec5cb.js">
+    <link rel="prefetch" href="/assets/js/290.86d9e5e2.js">
+    <link rel="prefetch" href="/assets/js/291.6d6d4344.js">
+    <link rel="prefetch" href="/assets/js/292.9c349d5c.js">
+    <link rel="prefetch" href="/assets/js/293.d80002c4.js">
+    <link rel="prefetch" href="/assets/js/294.57b0e252.js">
+    <link rel="prefetch" href="/assets/js/295.98856ec8.js">
+    <link rel="prefetch" href="/assets/js/296.adda0a14.js">
+    <link rel="prefetch" href="/assets/js/297.a3b35063.js">
+    <link rel="prefetch" href="/assets/js/298.47b703c2.js">
+    <link rel="prefetch" href="/assets/js/299.0c107460.js">
+    <link rel="prefetch" href="/assets/js/3.1806ad6b.js">
+    <link rel="prefetch" href="/assets/js/30.6b2ed095.js">
+    <link rel="prefetch" href="/assets/js/300.4995df1c.js">
+    <link rel="prefetch" href="/assets/js/301.2ff14c37.js">
+    <link rel="prefetch" href="/assets/js/302.a95098a5.js">
+    <link rel="prefetch" href="/assets/js/303.b8c4628c.js">
+    <link rel="prefetch" href="/assets/js/304.b12ca319.js">
+    <link rel="prefetch" href="/assets/js/305.ee8cdb5d.js">
+    <link rel="prefetch" href="/assets/js/306.5cbb601d.js">
+    <link rel="prefetch" href="/assets/js/307.889cc661.js">
+    <link rel="prefetch" href="/assets/js/308.6b523364.js">
+    <link rel="prefetch" href="/assets/js/309.3437b245.js">
+    <link rel="prefetch" href="/assets/js/31.b041bffd.js">
+    <link rel="prefetch" href="/assets/js/310.f2cf0f6a.js">
+    <link rel="prefetch" href="/assets/js/311.1697b419.js">
+    <link rel="prefetch" href="/assets/js/312.06063f5c.js">
+    <link rel="prefetch" href="/assets/js/313.5e57c638.js">
+    <link rel="prefetch" href="/assets/js/314.948960a8.js">
+    <link rel="prefetch" href="/assets/js/315.679a9e5b.js">
+    <link rel="prefetch" href="/assets/js/316.0ab0bf13.js">
+    <link rel="prefetch" href="/assets/js/317.2da65d8b.js">
+    <link rel="prefetch" href="/assets/js/318.86cb7ebc.js">
+    <link rel="prefetch" href="/assets/js/319.c5c71b0a.js">
+    <link rel="prefetch" href="/assets/js/32.7569af96.js">
+    <link rel="prefetch" href="/assets/js/320.58317e7a.js">
+    <link rel="prefetch" href="/assets/js/321.41faecb3.js">
+    <link rel="prefetch" href="/assets/js/322.a1cd840d.js">
+    <link rel="prefetch" href="/assets/js/323.73d08d59.js">
+    <link rel="prefetch" href="/assets/js/324.dfff23cc.js">
+    <link rel="prefetch" href="/assets/js/325.0104d7e3.js">
+    <link rel="prefetch" href="/assets/js/326.7e177807.js">
+    <link rel="prefetch" href="/assets/js/327.07ecb5b7.js">
+    <link rel="prefetch" href="/assets/js/328.28635f75.js">
+    <link rel="prefetch" href="/assets/js/329.be9823a4.js">
+    <link rel="prefetch" href="/assets/js/33.a1130d12.js">
+    <link rel="prefetch" href="/assets/js/330.f2e4c22c.js">
+    <link rel="prefetch" href="/assets/js/331.fd10beba.js">
+    <link rel="prefetch" href="/assets/js/332.5c05d161.js">
+    <link rel="prefetch" href="/assets/js/333.e6134fde.js">
+    <link rel="prefetch" href="/assets/js/334.0f50feb2.js">
+    <link rel="prefetch" href="/assets/js/335.ee2f4cfa.js">
+    <link rel="prefetch" href="/assets/js/336.0e3c6379.js">
+    <link rel="prefetch" href="/assets/js/337.54999ec6.js">
+    <link rel="prefetch" href="/assets/js/338.23e0d2e5.js">
+    <link rel="prefetch" href="/assets/js/339.98a6b341.js">
+    <link rel="prefetch" href="/assets/js/34.f5656b0a.js">
+    <link rel="prefetch" href="/assets/js/340.2f36172e.js">
+    <link rel="prefetch" href="/assets/js/341.bbec9ccf.js">
+    <link rel="prefetch" href="/assets/js/342.07a5d440.js">
+    <link rel="prefetch" href="/assets/js/343.2f289f19.js">
+    <link rel="prefetch" href="/assets/js/344.5b88edbe.js">
+    <link rel="prefetch" href="/assets/js/345.63ee6f5e.js">
+    <link rel="prefetch" href="/assets/js/346.7de69b6c.js">
+    <link rel="prefetch" href="/assets/js/347.39ecc70a.js">
+    <link rel="prefetch" href="/assets/js/348.b02ad9fe.js">
+    <link rel="prefetch" href="/assets/js/349.cef48dba.js">
+    <link rel="prefetch" href="/assets/js/35.6e51a113.js">
+    <link rel="prefetch" href="/assets/js/350.dbaadd79.js">
+    <link rel="prefetch" href="/assets/js/351.6a21ee85.js">
+    <link rel="prefetch" href="/assets/js/352.f900936f.js">
+    <link rel="prefetch" href="/assets/js/353.34618b94.js">
+    <link rel="prefetch" href="/assets/js/354.175c8858.js">
+    <link rel="prefetch" href="/assets/js/355.761ec5d5.js">
+    <link rel="prefetch" href="/assets/js/356.f492e376.js">
+    <link rel="prefetch" href="/assets/js/357.62f4150a.js">
+    <link rel="prefetch" href="/assets/js/358.6c474bf5.js">
+    <link rel="prefetch" href="/assets/js/359.0e67f532.js">
+    <link rel="prefetch" href="/assets/js/36.2bd7313f.js">
+    <link rel="prefetch" href="/assets/js/360.3a782bb1.js">
+    <link rel="prefetch" href="/assets/js/361.8636dc33.js">
+    <link rel="prefetch" href="/assets/js/362.2dd81bf2.js">
+    <link rel="prefetch" href="/assets/js/363.af54bbf6.js">
+    <link rel="prefetch" href="/assets/js/364.9c605f0c.js">
+    <link rel="prefetch" href="/assets/js/365.a627c7c5.js">
+    <link rel="prefetch" href="/assets/js/366.441fde70.js">
+    <link rel="prefetch" href="/assets/js/367.a26f3270.js">
+    <link rel="prefetch" href="/assets/js/368.a8a5e0f7.js">
+    <link rel="prefetch" href="/assets/js/369.fe10cfd2.js">
+    <link rel="prefetch" href="/assets/js/37.a6372dab.js">
+    <link rel="prefetch" href="/assets/js/370.137ac4cb.js">
+    <link rel="prefetch" href="/assets/js/371.f4a11785.js">
+    <link rel="prefetch" href="/assets/js/372.123723e4.js">
+    <link rel="prefetch" href="/assets/js/373.4e6f9bd6.js">
+    <link rel="prefetch" href="/assets/js/374.1fadd759.js">
+    <link rel="prefetch" href="/assets/js/375.dca85ad5.js">
+    <link rel="prefetch" href="/assets/js/376.32b6e512.js">
+    <link rel="prefetch" href="/assets/js/377.92f2ccc8.js">
+    <link rel="prefetch" href="/assets/js/378.488bda73.js">
+    <link rel="prefetch" href="/assets/js/379.cdccaf93.js">
+    <link rel="prefetch" href="/assets/js/38.5e6acf9b.js">
+    <link rel="prefetch" href="/assets/js/380.f460e2a5.js">
+    <link rel="prefetch" href="/assets/js/381.8266894e.js">
+    <link rel="prefetch" href="/assets/js/382.6f3a06a2.js">
+    <link rel="prefetch" href="/assets/js/383.4a8f9b36.js">
+    <link rel="prefetch" href="/assets/js/384.6903c339.js">
+    <link rel="prefetch" href="/assets/js/385.79477617.js">
+    <link rel="prefetch" href="/assets/js/386.f8c89836.js">
+    <link rel="prefetch" href="/assets/js/387.0e8ee77a.js">
+    <link rel="prefetch" href="/assets/js/388.2baa3b0f.js">
+    <link rel="prefetch" href="/assets/js/389.d4812bae.js">
+    <link rel="prefetch" href="/assets/js/39.dff31f34.js">
+    <link rel="prefetch" href="/assets/js/390.8ce11d43.js">
+    <link rel="prefetch" href="/assets/js/391.19398599.js">
+    <link rel="prefetch" href="/assets/js/392.95ec3724.js">
+    <link rel="prefetch" href="/assets/js/393.2afccbc1.js">
+    <link rel="prefetch" href="/assets/js/394.a043c6c2.js">
+    <link rel="prefetch" href="/assets/js/395.5d0f1c92.js">
+    <link rel="prefetch" href="/assets/js/396.5f489405.js">
+    <link rel="prefetch" href="/assets/js/397.7966cc4d.js">
+    <link rel="prefetch" href="/assets/js/398.292ae067.js">
+    <link rel="prefetch" href="/assets/js/399.398e2915.js">
+    <link rel="prefetch" href="/assets/js/4.952b6c17.js">
+    <link rel="prefetch" href="/assets/js/40.f946741c.js">
+    <link rel="prefetch" href="/assets/js/400.83a11f3c.js">
+    <link rel="prefetch" href="/assets/js/401.07de45b6.js">
+    <link rel="prefetch" href="/assets/js/402.3b0b58fd.js">
+    <link rel="prefetch" href="/assets/js/403.0f91ecfa.js">
+    <link rel="prefetch" href="/assets/js/404.607c65fc.js">
+    <link rel="prefetch" href="/assets/js/405.87750790.js">
+    <link rel="prefetch" href="/assets/js/406.05c28d1c.js">
+    <link rel="prefetch" href="/assets/js/407.260b67a4.js">
+    <link rel="prefetch" href="/assets/js/408.91409afd.js">
+    <link rel="prefetch" href="/assets/js/409.0bd2cfb6.js">
+    <link rel="prefetch" href="/assets/js/41.598f6955.js">
+    <link rel="prefetch" href="/assets/js/410.9cd72372.js">
+    <link rel="prefetch" href="/assets/js/411.006b8fbb.js">
+    <link rel="prefetch" href="/assets/js/412.0b7b21e6.js">
+    <link rel="prefetch" href="/assets/js/413.95fcb4a2.js">
+    <link rel="prefetch" href="/assets/js/414.54a889f4.js">
+    <link rel="prefetch" href="/assets/js/415.08dc1fb9.js">
+    <link rel="prefetch" href="/assets/js/416.d642ab53.js">
+    <link rel="prefetch" href="/assets/js/417.277bf221.js">
+    <link rel="prefetch" href="/assets/js/418.2d7a3c3a.js">
+    <link rel="prefetch" href="/assets/js/419.16830fdd.js">
+    <link rel="prefetch" href="/assets/js/42.d471d59d.js">
+    <link rel="prefetch" href="/assets/js/420.ff729e2d.js">
+    <link rel="prefetch" href="/assets/js/421.cec8c453.js">
+    <link rel="prefetch" href="/assets/js/422.03bc7ec1.js">
+    <link rel="prefetch" href="/assets/js/423.517fa8d9.js">
+    <link rel="prefetch" href="/assets/js/424.a4da67d6.js">
+    <link rel="prefetch" href="/assets/js/425.3a05d59b.js">
+    <link rel="prefetch" href="/assets/js/426.b00c8db4.js">
+    <link rel="prefetch" href="/assets/js/427.6d6aaaeb.js">
+    <link rel="prefetch" href="/assets/js/428.e68aa3a9.js">
+    <link rel="prefetch" href="/assets/js/429.c28ce391.js">
+    <link rel="prefetch" href="/assets/js/43.8d49de5b.js">
+    <link rel="prefetch" href="/assets/js/44.d0bbe02f.js">
+    <link rel="prefetch" href="/assets/js/45.b2a1203f.js">
+    <link rel="prefetch" href="/assets/js/46.116971e0.js">
+    <link rel="prefetch" href="/assets/js/47.6459fab3.js">
+    <link rel="prefetch" href="/assets/js/48.f44ed0f3.js">
+    <link rel="prefetch" href="/assets/js/49.b6d688ca.js">
+    <link rel="prefetch" href="/assets/js/5.5f0f7e4b.js">
+    <link rel="prefetch" href="/assets/js/50.49b87d2d.js">
+    <link rel="prefetch" href="/assets/js/51.e3474b11.js">
+    <link rel="prefetch" href="/assets/js/52.835d82c9.js">
+    <link rel="prefetch" href="/assets/js/53.13fc43f9.js">
+    <link rel="prefetch" href="/assets/js/54.b4eefe0c.js">
+    <link rel="prefetch" href="/assets/js/55.ccf88201.js">
+    <link rel="prefetch" href="/assets/js/56.eaccb98b.js">
+    <link rel="prefetch" href="/assets/js/57.4c169ce0.js">
+    <link rel="prefetch" href="/assets/js/58.bf1b972d.js">
+    <link rel="prefetch" href="/assets/js/59.833a23a0.js">
+    <link rel="prefetch" href="/assets/js/6.293a4b09.js">
+    <link rel="prefetch" href="/assets/js/60.50b395c2.js">
+    <link rel="prefetch" href="/assets/js/61.12ad500e.js">
+    <link rel="prefetch" href="/assets/js/62.7d9dda94.js">
+    <link rel="prefetch" href="/assets/js/63.907e4e21.js">
+    <link rel="prefetch" href="/assets/js/64.2243508f.js">
+    <link rel="prefetch" href="/assets/js/65.f5cacf1a.js">
+    <link rel="prefetch" href="/assets/js/66.1576aee2.js">
+    <link rel="prefetch" href="/assets/js/67.4fd90dca.js">
+    <link rel="prefetch" href="/assets/js/68.8bb56410.js">
+    <link rel="prefetch" href="/assets/js/69.9172257a.js">
+    <link rel="prefetch" href="/assets/js/7.47b0342b.js">
+    <link rel="prefetch" href="/assets/js/70.aae09be3.js">
+    <link rel="prefetch" href="/assets/js/71.9a6aacbf.js">
+    <link rel="prefetch" href="/assets/js/72.74e23eaa.js">
+    <link rel="prefetch" href="/assets/js/73.0a7f9af8.js">
+    <link rel="prefetch" href="/assets/js/74.19b519e8.js">
+    <link rel="prefetch" href="/assets/js/75.c096bded.js">
+    <link rel="prefetch" href="/assets/js/76.28259965.js">
+    <link rel="prefetch" href="/assets/js/77.a2a8fb2b.js">
+    <link rel="prefetch" href="/assets/js/78.aa956985.js">
+    <link rel="prefetch" href="/assets/js/79.2555852f.js">
+    <link rel="prefetch" href="/assets/js/8.82ad8e57.js">
+    <link rel="prefetch" href="/assets/js/80.0c381b4f.js">
+    <link rel="prefetch" href="/assets/js/81.ae7395a0.js">
+    <link rel="prefetch" href="/assets/js/82.8cf335be.js">
+    <link rel="prefetch" href="/assets/js/83.38c9fd03.js">
+    <link rel="prefetch" href="/assets/js/84.9a51aab7.js">
+    <link rel="prefetch" href="/assets/js/85.cdcd9cfb.js">
+    <link rel="prefetch" href="/assets/js/86.515cc9cd.js">
+    <link rel="prefetch" href="/assets/js/87.84a92611.js">
+    <link rel="prefetch" href="/assets/js/88.c9f5273c.js">
+    <link rel="prefetch" href="/assets/js/89.284220ef.js">
+    <link rel="prefetch" href="/assets/js/90.76c8f184.js">
+    <link rel="prefetch" href="/assets/js/91.008be16b.js">
+    <link rel="prefetch" href="/assets/js/92.7acd4f26.js">
+    <link rel="prefetch" href="/assets/js/93.fe7e5c14.js">
+    <link rel="prefetch" href="/assets/js/94.c34ba9dc.js">
+    <link rel="prefetch" href="/assets/js/95.28d801c9.js">
+    <link rel="prefetch" href="/assets/js/96.7a79fe4c.js">
+    <link rel="prefetch" href="/assets/js/97.fd24657e.js">
+    <link rel="prefetch" href="/assets/js/98.03ce5cda.js">
+    <link rel="prefetch" href="/assets/js/99.1789f93d.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.9747aa62.css">
+</head>
+<body>
+    <div id="app" data-server-rendered="true">
+        <div class="theme-container no-sidebar">
+            <header class="navbar">
+                <div class="sidebar-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon">
+                        <path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path>
+                    </svg>
+                </div>
+                <a href="/" aria-current="page" class="home-link router-link-exact-active router-link-active">
+                    <!---->
+                    <span class="site-name">Nushell</span>
+                </a>
+                <div class="links">
+                    <div class="search-box">
+                        <input aria-label="Search" autocomplete="off" spellcheck="false" value="">
+                        <!---->
+                    </div>
+                    <nav class="nav-links can-hide">
+                        <div class="nav-item">
+                            <a href="/book/" class="nav-link">
+                              Book
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="/contributor-book/" class="nav-link">
+                              Contributor Book
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="/cookbook/" class="nav-link">
+                              Cookbook
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="/blog/" class="nav-link">
+                              Blog
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="http://nushell.sh/demo" target="_blank" rel="noopener noreferrer" class="nav-link external">
+
+                                  Demo
+                                  
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                        <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                        <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                    </svg>
+                                    <span class="sr-only">(opens new window)</span>
+                                </span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <div class="dropdown-wrapper">
+                                <button type="button" aria-label="Select language" class="dropdown-title">
+                                    <span class="title">Languages</span>
+                                    <span class="arrow down"></span>
+                                </button>
+                                <button type="button" aria-label="Select language" class="mobile-dropdown-title">
+                                    <span class="title">Languages</span>
+                                    <span class="arrow right"></span>
+                                </button>
+                                <ul class="nav-dropdown" style="display:none;">
+                                    <li class="dropdown-item">
+                                        <!---->
+                                        <a href="/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+                                          English
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <!---->
+                                        <a href="/es/" class="nav-link">
+                                          Español
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <!---->
+                                        <a href="/ja/" class="nav-link">
+                                          日本語
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <!---->
+                                        <a href="/pt-BR/" class="nav-link">
+                                          Português do Brasil
+                                        </a>
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <!---->
+                                        <a href="/zh-cn/" class="nav-link">
+                                          中文
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="https://github.com/nushell/nushell" target="_blank" rel="noopener noreferrer" class="repo-link">
+
+                                GitHub
+                                
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                    </nav>
+                </div>
+            </header>
+            <div class="sidebar-mask"></div>
+            <aside class="sidebar">
+                <nav class="nav-links">
+                    <div class="nav-item">
+                        <a href="/book/" class="nav-link">
+                          Book
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/contributor-book/" class="nav-link">
+                          Contributor Book
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/cookbook/" class="nav-link">
+                          Cookbook
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="/blog/" class="nav-link">
+                          Blog
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="http://nushell.sh/demo" target="_blank" rel="noopener noreferrer" class="nav-link external">
+
+                              Demo
+                              
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <div class="dropdown-wrapper">
+                            <button type="button" aria-label="Select language" class="dropdown-title">
+                                <span class="title">Languages</span>
+                                <span class="arrow down"></span>
+                            </button>
+                            <button type="button" aria-label="Select language" class="mobile-dropdown-title">
+                                <span class="title">Languages</span>
+                                <span class="arrow right"></span>
+                            </button>
+                            <ul class="nav-dropdown" style="display:none;">
+                                <li class="dropdown-item">
+                                    <!---->
+                                    <a href="/" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+                                      English
+                                    </a>
+                                </li>
+                                <li class="dropdown-item">
+                                    <!---->
+                                    <a href="/es/" class="nav-link">
+                                      Español
+                                    </a>
+                                </li>
+                                <li class="dropdown-item">
+                                    <!---->
+                                    <a href="/ja/" class="nav-link">
+                                      日本語
+                                    </a>
+                                </li>
+                                <li class="dropdown-item">
+                                    <!---->
+                                    <a href="/pt-BR/" class="nav-link">
+                                      Português do Brasil
+                                    </a>
+                                </li>
+                                <li class="dropdown-item">
+                                    <!---->
+                                    <a href="/zh-cn/" class="nav-link">
+                                      中文
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="https://github.com/nushell/nushell" target="_blank" rel="noopener noreferrer" class="repo-link">
+
+                            GitHub
+                            
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                            </svg>
+                            <span class="sr-only">(opens new window)</span>
+                        </span>
+                    </a>
+                </nav>
+                <!---->
+            </aside>
+            <main aria-labelledby="main-title" class="home">
+                <header class="hero">
+                    <!---->
+                    <h1 id="main-title">
+                          Nushell
+                        </h1>
+                    <p class="description">
+                          A new type of shell.
+                        </p>
+                    <p class="action">
+                        <a href="/book/" class="nav-link action-button">
+                          Get Started →
+                        </a>
+                    </p>
+                </header>
+                <div class="features">
+                    <div class="feature">
+                        <h2>Powerful pipelines to control your system</h2>
+                        <p>Pipelines allow you to work with your system like never before. You are in control of the system, ready for your next command.</p>
+                    </div>
+                    <div class="feature">
+                        <h2>Everything is data.</h2>
+                        <p>Rather than having the need to remember all the parameters to all the commands, we can just use the same, regardless of where it came from.</p>
+                    </div>
+                    <div class="feature">
+                        <h2>Powerful Plugins</h2>
+                        <p>Nu can't come with everything you might want to do with it, so you can extend using its powerful plugin system.</p>
+                    </div>
+                </div>
+                <div class="theme-default-content custom content__default">
+                    <h3 id="quick-install">
+                        <a href="#quick-install" class="header-anchor">#</a>
+                         Quick Install
+                    </h3>
+                    <h4 id="install-latest-version">
+                        <a href="#install-latest-version" class="header-anchor">#</a>
+                         Install Latest Version
+                    </h4>
+                    <p>
+                        Install the latest version from the 
+                        <a href="https://github.com/nushell/nushell/releases" target="_blank" rel="noopener noreferrer">
+                            releases page
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                    </p>
+                    <p>
+                        From source on 
+                        <a href="https://crates.io" target="_blank" rel="noopener noreferrer">
+                            crates.io
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                        :
+                    </p>
+                    <div class="language-sh extra-class">
+                        <pre class="language-sh">
+                            <code>
+                                $ cargo 
+                                <span class="token function">install</span>
+                                 nu
+                            </code>
+                        </pre>
+                    </div>
+                    <h4 id="install-via-package-manager">
+                        <a href="#install-via-package-manager" class="header-anchor">#</a>
+                         Install via Package Manager
+                    </h4>
+                    <p>
+                        With 
+                        <a href="https://brew.sh/" target="_blank" rel="noopener noreferrer">
+                            Homebrew
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                        :
+                    </p>
+                    <div class="language-sh extra-class">
+                        <pre class="language-sh">
+                            <code>
+                                $ brew 
+                                <span class="token function">install</span>
+                                 nushell
+                            </code>
+                        </pre>
+                    </div>
+                    <p>
+                        With 
+                        <a href="https://docs.microsoft.com/en-us/windows/package-manager/winget/" target="_blank" rel="noopener noreferrer">
+                            winget
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                    <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                    <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                </svg>
+                                <span class="sr-only">(opens new window)</span>
+                            </span>
+                        </a>
+                        :
+                    </p>
+                    <div class="language-powershell extra-class">
+                        <pre class="language-powershell">
+                            <code>$ winget install nu
+                            </code>
+                        </pre>
+                    </div>
+                    <h4 id="start-the-shell">
+                        <a href="#start-the-shell" class="header-anchor">#</a>
+                         Start the shell
+                    </h4>
+                    <div class="language- extra-class">
+                        <pre class="language-text">
+                            <code>$ nu
+                            </code>
+                        </pre>
+                    </div>
+                    <p>
+                        <em>
+                            You can help improve this site by 
+                            <a href="https://github.com/nushell/nushell.github.io/issues" target="_blank" rel="noopener noreferrer">
+                                giving us feedback
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                        <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                        <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                    </svg>
+                                    <span class="sr-only">(opens new window)</span>
+                                </span>
+                            </a>
+                             or 
+                            <a href="https://github.com/nushell/nushell.github.io/pulls" target="_blank" rel="noopener noreferrer">
+                                sending a PR
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound">
+                                        <path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path>
+                                        <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon>
+                                    </svg>
+                                    <span class="sr-only">(opens new window)</span>
+                                </span>
+                            </a>
+                        </em>
+                    </p>
+                </div>
+                <!---->
+            </main>
+        </div>
+        <div class="global-ui"></div>
+    </div>
+    <script src="/assets/js/app.fc89fe24.js" defer></script>
+    <script src="/assets/js/9.d6a1d11f.js" defer></script>
+    <script src="/assets/js/2.aa512501.js" defer></script>
+    <script src="/assets/js/29.90f75209.js" defer></script>
+</body>
+</html>
