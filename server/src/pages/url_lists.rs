@@ -6,19 +6,18 @@ use askama::Template;
 use std::convert::TryInto;
 use warp::{filters::BoxedFilter, http::Uri, reply::Response, Filter, Rejection, Reply};
 
+const PAGINATE_BOUNDS: i64 = 2;
 const PAGE_SIZE: i64 = 10;
 
 #[derive(Template)]
 #[template(path = "pages/url_list.html")]
 struct Page<'a> {
-    route: &'a str,
     title: &'a str,
 
     list_header: Option<ListHeader<'a>>,
     url_list: &'a [UrlPartial],
 
-    page: u32,
-    page_count: u32,
+    pagination: PaginatePartial<'a>,
 
     is_logged_in: bool,
     xsrf_token: &'a str,
@@ -38,6 +37,48 @@ struct UrlPartial {
     is_upvoted_by_viewer: bool,
     comment_count: i64,
     is_logged_in: bool,
+}
+
+#[derive(Template)]
+#[template(path = "partials/paginate.html")]
+struct PaginatePartial<'a> {
+    route: &'a str,
+    page: u32,
+    page_count: u32,
+}
+
+impl PaginatePartial<'_> {
+    fn show_link(&self, idx: &u32) -> bool {
+        let idx = *idx as i64;
+
+        let start = (self.page as i64 - PAGINATE_BOUNDS).max(2);
+        let end = (self.page as i64 + PAGINATE_BOUNDS).min(self.page_count as i64 - 3);
+
+        let is_first = idx == 0;
+        let is_last = idx + 1 == self.page_count as i64;
+
+        let in_start_range = idx >= start && idx <= start + 2 * PAGINATE_BOUNDS;
+        let in_end_range = idx >= end - 2 * PAGINATE_BOUNDS && idx <= end;
+
+        let would_be_single_dots = if idx == 1 {
+            self.show_link(&2)
+        } else if idx + 2 == self.page_count as i64 && idx > 0 {
+            self.show_link(&(idx as u32 - 1))
+        } else {
+            false
+        };
+
+        is_first || is_last || in_start_range || in_end_range || would_be_single_dots
+    }
+
+    fn show_dots(&self, idx: &u32) -> bool {
+        if self.show_link(idx) {
+            false
+        } else {
+            let idx = *idx;
+            idx == 1 || idx + 2 == self.page_count
+        }
+    }
 }
 
 async fn handle(
@@ -83,14 +124,16 @@ async fn handle(
     };
 
     let page = Page {
-        route,
         title,
 
         list_header,
         url_list: &url_list,
 
-        page,
-        page_count: page_count.try_into()?,
+        pagination: PaginatePartial {
+            route,
+            page,
+            page_count: page_count.try_into()?,
+        },
 
         is_logged_in: ctx.is_logged_in(),
         xsrf_token: ctx.xsrf_token(),
