@@ -1,10 +1,7 @@
 use super::{ERR, ID, SIZE};
 use arrayvec::ArrayString;
-use std::{
-    convert::{TryFrom, TryInto},
-    fmt, ops,
-    str::FromStr,
-};
+use std::convert::{TryFrom, TryInto};
+use std::{fmt, str::FromStr};
 
 impl<const KIND: u64> TryFrom<&str> for ID<KIND> {
     type Error = &'static str;
@@ -40,14 +37,6 @@ impl<const KIND: u64> TryFrom<&[u8]> for ID<KIND> {
             .try_into()
             .map_err(|_| ERR)
             .and_then(TryFrom::<[u8; SIZE]>::try_from)
-    }
-}
-
-impl<const KIND: u64> ops::Deref for ID<KIND> {
-    type Target = str;
-
-    fn deref(&self) -> &str {
-        self.as_ref()
     }
 }
 

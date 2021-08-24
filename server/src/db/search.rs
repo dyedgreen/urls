@@ -65,7 +65,7 @@ impl SearchIndex {
             let mut writer = self.index.writer(WRITER_HEAP)?;
             for url in urls {
                 writer.add_document(doc! {
-                    self.f_id => url.id().as_bytes(),
+                    self.f_id => url.id().as_str().as_bytes(),
                     self.f_title => url.title().unwrap_or(""),
                     self.f_description => url.description().unwrap_or(""),
                 });
@@ -88,7 +88,7 @@ impl SearchIndex {
         block_in_place(|| {
             let mut writer = self.index.writer(WRITER_HEAP)?;
             for url in urls {
-                let id_term = Term::from_field_bytes(self.f_id, url.id().as_bytes());
+                let id_term = Term::from_field_bytes(self.f_id, url.id().as_str().as_bytes());
                 writer.delete_term(id_term);
             }
             writer.commit()?;

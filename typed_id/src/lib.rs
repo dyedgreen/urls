@@ -13,7 +13,7 @@ const ERR: &str = "An ID must be exactly of size 21";
 
 /// Typed random IDs.
 ///
-/// IDs consist of 16 ascii only, URL safe characters.
+/// IDs consist of ascii only, URL safe characters.
 /// Since IDs are generic over a kind identifier,
 /// it's easy to define unique ID types
 /// for your domain objects, without needing
@@ -43,6 +43,11 @@ impl<const KIND: u64> ID<KIND> {
     /// string.
     pub fn as_str(&self) -> &str {
         self.0.as_str()
+    }
+
+    /// Return this IDs kind identifier.
+    pub fn kind() -> u64 {
+        KIND
     }
 }
 
