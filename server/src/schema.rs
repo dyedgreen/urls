@@ -88,12 +88,4 @@ joinable!(url_upvotes -> urls (url_id));
 joinable!(url_upvotes -> users (user_id));
 joinable!(urls -> users (created_by));
 
-allow_tables_to_appear_in_same_query!(
-    comments,
-    invites,
-    logins,
-    roles,
-    url_upvotes,
-    urls,
-    users,
-);
+allow_tables_to_appear_in_same_query!(comments, invites, logins, roles, url_upvotes, urls, users,);

@@ -5,12 +5,14 @@ use crate::Context;
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use diesel::prelude::*;
+use form_urlencoded::Serializer;
 use futures_util::StreamExt;
 use juniper::GraphQLInputObject;
 use meta_parser::Meta;
 use std::convert::TryInto;
+use std::str::FromStr;
 use validator::Validate;
-use warp::http::{StatusCode, Uri};
+use warp::http::{uri::Scheme, StatusCode, Uri};
 
 const INCLUDE_DAYS_IN_RANKED: i64 = 7;
 
@@ -223,11 +225,62 @@ impl Url {
 }
 
 impl Url {
+    /// Normalizes a given Uri by removing known query
+    /// parameters (e.g. those used for tracking).
+    fn canonicalize(uri_str: &str) -> Result<Uri> {
+        let uri = Uri::from_str(uri_str)?;
+        let builder = Uri::builder()
+            .scheme(uri.scheme().cloned().unwrap_or(Scheme::HTTPS))
+            .authority(uri.authority().ok_or(anyhow!("Malformed URL"))?.clone());
+
+        let path_and_query = if let Some(raw) = uri.query() {
+            let query = form_urlencoded::parse(raw.as_bytes())
+                .filter(
+                    |(name, _value)| match (uri.host().unwrap_or(""), name.as_ref()) {
+                        // discard tracking parameters
+                        (
+                            _,
+                            "utm_source" | "utm_medium" | "utm_campaign" | "utm_term"
+                            | "utm_content",
+                        ) => false,
+                        // discard youtube time stamps
+                        ("youtu.be" | "www.youtube.com", "t") => false,
+                        // discard twitter share method tracking
+                        ("twitter.com", "s") => false,
+                        // keep everything else
+                        (_, _) => true,
+                    },
+                )
+                .fold(
+                    Serializer::new(String::new()),
+                    |mut builder, (name, value)| {
+                        if value.is_empty() {
+                            builder.append_key_only(name.as_ref());
+                        } else {
+                            builder.append_pair(name.as_ref(), value.as_ref());
+                        }
+                        builder
+                    },
+                )
+                .finish();
+            if query.is_empty() {
+                uri.path().to_string()
+            } else {
+                format!("{}?{}", uri.path(), query)
+            }
+        } else {
+            uri.path().to_string()
+        };
+
+        Ok(builder.path_and_query(path_and_query).build()?)
+    }
+
     /// Creates a new role for the given user and assigns the given
     /// permission.
     pub async fn create(ctx: &Context, input: NewUrlInput, created_by: UserID) -> Result<Self> {
         input.validate()?;
         let NewUrlInput { url } = input;
+        let url = Self::canonicalize(&url)?.to_string();
 
         // verify URL is unique, to avoid an additional query
         let exists: i64 = urls::table
@@ -331,5 +384,25 @@ impl Url {
             .filter(url_upvotes::dsl::user_id.eq(ctx.user_id()?));
         diesel::delete(upvote).execute(&*ctx.conn().await?)?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Uri, Url};
+
+    #[test]
+    fn test_canonicalize() {
+        let pairs = [
+            ("https://urls.fyi/?utm_source=google&utm_campaign=test&allowed&other=test", "https://urls.fyi/?allowed&other=test"),
+            ("https://urls.fyi/no-other-params?utm_medium=cpc&utm_content=textlink&utm_term=running+shoes", "https://urls.fyi/no-other-params"),
+            ("https://urls.fyi/no-proto?other_test=&utm_medium=cpc&utm_content=text", "https://urls.fyi/no-proto?other_test"),
+            ("https://www.youtube.com/watch?v=XXX&t=200s", "https://www.youtube.com/watch?v=XXX"),
+            ("https://www.youtube.com/watch?v=XXX&t=200s", "https://www.youtube.com/watch?v=XXX"),
+            ("https://youtu.be/YYY?t=200", "https://youtu.be/YYY"),
+        ];
+        for (raw, clean) in pairs {
+            assert_eq!(Uri::from_static(clean), Url::canonicalize(raw).unwrap());
+        }
     }
 }
