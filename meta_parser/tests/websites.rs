@@ -85,3 +85,21 @@ fn www_nushell_sh() {
     assert_eq!(meta.description, Some("A new type of shell.".into()));
     assert_eq!(meta.image, None);
 }
+
+#[test]
+fn soatok_blog() {
+    let html = include_bytes!("html/soatok.blog.html");
+    let mut meta = Meta::new();
+    meta.parse(html);
+    assert_eq!(
+        meta.title,
+        Some("Programmers Don’t Understand Hash\u{a0}Functions".into())
+    );
+    assert_eq!(meta.description, None);
+    assert_eq!(
+        meta.image,
+        Some(
+            "https://soatok.files.wordpress.com/2021/08/blogheader-hashfunctions.png?w=640".into()
+        )
+    );
+}

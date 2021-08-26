@@ -58,7 +58,7 @@ impl Meta {
                         // interpret tag
                         match tag {
                             Tag::Meta(meta_tag) => match meta_tag.name {
-                                b"twitter:title" | b"og:title" => {
+                                b"twitter:title" | b"twitter:text:title" | b"og:title" => {
                                     self.title = decode_str_bytes(meta_tag.content);
                                 }
                                 b"twitter:description" | b"og:description" => {
