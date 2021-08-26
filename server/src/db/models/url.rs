@@ -238,11 +238,8 @@ impl Url {
                 .filter(
                     |(name, _value)| match (uri.host().unwrap_or(""), name.as_ref()) {
                         // discard tracking parameters
-                        (
-                            _,
-                            "utm_source" | "utm_medium" | "utm_campaign" | "utm_term"
-                            | "utm_content",
-                        ) => false,
+                        (_, "utm_source" | "utm_medium" | "utm_campaign") => false,
+                        (_, "utm_term" | "utm_content") => false,
                         // discard youtube time stamps
                         ("youtu.be" | "www.youtube.com", "t") => false,
                         // discard twitter share method tracking
