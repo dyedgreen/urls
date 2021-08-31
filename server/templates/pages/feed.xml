@@ -1,0 +1,30 @@
+<rss version="2.0">
+  <channel>
+    <title>urls.fyi</title>
+    <link>https://urls.fyi</link>
+    <description>A tech link aggregator.</description>
+    <language>en-us</language>
+    <pubDate>{{ pub_date.to_rfc2822() }}</pubDate>
+    <lastBuildDate>{{ pub_date.to_rfc2822() }}</lastBuildDate>
+    <generator>urls.fyi</generator>
+    <ttl>60</ttl>
+
+    {% for url in urls %}
+    <item>
+      <guid isPermaLink="false">{{ url.id() }}</guid>
+      <link>{{ url.url_str() }}</link>
+      {% match url.title() %}
+        {% when Some with (title) %}
+        <title>{{ title }}</title>
+        {% when None %}
+      {% endmatch %}
+      {% match url.description() %}
+        {% when Some with (description) %}
+        <description>{{ description }}</description>
+        {% when None %}
+      {% endmatch %}
+      <pubDate>{{ url.created_at().to_rfc2822() }}</pubDate>
+    </item>
+    {% endfor %}
+  </channel>
+</rss>

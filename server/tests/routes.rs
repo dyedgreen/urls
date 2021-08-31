@@ -20,6 +20,10 @@ macro_rules! check_status {
 }
 
 check_status!(index_page, "/", 200);
+check_status!(best_page, "/best", 200);
+check_status!(recent_page, "/recent", 200);
+check_status!(rss_feed, "/feed.xml", 200);
+check_status!(search_page, "/search", 200);
 check_status!(login_page, "/login", 200);
 check_status!(logout_page, "/logout", 307);
 check_status!(account_page, "/account", 307);

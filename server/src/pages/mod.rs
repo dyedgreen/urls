@@ -7,6 +7,7 @@ pub mod account;
 pub mod admin;
 pub mod comments;
 pub mod error;
+pub mod feed;
 pub mod graphiql;
 pub mod login;
 pub mod logout;
