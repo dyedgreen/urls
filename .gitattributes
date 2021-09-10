@@ -1,1 +1,1 @@
-meta_parser/tests/**.html linguist-vendored
+meta_parser/tests/html/*.html linguist-vendored
