@@ -139,7 +139,7 @@ async fn handle(
         xsrf_token: ctx.xsrf_token(),
     };
 
-    let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+    let resp = super::xsrf::cookie(&ctx, page);
     Ok(resp.into_response())
 }
 

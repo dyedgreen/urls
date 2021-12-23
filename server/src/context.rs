@@ -37,7 +37,7 @@ pub struct Context {
     pool: Pool,
     mailer: Mailer,
     xsrf_token: String,
-    logged_in_user: Option<UserID>,
+    login_session: Option<(UserID, String)>,
     request_time: DateTime<Utc>,
     user_agent: Option<String>,
     remote_ip: Option<IpAddr>,
@@ -49,7 +49,6 @@ impl Context {
         pool: &Pool,
         mailer: &Mailer,
         xsrf_token: String,
-        logged_in_user: Option<UserID>,
         user_agent: Option<String>,
         remote_ip: Option<IpAddr>,
     ) -> Self {
@@ -57,7 +56,7 @@ impl Context {
             pool: pool.clone(),
             mailer: mailer.clone(),
             xsrf_token,
-            logged_in_user,
+            login_session: None,
             request_time: Utc::now(),
             user_agent,
             remote_ip,
@@ -71,7 +70,7 @@ impl Context {
             pool: pool.clone(),
             mailer: mailer.clone(),
             xsrf_token: SERVER_XSRF_TOKEN.to_string(),
-            logged_in_user: None,
+            login_session: None,
             request_time: Utc::now(),
             user_agent: None,
             remote_ip: None,
@@ -81,8 +80,8 @@ impl Context {
     /// Updates the user associated with this context.
     /// This exists to be used when constructing the
     /// context, and is probably not what you want.
-    pub fn set_logged_in_user(&mut self, user: UserID) {
-        self.logged_in_user = Some(user);
+    pub fn set_logged_in_user(&mut self, user: UserID, session_token: String) {
+        self.login_session = Some((user, session_token));
     }
 
     /// Retrieve a database connection from the
@@ -112,7 +111,7 @@ impl Context {
 
     /// Retrieve the ID of the logged in user.
     pub fn maybe_user_id(&self) -> Option<UserID> {
-        self.logged_in_user
+        self.login_session.as_ref().map(|(id, _)| *id)
     }
 
     /// Determine if the context has a logged in user.
@@ -173,6 +172,12 @@ impl Context {
     /// of a given request.
     pub fn now(&self) -> DateTime<Utc> {
         self.request_time
+    }
+
+    /// Return the current login session
+    /// token, if any.
+    pub fn session_token(&self) -> Option<&str> {
+        self.login_session.as_ref().map(|(_, token)| token.as_str())
     }
 
     /// Return the contexts XSRF token, e.g. to

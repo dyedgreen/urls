@@ -15,7 +15,7 @@ async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
         xsrf_token: ctx.xsrf_token(),
         is_logged_in: ctx.is_logged_in(),
     };
-    let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+    let resp = super::xsrf::cookie(&ctx, page);
     Ok(resp.into_response())
 }
 

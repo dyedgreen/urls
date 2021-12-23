@@ -53,7 +53,7 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
         .and(user_agent)
         .and(remote_address)
         .and_then(move |session, xsrf, user_agent, remote_address| {
-            let ctx = Context::for_request(&pool, &mailer, xsrf, None, user_agent, remote_address);
+            let ctx = Context::for_request(&pool, &mailer, xsrf, user_agent, remote_address);
             attempt_login(ctx, session)
         })
 }

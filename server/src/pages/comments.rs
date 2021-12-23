@@ -38,7 +38,7 @@ async fn handle(ctx: Context, url_id: UrlID) -> Result<Response, error::ServerEr
         xsrf_token: ctx.xsrf_token(),
         is_logged_in: ctx.is_logged_in(),
     };
-    let resp = super::xsrf::cookie(page, ctx.xsrf_token());
+    let resp = super::xsrf::cookie(&ctx, page);
     Ok(resp.into_response())
 }
 

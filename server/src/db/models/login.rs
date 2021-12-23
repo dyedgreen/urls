@@ -187,7 +187,7 @@ impl Login {
             login.updated_at = ctx.now().naive_utc();
             login.save_changes::<Login>(&*conn)?;
             drop(conn);
-            ctx.set_logged_in_user(login.user_id);
+            ctx.set_logged_in_user(login.user_id, session_token.to_string());
             Ok(())
         }
     }
