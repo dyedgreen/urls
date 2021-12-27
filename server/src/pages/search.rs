@@ -10,18 +10,17 @@ struct Page<'a> {
     is_logged_in: bool,
 }
 
-async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
+async fn handle(ctx: &Context) -> Result<Response, error::ServerError> {
     let page = Page {
         xsrf_token: ctx.xsrf_token(),
         is_logged_in: ctx.is_logged_in(),
     };
-    let resp = super::xsrf::cookie(&ctx, page);
-    Ok(resp.into_response())
+    Ok(page.into_response())
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     warp::path::end()
         .and(ctx)
-        .and_then(|ctx: Context| async move { error::reply(handle(ctx).await) })
+        .and_then(|ctx: Context| async move { error::reply(&ctx, handle(&ctx).await) })
         .boxed()
 }

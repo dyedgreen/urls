@@ -10,7 +10,7 @@ struct Page<'a> {
     is_logged_in: bool,
 }
 
-async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
+async fn handle(ctx: &Context) -> Result<Response, error::ServerError> {
     if !ctx.is_logged_in() {
         Ok(warp::redirect::temporary(Uri::from_static("/login")).into_response())
     } else {
@@ -18,14 +18,13 @@ async fn handle(ctx: Context) -> Result<Response, error::ServerError> {
             xsrf_token: ctx.xsrf_token(),
             is_logged_in: true,
         };
-        let resp = super::xsrf::cookie(&ctx, page);
-        Ok(resp.into_response())
+        Ok(page.into_response())
     }
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     warp::path::end()
         .and(ctx)
-        .and_then(|ctx: Context| async move { error::reply(handle(ctx).await) })
+        .and_then(|ctx: Context| async move { error::reply(&ctx, handle(&ctx).await) })
         .boxed()
 }

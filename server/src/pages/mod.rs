@@ -13,11 +13,12 @@ pub mod login;
 pub mod logout;
 pub mod register;
 pub mod search;
+pub mod session;
 pub mod url_lists;
 pub mod xsrf;
 
-const XSRF_COOKIE_NAME: &'static str = "xsrf";
-const AUTH_COOKIE_NAME: &'static str = "session";
+const XSRF_COOKIE_NAME: &str = "xsrf";
+const AUTH_COOKIE_NAME: &str = "session";
 
 /// Captures a context from the given request. This never fails, and
 /// thus should be used at the end of a filter chain to extract the context
@@ -33,7 +34,6 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
         Ok(ctx)
     }
 
-    let session_cookie = warp::cookie::optional::<String>(AUTH_COOKIE_NAME);
     let user_agent = warp::header::optional::<String>("user-agent")
         .or(warp::any().map(|| None))
         .unify();
@@ -48,11 +48,11 @@ pub fn context(pool: Pool, mailer: Mailer) -> impl ContextFilter {
         .or(warp::addr::remote().map(|remote: Option<SocketAddr>| remote.map(|addr| addr.ip())))
         .unify();
 
-    session_cookie
-        .and(xsrf::token())
-        .and(user_agent)
+    user_agent
         .and(remote_address)
-        .and_then(move |session, xsrf, user_agent, remote_address| {
+        .and(session::token())
+        .and(xsrf::token())
+        .and_then(move |user_agent, remote_address, session, xsrf| {
             let ctx = Context::for_request(&pool, &mailer, xsrf, user_agent, remote_address);
             attempt_login(ctx, session)
         })

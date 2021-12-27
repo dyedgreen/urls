@@ -44,7 +44,7 @@ function Login() {
   `,
     {
       onCommit: ({ login }) => {
-        document.cookie = `session=${login};path=/;max-age=2147483647`;
+        document.cookie = `session=${login};path=/;max-age=7776000`;
         window.location.href = "/";
       },
       onError: (errors) => {

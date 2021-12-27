@@ -102,6 +102,12 @@ impl Meta {
     }
 }
 
+impl Default for Meta {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 fn decode_str_bytes(bytes: &[u8]) -> Option<String> {
     let html = String::from_utf8_lossy(bytes);
     let clean = decode_html_entities(&html).trim().to_string();

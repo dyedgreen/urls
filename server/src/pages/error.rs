@@ -1,3 +1,4 @@
+use crate::Context;
 use askama::Template;
 use std::{convert::Infallible, fmt::Display};
 use warp::http;
@@ -42,12 +43,17 @@ pub fn request(error: impl Display) -> ServerError {
 
 /// Turns a result into a reply. This is supposed to be used when
 /// returning from a filter handler.
-pub fn reply<R, E>(maybe_reply: Result<R, E>) -> Result<Response, Infallible>
+///
+/// This also handles common headers that depend on the session, e.g.
+/// XSRF token and refreshing the login session.
+pub fn reply<R, E>(ctx: &Context, maybe_reply: Result<R, E>) -> Result<Response, Infallible>
 where
-    R: Reply,
+    R: 'static + Reply,
     E: Into<ServerError>,
 {
     maybe_reply
+        .map(|reply| super::xsrf::cookie(ctx, reply))
+        .map(|reply| super::session::cookie(ctx, reply))
         .map(|reply| reply.into_response())
         .map_err(Into::into)
         .or_else(|error| {
@@ -64,9 +70,11 @@ where
 /// Recover from a rejection with a rendered
 /// error page.
 pub async fn recover(rejection: Rejection) -> Result<Response, Infallible> {
-    if rejection.is_not_found() {
-        reply::<&str, _>(Err(ServerError::NotFound))
+    let status = if rejection.is_not_found() {
+        http::StatusCode::NOT_FOUND
     } else {
-        reply::<&str, _>(Err(ServerError::Request))
-    }
+        http::StatusCode::BAD_REQUEST
+    };
+    let page = ErrorPage { status };
+    Ok(warp::reply::with_status(page, status).into_response())
 }

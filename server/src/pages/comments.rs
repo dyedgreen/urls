@@ -24,7 +24,7 @@ struct UrlPartial {
     is_logged_in: bool,
 }
 
-async fn handle(ctx: Context, url_id: UrlID) -> Result<Response, error::ServerError> {
+async fn handle(ctx: &Context, url_id: UrlID) -> Result<Response, error::ServerError> {
     let url = Url::find(&ctx, url_id).await.map_err(error::not_found)?;
     let page = Page {
         url_partial: UrlPartial {
@@ -38,16 +38,15 @@ async fn handle(ctx: Context, url_id: UrlID) -> Result<Response, error::ServerEr
         xsrf_token: ctx.xsrf_token(),
         is_logged_in: ctx.is_logged_in(),
     };
-    let resp = super::xsrf::cookie(&ctx, page);
-    Ok(resp.into_response())
+    Ok(page.into_response())
 }
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     warp::path::param()
         .and(warp::path::end())
         .and(ctx)
-        .and_then(
-            |url_id: UrlID, ctx: Context| async move { error::reply(handle(ctx, url_id).await) },
-        )
+        .and_then(|url_id: UrlID, ctx: Context| async move {
+            error::reply(&ctx, handle(&ctx, url_id).await)
+        })
         .boxed()
 }

@@ -82,21 +82,21 @@ impl PaginatePartial<'_> {
 }
 
 async fn handle(
-    ctx: Context,
+    ctx: &Context,
     order: UrlOrdering,
     page: u32,
     route: &str,
     title: &str,
 ) -> Result<Response, error::ServerError> {
-    let (urls, page_count) = Url::paginate(&ctx, order, page.into(), PAGE_SIZE).await?;
+    let (urls, page_count) = Url::paginate(ctx, order, page.into(), PAGE_SIZE).await?;
 
     let mut url_list = vec![];
     for url in urls {
         url_list.push(UrlPartial {
-            created_by: url.created_by(&ctx).await?,
-            upvote_count: url.upvote_count(&ctx).await?,
-            is_upvoted_by_viewer: url.upvoted_by_viewer(&ctx).await?,
-            comment_count: url.comment_count(&ctx).await?,
+            created_by: url.created_by(ctx).await?,
+            upvote_count: url.upvote_count(ctx).await?,
+            is_upvoted_by_viewer: url.upvoted_by_viewer(ctx).await?,
+            comment_count: url.comment_count(ctx).await?,
             url,
             is_logged_in: ctx.is_logged_in(),
         });
@@ -114,7 +114,7 @@ async fn handle(
             sub_heading: "The most recent submissions",
         }),
         UrlOrdering::User(user_id) => {
-            let user = User::find(&ctx, user_id).await?;
+            let user = User::find(ctx, user_id).await?;
             user_heading = format!("By {}", user.name());
             Some(ListHeader {
                 heading: &user_heading,
@@ -139,8 +139,7 @@ async fn handle(
         xsrf_token: ctx.xsrf_token(),
     };
 
-    let resp = super::xsrf::cookie(&ctx, page);
-    Ok(resp.into_response())
+    Ok(page.into_response())
 }
 
 fn paginate() -> impl Filter<Extract = (u32,), Error = Rejection> + Clone + Copy {
@@ -154,7 +153,10 @@ pub fn ranked(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Ranked, page, "", "home").await)
+            error::reply(
+                &ctx,
+                handle(&ctx, UrlOrdering::Ranked, page, "", "home").await,
+            )
         })
         .boxed()
 }
@@ -163,7 +165,10 @@ pub fn best(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Best, page, "/best", "best").await)
+            error::reply(
+                &ctx,
+                handle(&ctx, UrlOrdering::Best, page, "/best", "best").await,
+            )
         })
         .boxed()
 }
@@ -172,7 +177,10 @@ pub fn recent(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     paginate()
         .and(ctx)
         .and_then(|page: u32, ctx: Context| async move {
-            error::reply(handle(ctx, UrlOrdering::Recent, page, "/recent", "recent").await)
+            error::reply(
+                &ctx,
+                handle(&ctx, UrlOrdering::Recent, page, "/recent", "recent").await,
+            )
         })
         .boxed()
 }
@@ -183,8 +191,9 @@ pub fn user(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
         .and(ctx)
         .and_then(|user_id: UserID, page: u32, ctx: Context| async move {
             error::reply(
+                &ctx,
                 handle(
-                    ctx,
+                    &ctx,
                     UrlOrdering::User(user_id),
                     page,
                     &format!("/user/{}", user_id),
@@ -202,7 +211,8 @@ pub fn mine(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
         .and_then(|page: u32, ctx: Context| async move {
             match ctx.maybe_user_id() {
                 Some(user_id) => error::reply(
-                    handle(ctx, UrlOrdering::User(user_id), page, "/mine", "mine").await,
+                    &ctx,
+                    handle(&ctx, UrlOrdering::User(user_id), page, "/mine", "mine").await,
                 ),
                 None => Ok(warp::redirect::temporary(Uri::from_static("/login")).into_response()),
             }
