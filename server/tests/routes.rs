@@ -56,3 +56,53 @@ async fn admin_backup_permissions() {
         .await;
     assert_eq!(res_admin_user.status(), 200);
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn server_side_cookies_are_set_correctly() {
+    let (server, ctx) = setup::mock().await;
+
+    let res_no_cookies = warp::test::request().path("/").reply(&server).await;
+    assert_eq!(res_no_cookies.status(), 200);
+    let cookies: Vec<&str> = res_no_cookies
+        .headers()
+        .get_all("Set-Cookie")
+        .iter()
+        .map(|v| v.to_str().unwrap())
+        .collect();
+    assert_eq!(cookies.len(), 1);
+    assert!(cookies[0].contains("xsrf="));
+
+    let res_xsrf_only = warp::test::request()
+        .path("/")
+        .header("Cookie", "xsrf=test-xsrf")
+        .reply(&server)
+        .await;
+    assert_eq!(res_xsrf_only.status(), 200);
+    let cookies: Vec<&str> = res_xsrf_only
+        .headers()
+        .get_all("Set-Cookie")
+        .iter()
+        .map(|v| v.to_str().unwrap())
+        .collect();
+    assert_eq!(cookies.len(), 1);
+    assert!(cookies[0].contains("xsrf=test-xsrf"));
+
+    let sess_user = setup::session_token(&ctx, "test.user@urls.fyi").await;
+    let res_sess = warp::test::request()
+        .path("/")
+        .header("Cookie", format!("xsrf=test-xsrf; session={}", sess_user))
+        .reply(&server)
+        .await;
+    assert_eq!(res_sess.status(), 200);
+    let cookies: Vec<&str> = res_sess
+        .headers()
+        .get_all("Set-Cookie")
+        .iter()
+        .map(|v| v.to_str().unwrap())
+        .collect();
+    assert_eq!(cookies.len(), 2);
+    assert!(cookies.iter().any(|v| v.contains("xsrf=test-xsrf")));
+    assert!(cookies
+        .iter()
+        .any(|v| v.contains(&format!("session={}", sess_user))));
+}
