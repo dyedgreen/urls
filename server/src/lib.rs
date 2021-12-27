@@ -75,7 +75,7 @@ pub fn global_routes(
     let api = ctx.clone().with(warp::wrap_fn(graphql::api));
     let api = warp::path("graphql").and(api);
 
-    let graphiql = ctx.clone().with(warp::wrap_fn(pages::graphiql::page));
+    let graphiql = ctx.with(warp::wrap_fn(pages::graphiql::page));
     let graphiql = warp::path!("graphql" / "playground").and(graphiql);
 
     let www = warp::fs::dir(conf.www().to_path_buf()).boxed();
@@ -96,12 +96,11 @@ pub fn global_routes(
         .or(api)
         .or(graphiql)
         .or(www);
-    let server = routes
+
+    routes
         .recover(pages::error::recover)
         .map(|reply| warp::reply::with_header(reply, "X-Frame-Options", "DENY"))
         .map(|reply| warp::reply::with_header(reply, "X-Content-Type-Options", "nosniff"))
         .map(|reply| warp::reply::with_header(reply, "Referrer-Policy", "no-referrer"))
-        .with(warp::log("http"));
-
-    server
+        .with(warp::log("http"))
 }

@@ -15,8 +15,11 @@ struct Page {
 }
 
 async fn handle(ctx: &Context) -> Result<Page, error::ServerError> {
-    let (urls, _) = Url::paginate(&ctx, UrlOrdering::Recent, 0, FEED_SIZE).await?;
-    let pub_date = urls.get(0).map(|url| url.created_at()).unwrap_or(ctx.now());
+    let (urls, _) = Url::paginate(ctx, UrlOrdering::Recent, 0, FEED_SIZE).await?;
+    let pub_date = urls
+        .get(0)
+        .map(|url| url.created_at())
+        .unwrap_or_else(|| ctx.now());
     Ok(Page { pub_date, urls })
 }
 
