@@ -2,7 +2,7 @@
     {% if idx == page %}
         <span class="block flex-none w-8 h-8 m-2 rounded-md border-2 text-center leading-7 border-gray-400 text-gray-400">{{ idx + 1 }}</span>
     {% else if self.show_link(idx) %}
-        <a href="{{ route }}/page/{{ idx }}" class="block flex-none w-8 h-8 m-2 rounded-md border-2 text-center leading-7 border-blue-500 text-blue-500">{{ idx + 1 }}</a>
+        <a href="{{ route }}/page/{{ idx + 1 }}" class="block flex-none w-8 h-8 m-2 rounded-md border-2 text-center leading-7 border-blue-500 text-blue-500">{{ idx + 1 }}</a>
     {% else if self.show_dots(idx) %}
         <span class="block flex-none w-8 h-8 m-2 rounded-md border-2 text-center leading-7 border-gray-400 text-gray-400">...</span>
     {% endif %}

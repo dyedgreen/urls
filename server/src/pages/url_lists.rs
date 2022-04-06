@@ -49,7 +49,7 @@ struct PaginatePartial<'a> {
 
 impl PaginatePartial<'_> {
     fn show_link(&self, idx: &u32) -> bool {
-        let idx = *idx as i64;
+        let idx: i64 = (*idx).into();
 
         let start = (self.page as i64 - PAGINATE_BOUNDS).max(2);
         let end = (self.page as i64 + PAGINATE_BOUNDS).min(self.page_count as i64 - 3);
@@ -144,9 +144,10 @@ async fn handle(
 
 fn paginate() -> impl Filter<Extract = (u32,), Error = Rejection> + Clone + Copy {
     warp::path::end()
-        .and(warp::any().map(|| 0))
+        .and(warp::any().map(|| 1))
         .or(warp::path!("page" / u32))
         .unify()
+        .map(|page_num| if page_num > 0 { page_num - 1 } else { page_num })
 }
 
 pub fn ranked(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
