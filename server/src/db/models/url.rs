@@ -160,7 +160,8 @@ impl Url {
                     slug.push_str(word);
                 }
             }
-            slug.to_lowercase()
+            slug.make_ascii_lowercase();
+            slug
         };
         self.title.as_ref().map(|title| slugify(title)).or_else(|| {
             let url = self.url().ok()?;
@@ -437,7 +438,7 @@ impl Url {
         diesel::delete(upvotes).execute(&*conn)?;
         diesel::delete(comments).execute(&*conn)?;
         diesel::delete(self).execute(&*conn)?;
-        ctx.search().delete_url(&self)?;
+        ctx.search().delete_url(self)?;
         Ok(())
     }
 
@@ -500,7 +501,7 @@ mod tests {
             image: None,
             created_by: UserID::new(),
         };
-        assert_eq!(url.slug().unwrap(), "404-Page-Not-Found");
+        assert_eq!(url.slug().unwrap(), "404-page-not-found");
         let url = Url { title: None, ..url };
         assert_eq!(url.slug().unwrap(), "urls-fyi-error-404");
         let url = Url {
