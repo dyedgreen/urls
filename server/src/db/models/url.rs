@@ -222,6 +222,37 @@ impl Url {
 
         Ok((page, page_count))
     }
+
+    /// Returns a list of URLs in reverse chronological order, in
+    /// a way that's suitable for use with a Relay connection.
+    pub async fn all_submissions(
+        ctx: &Context,
+        after: Option<UrlID>,
+        before: Option<UrlID>,
+        limit: Option<i64>,
+    ) -> Result<Vec<Self>> {
+        let conn = ctx.conn().await?;
+
+        let mut query = urls::table
+            .order_by(urls::dsl::created_at.desc())
+            .into_boxed();
+
+        if let Some(after) = after {
+            let after: Url = urls::table.find(after).get_result(&*conn)?;
+            query = query.filter(urls::dsl::created_at.lt(after.created_at().naive_utc()));
+        }
+
+        if let Some(before) = before {
+            let before: Url = urls::table.find(before).get_result(&*conn)?;
+            query = query.filter(urls::dsl::created_at.gt(before.created_at().naive_utc()));
+        }
+
+        if let Some(limit) = limit {
+            query = query.limit(limit);
+        }
+
+        Ok(query.load(&*conn)?)
+    }
 }
 
 impl Url {

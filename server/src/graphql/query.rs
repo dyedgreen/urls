@@ -3,6 +3,7 @@ use crate::db::models::{Comment, Url, User};
 use crate::graphql::{search::Search, viewer::Viewer};
 use crate::Context;
 use juniper::{graphql_object, FieldResult};
+use juniper_relay_connection::RelayConnection;
 
 pub struct Query;
 
@@ -19,6 +20,27 @@ impl Query {
     /// Search through all submitted urls.
     async fn search(query: String) -> Search {
         Search::new(query)
+    }
+
+    /// All submitted urls in reverse
+    /// chronological order.
+    async fn submissions(
+        ctx: &Context,
+        first: Option<i32>,
+        after: Option<String>,
+        last: Option<i32>,
+        before: Option<String>,
+    ) -> FieldResult<RelayConnection<Url>> {
+        RelayConnection::new_async(
+            first,
+            after,
+            last,
+            before,
+            |after, before, limit| async move {
+                Ok(Url::all_submissions(ctx, after, before, limit).await?)
+            },
+        )
+        .await
     }
 
     #[graphql(name = "fetch__Url")]
