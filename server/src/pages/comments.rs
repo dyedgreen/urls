@@ -24,14 +24,24 @@ struct UrlPartial {
     is_logged_in: bool,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct IgnoreSlug {}
+
+impl std::str::FromStr for IgnoreSlug {
+    type Err = std::convert::Infallible;
+    fn from_str(_: &str) -> Result<Self, Self::Err> {
+        Ok(Self {})
+    }
+}
+
 async fn handle(ctx: &Context, url_id: UrlID) -> Result<Response, error::ServerError> {
-    let url = Url::find(&ctx, url_id).await.map_err(error::not_found)?;
+    let url = Url::find(ctx, url_id).await.map_err(error::not_found)?;
     let page = Page {
         url_partial: UrlPartial {
-            created_by: url.created_by(&ctx).await?,
-            upvote_count: url.upvote_count(&ctx).await?,
-            is_upvoted_by_viewer: url.upvoted_by_viewer(&ctx).await?,
-            comment_count: url.comment_count(&ctx).await?,
+            created_by: url.created_by(ctx).await?,
+            upvote_count: url.upvote_count(ctx).await?,
+            is_upvoted_by_viewer: url.upvoted_by_viewer(ctx).await?,
+            comment_count: url.comment_count(ctx).await?,
             is_logged_in: ctx.is_logged_in(),
             url,
         },
@@ -43,6 +53,10 @@ async fn handle(ctx: &Context, url_id: UrlID) -> Result<Response, error::ServerE
 
 pub fn page(ctx: impl ContextFilter + 'static) -> BoxedFilter<(Response,)> {
     warp::path::param()
+        .and(warp::path::param())
+        .map(|url_id: UrlID, _slug: IgnoreSlug| url_id)
+        .or(warp::path::param::<UrlID>())
+        .unify()
         .and(warp::path::end())
         .and(ctx)
         .and_then(|url_id: UrlID, ctx: Context| async move {

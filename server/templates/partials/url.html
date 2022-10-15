@@ -69,7 +69,7 @@
             <span class="sm:block hidden">&middot;</span>
             <a
                 class="block p-1 rounded-xl flex items-center hover:bg-gray-300"
-                href="/comments/{{ url.id() }}"
+                href="/comments/{{ url.id() }}/{{ url.slug().as_deref().unwrap_or("") }}"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />

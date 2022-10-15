@@ -135,6 +135,40 @@ impl Url {
             .get_result(&*ctx.conn().await?)?;
         Ok(count)
     }
+
+    pub fn slug(&self) -> Option<String> {
+        let slugify = |text: &str| {
+            let words = text
+                .split(|c: char| !c.is_alphanumeric())
+                .filter(|word| !word.is_empty());
+            let mut slug = String::new();
+            for word in words {
+                if slug.is_empty() {
+                    slug.push_str(word);
+                } else {
+                    slug.push('-');
+                    slug.push_str(word);
+                }
+            }
+            slug
+        };
+        self.title.as_ref().map(|title| slugify(title)).or_else(|| {
+            let url = self.url().ok()?;
+            let authority = url.authority().map(|authority| slugify(authority.as_str()));
+            let path = slugify(url.path());
+            match authority {
+                Some(authority) if !path.is_empty() => Some(format!("{authority}-{path}")),
+                Some(authority) => Some(authority),
+                None => {
+                    if path.is_empty() {
+                        None
+                    } else {
+                        Some(path)
+                    }
+                }
+            }
+        })
+    }
 }
 
 /// Determine how to order and filter the url
@@ -262,7 +296,11 @@ impl Url {
         let uri = Uri::from_str(uri_str)?;
         let builder = Uri::builder()
             .scheme(uri.scheme().cloned().unwrap_or(Scheme::HTTPS))
-            .authority(uri.authority().ok_or(anyhow!("Malformed URL"))?.clone());
+            .authority(
+                uri.authority()
+                    .ok_or_else(|| anyhow!("Malformed URL"))?
+                    .clone(),
+            );
 
         let path_and_query = if let Some(raw) = uri.query() {
             let query = form_urlencoded::parse(raw.as_bytes())
@@ -365,9 +403,9 @@ impl Url {
             while let Some(part) = stream.next().await {
                 meta.parse(&part?);
             }
-            self.title = meta.title.or(self.title.clone());
-            self.description = meta.description.or(self.description.clone());
-            self.image = meta.image.or(self.image.clone());
+            self.title = meta.title.or_else(|| self.title.clone());
+            self.description = meta.description.or_else(|| self.description.clone());
+            self.image = meta.image.or_else(|| self.image.clone());
         }
 
         *self = self.save_changes(&*ctx.conn().await?)?;
@@ -417,7 +455,8 @@ impl Url {
 
 #[cfg(test)]
 mod tests {
-    use super::{Uri, Url};
+    use super::*;
+    use chrono::{NaiveDate, NaiveTime};
 
     #[test]
     fn test_canonicalize() {
@@ -432,5 +471,32 @@ mod tests {
         for (raw, clean) in pairs {
             assert_eq!(Uri::from_static(clean), Url::canonicalize(raw).unwrap());
         }
+    }
+
+    #[test]
+    fn test_slug() {
+        let date = NaiveDateTime::new(
+            NaiveDate::from_ymd(2022, 10, 15),
+            NaiveTime::from_hms(16, 5, 00),
+        );
+        let url = Url {
+            id: UrlID::new(),
+            created_at: date,
+            updated_at: date,
+            url: "https://urls.fyi/error/404".into(),
+            status_code: 404,
+            title: Some("404 :: Page Not Found".into()),
+            description: None,
+            image: None,
+            created_by: UserID::new(),
+        };
+        assert_eq!(url.slug().unwrap(), "404-Page-Not-Found");
+        let url = Url { title: None, ..url };
+        assert_eq!(url.slug().unwrap(), "urls-fyi-error-404");
+        let url = Url {
+            url: "https://tilman.dev/".into(),
+            ..url
+        };
+        assert_eq!(url.slug().unwrap(), "tilman-dev");
     }
 }
