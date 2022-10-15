@@ -160,7 +160,7 @@ impl Url {
                     slug.push_str(word);
                 }
             }
-            slug
+            slug.to_lowercase()
         };
         self.title.as_ref().map(|title| slugify(title)).or_else(|| {
             let url = self.url().ok()?;

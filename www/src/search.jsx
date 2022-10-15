@@ -22,6 +22,7 @@ function Search() {
               id
               url
               title
+              slug
               upvoteCount
             }
           }

@@ -63,6 +63,13 @@ impl Url {
         Ok(self.image()?.map(|uri| uri.to_string()))
     }
 
+    /// A slug for this URL, which is derived from the
+    /// original title (or the url host and path, if no
+    /// title is present).
+    fn slug(&self) -> Option<String> {
+        self.slug()
+    }
+
     /// The time this url was submitted.
     fn created_at(&self) -> DateTime<Utc> {
         self.created_at()
