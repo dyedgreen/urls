@@ -1,5 +1,5 @@
 use crate::db::id::{UrlID, UserID};
-use crate::db::models::User;
+use crate::db::models::{Comment, User};
 use crate::schema::{comments, url_upvotes, urls, users};
 use crate::Context;
 use anyhow::{anyhow, Result};
@@ -126,6 +126,16 @@ impl Url {
         } else {
             Ok(false)
         }
+    }
+
+    pub async fn comments(&self, ctx: &Context, limit: i64) -> Result<Vec<Comment>> {
+        let comments = comments::table
+            .filter(comments::dsl::url_id.eq(self.id))
+            .order_by(comments::created_at.asc())
+            .limit(limit)
+            .select(comments::all_columns)
+            .get_results(&*ctx.conn().await?)?;
+        Ok(comments)
     }
 
     pub async fn comment_count(&self, ctx: &Context) -> Result<i64> {

@@ -34,8 +34,7 @@ async fn test_login() {
     let token = email
         .split_whitespace()
         .find(|maybe_token| maybe_token.len() == 12)
-        .expect("Email should contain a 12 character login token")
-        .clone();
+        .expect("Email should contain a 12 character login token");
 
     // obtain a session from the emailed token
     let query = "
@@ -52,7 +51,7 @@ async fn test_login() {
     assert_eq!(res.status(), 200);
 
     let body: Value = serde_json::from_slice(res.body()).expect("Invalid JSON");
-    assert_eq!(false, body.as_object().unwrap().contains_key("errors"));
+    assert!(!body.as_object().unwrap().contains_key("errors"));
 
     let session = body
         .as_object()

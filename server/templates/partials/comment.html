@@ -1,0 +1,16 @@
+<div class="w-full">
+  <div class="text-sm leading-tight markdown">
+    {{ comment.html()|safe }}
+  </div>
+  <div class="flex justify-start items-center text-sm italic text-gray-400 dark:text-gray-500 space-x-1">
+    <a class="flex items-center" href="/user/{{ created_by.id() }}">
+      {% include "icons/person.svg" %}
+      {{ created_by.name() }}
+    </a>
+    <span class="sm:block hidden">&middot;</span>
+    <div class="flex items-center">
+      {% include "icons/calendar.svg" %}
+      {{ "{}"|format(comment.created_at().format("%A %e. %b %Y")) }}
+    </div>
+  </div>
+</div>
