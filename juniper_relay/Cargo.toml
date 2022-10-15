@@ -1,8 +1,0 @@
-[package]
-name = "juniper_relay"
-version = "0.1.0"
-authors = ["Tilman Roeder"]
-edition = "2018"
-
-[dependencies]
-juniper = "0.15"

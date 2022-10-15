@@ -2,7 +2,7 @@ use crate::db::id::InviteID;
 use crate::db::models::{Invite, User};
 use crate::Context;
 use juniper::{graphql_object, FieldResult};
-use juniper_relay::RelayConnectionNode;
+use juniper_relay_connection::RelayConnectionNode;
 
 impl RelayConnectionNode for Invite {
     type Cursor = InviteID;

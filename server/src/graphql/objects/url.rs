@@ -5,7 +5,7 @@ use crate::Context;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult, Nullable};
-use juniper_relay::{RelayConnection, RelayConnectionNode};
+use juniper_relay_connection::{RelayConnection, RelayConnectionNode};
 use std::convert::TryInto;
 
 impl RelayConnectionNode for Url {

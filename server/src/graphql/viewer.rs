@@ -3,7 +3,7 @@ use crate::schema::{invites, logins};
 use crate::Context;
 use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult, ID};
-use juniper_relay::RelayConnection;
+use juniper_relay_connection::RelayConnection;
 
 pub struct Viewer;
 

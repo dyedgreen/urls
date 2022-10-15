@@ -22,7 +22,7 @@ form_urlencoded = "1"
 futures-util = "0.3"
 meta_parser = { path = "../meta_parser" }
 juniper = { version = "0.15.7", features = ["chrono"] }
-juniper_relay = { path = "../juniper_relay" }
+juniper_relay_connection = "0.1"
 juniper_warp = "0.7.0"
 lettre = { version = "0.10.0-rc.3", features = ["tokio1", "tokio1-native-tls", "file-transport"] }
 log = "0.4"

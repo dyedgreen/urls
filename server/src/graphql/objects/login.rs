@@ -3,7 +3,7 @@ use crate::db::models::Login;
 use crate::Context;
 use chrono::{DateTime, Utc};
 use juniper::{graphql_object, FieldResult, GraphQLObject};
-use juniper_relay::RelayConnectionNode;
+use juniper_relay_connection::RelayConnectionNode;
 use serde::Deserialize;
 
 impl RelayConnectionNode for Login {

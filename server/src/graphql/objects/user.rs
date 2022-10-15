@@ -5,7 +5,7 @@ use crate::Context;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult};
-use juniper_relay::RelayConnection;
+use juniper_relay_connection::RelayConnection;
 
 #[graphql_object(context = Context)]
 impl User {

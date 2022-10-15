@@ -5,7 +5,7 @@ use crate::Context;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult};
-use juniper_relay::{RelayConnection, RelayConnectionNode};
+use juniper_relay_connection::{RelayConnection, RelayConnectionNode};
 
 impl RelayConnectionNode for Comment {
     type Cursor = CommentID;

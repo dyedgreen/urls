@@ -10,7 +10,7 @@ use once_cell::sync::Lazy;
 use std::net::IpAddr;
 
 const SERVER_XSRF_TOKEN: &str = "server_xsrt_token";
-const HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
+static HTTP_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     use ::std::time::Duration;
 
     reqwest::Client::builder()

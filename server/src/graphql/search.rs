@@ -4,7 +4,7 @@ use crate::schema::urls;
 use crate::Context;
 use diesel::prelude::*;
 use juniper::{graphql_object, FieldResult, ID};
-use juniper_relay::RelayConnection;
+use juniper_relay_connection::RelayConnection;
 use std::collections::HashMap;
 
 pub struct Search(String);

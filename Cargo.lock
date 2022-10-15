@@ -1102,8 +1102,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "juniper_relay"
-version = "0.1.0"
+name = "juniper_relay_connection"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e39e3bab58ad4a65274507985543abaa442478b2781ec8e20474519c980e8e0b"
 dependencies = [
  "juniper",
 ]
@@ -1991,7 +1993,7 @@ dependencies = [
  "form_urlencoded",
  "futures-util",
  "juniper",
- "juniper_relay",
+ "juniper_relay_connection",
  "juniper_warp",
  "lettre",
  "log",
